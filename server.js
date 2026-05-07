@@ -1,5 +1,4 @@
-import { createServer } from 'node:http';
-
+import { readFile } from 'node:fs/promises';
 const port = process.env.PORT || 3000;
 
 const server = createServer(async (req, res) => {
