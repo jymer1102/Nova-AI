@@ -1,27 +1,36 @@
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
 
 const port = process.env.PORT || 3000;
 
 const server = createServer(async (req, res) => {
-  // Serve homepage
-  if (req.url === '/' || req.url === '/index.html') {
+  if (req.url === '/') {
     const file = await readFile('./public/index.html');
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(file);
     return;
   }
 
-  // Serve static files
-  try {
-    const file = await readFile('./public' + req.url);
-    res.end(file);
-  } catch {
-    // ignore
+  if (req.url === '/api/chat') {
+    let body = '';
+
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      const msg = JSON.parse(body).messages?.[0]?.content || '';
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        answer: "You said: " + msg
+      }));
+    });
+
+    return;
   }
+
+  res.writeHead(404);
+  res.end('Not found');
 });
 
 server.listen(port, () => {
-  console.log(`Running on ${port}`);
+  console.log("Running on " + port);
 });
