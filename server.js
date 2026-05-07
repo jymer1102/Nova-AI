@@ -47,7 +47,7 @@ const server = createServer(async (req, res) => {
         // Get the user's last message
         const userMessage = messages[messages.length - 1]?.content || '';
 
-        // Call Replicate API
+        // Call Replicate API with Llama 2 70B Chat (free and reliable)
         const response = await fetch('https://api.replicate.com/v1/predictions', {
           method: 'POST',
           headers: {
@@ -55,7 +55,7 @@ const server = createServer(async (req, res) => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            version: 'e5582ad7d6168cea1923d79e10274fbbf098de0c57c4f65a1ad76997ad894374',
+            version: 'a16z-infra/llama-2-70b-chat:56541d8490b46533605a32656f0d4419427c7cc337f34a46ddd7d0b11c9547bf',
             input: {
               prompt: userMessage,
               temperature: 0.7,
@@ -75,8 +75,7 @@ const server = createServer(async (req, res) => {
           return;
         }
 
-        // Replicate returns predictions asynchronously
-        // For now, return the prediction ID (you can poll later if needed)
+        // Extract answer from Replicate output
         let answer = '';
 
         if (data.output && Array.isArray(data.output)) {
@@ -84,7 +83,7 @@ const server = createServer(async (req, res) => {
         } else if (data.output) {
           answer = String(data.output);
         } else if (data.status === 'processing') {
-          answer = 'Processing your request... (This may take a few seconds)';
+          answer = 'Processing your request...';
         } else {
           answer = 'No response received';
         }
@@ -109,6 +108,6 @@ const server = createServer(async (req, res) => {
 
 server.listen(port, () => {
   console.log(`🚀 Chromebook AI running on port ${port}`);
-  console.log(`🤖 Model: Mistral-7B via Replicate`);
+  console.log(`🤖 Model: Llama 2 70B Chat via Replicate`);
   console.log(`✅ Free & Unlimited`);
 });
