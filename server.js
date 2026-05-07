@@ -38,49 +38,55 @@ const server = createServer(async (req, res) => {
       try {
         const { messages } = JSON.parse(body);
 
-        if (!process.env.HUGGING_FACE_API_KEY) {
+        if (!process.env.REPLICATE_API_TOKEN) {
           res.writeHead(500, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Hugging Face API key not configured. Set HUGGING_FACE_API_KEY environment variable.' }));
+          res.end(JSON.stringify({ error: 'Replicate API token not configured. Set REPLICATE_API_TOKEN environment variable.' }));
           return;
         }
 
-        // Use Hugging Face Inference API for text generation
-        const response = await fetch(
-          'https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2',
-          {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${process.env.HUGGING_FACE_API_KEY}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              inputs: messages.map(m => `${m.role}: ${m.content}`).join('\n'),
-              parameters: {
-                max_new_tokens: 512,
-                temperature: 0.7,
-                top_p: 0.95
-              }
-            })
-          }
-        );
+        // Get the user's last message
+        const userMessage = messages[messages.length - 1]?.content || '';
+
+        // Call Replicate API
+        const response = await fetch('https://api.replicate.com/v1/predictions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Token ${process.env.REPLICATE_API_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            version: 'e5582ad7d6168cea1923d79e10274fbbf098de0c57c4f65a1ad76997ad894374',
+            input: {
+              prompt: userMessage,
+              temperature: 0.7,
+              max_tokens: 512
+            }
+          })
+        });
 
         const data = await response.json();
 
         if (!response.ok) {
-          console.error('HF Error:', data);
+          console.error('Replicate Error:', data);
           res.writeHead(response.status, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({
-            error: data.error?.[0] || data.error || 'Hugging Face API error'
+            error: data.detail || data.error || 'Replicate API error'
           }));
           return;
         }
 
-        // Extract text from response
+        // Replicate returns predictions asynchronously
+        // For now, return the prediction ID (you can poll later if needed)
         let answer = '';
-        if (Array.isArray(data)) {
-          answer = data[0]?.generated_text || 'No response received';
+
+        if (data.output && Array.isArray(data.output)) {
+          answer = data.output.join('');
+        } else if (data.output) {
+          answer = String(data.output);
+        } else if (data.status === 'processing') {
+          answer = 'Processing your request... (This may take a few seconds)';
         } else {
-          answer = data.generated_text || 'No response received';
+          answer = 'No response received';
         }
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -103,6 +109,6 @@ const server = createServer(async (req, res) => {
 
 server.listen(port, () => {
   console.log(`🚀 Chromebook AI running on port ${port}`);
-  console.log(`🤖 Model: Mistral-7B-Instruct-v0.2`);
-  console.log(`✅ Free via Hugging Face API`);
+  console.log(`🤖 Model: Mistral-7B via Replicate`);
+  console.log(`✅ Free & Unlimited`);
 });
