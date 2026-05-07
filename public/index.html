@@ -4,27 +4,27 @@
   <title>Chromebook AI</title>
 </head>
 <body>
-  <h1>Chromebook AI</h1>
+  <h2>Chromebook AI</h2>
 
-  <textarea id="input" placeholder="Type here"></textarea>
+  <input id="msg" placeholder="Ask something" />
   <button onclick="send()">Send</button>
 
   <pre id="out"></pre>
 
   <script>
     async function send() {
-      const text = document.getElementById('input').value;
+      const text = document.getElementById("msg").value;
 
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: [{ role: 'user', content: text }]
+          messages: [{ role: "user", content: text }]
         })
       });
 
       const data = await res.json();
-      document.getElementById('out').innerText = data.answer;
+      document.getElementById("out").innerText = data.answer;
     }
   </script>
 </body>
