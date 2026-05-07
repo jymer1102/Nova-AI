@@ -3,6 +3,10 @@ import { readFile } from 'node:fs/promises';
 
 const port = process.env.PORT || 3000;
 
+// Hugging Face inference API endpoint
+const HF_API_URL = 'https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2/v1/chat/completions';
+const HF_API_KEY = process.env.HUGGING_FACE_API_KEY;
+
 const server = createServer(async (req, res) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -38,23 +42,23 @@ const server = createServer(async (req, res) => {
       try {
         const { messages } = JSON.parse(body);
 
-        if (!process.env.OPENAI_API_KEY) {
+        if (!HF_API_KEY) {
           res.writeHead(500, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'OpenAI API key not configured' }));
+          res.end(JSON.stringify({ error: 'Hugging Face API key not configured. Set HUGGING_FACE_API_KEY environment variable.' }));
           return;
         }
 
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const response = await fetch(HF_API_URL, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+            'Authorization': `Bearer ${HF_API_KEY}`,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
             messages: messages,
+            max_tokens: 1024,
             temperature: 0.7,
-            max_tokens: 2000
+            top_p: 0.95
           })
         });
 
@@ -63,7 +67,7 @@ const server = createServer(async (req, res) => {
         if (!response.ok) {
           res.writeHead(response.status, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({
-            error: data.error?.message || 'OpenAI API error'
+            error: data.error || data.message || 'Hugging Face API error'
           }));
           return;
         }
@@ -89,5 +93,6 @@ const server = createServer(async (req, res) => {
 
 server.listen(port, () => {
   console.log(`🚀 Chromebook AI running on port ${port}`);
-  console.log(`📝 OpenAI Model: ${process.env.OPENAI_MODEL || 'gpt-3.5-turbo'}`);
+  console.log(`🤖 Model: Mistral-7B-Instruct (via Hugging Face)`);
+  console.log(`✅ Free & Unlimited Usage`);
 });
