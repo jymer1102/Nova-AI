@@ -5,25 +5,34 @@ const port = process.env.PORT || 3000;
 
 const server = createServer(async (req, res) => {
 
-  if (req.url === '/') {
+  // HOME PAGE
+  if (req.url === '/' && req.method === 'GET') {
     const file = await readFile('./index.html');
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(file);
     return;
   }
 
+  // CHAT API (echo version first, stable)
   if (req.url === '/api/chat' && req.method === 'POST') {
     let body = '';
 
     req.on('data', chunk => body += chunk);
 
     req.on('end', () => {
-      const msg = JSON.parse(body).messages?.[0]?.content || '';
+      try {
+        const { messages } = JSON.parse(body);
 
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({
-        answer: "You said: " + msg
-      }));
+        const userMsg = messages?.[0]?.content || '';
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          answer: `You said: ${userMsg}`
+        }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
     });
 
     return;
@@ -34,5 +43,5 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(port, () => {
-  console.log("Running on " + port);
+  console.log(`Server running on port ${port}`);
 });
