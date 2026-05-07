@@ -2,30 +2,38 @@
 <html>
 <head>
   <title>Chromebook AI</title>
+  <style>
+    body { font-family: Arial; background:#0f172a; color:white; padding:20px; }
+    input { width: 70%; padding:10px; }
+    button { padding:10px; }
+    pre { margin-top:20px; background:#1e293b; padding:10px; }
+  </style>
 </head>
 <body>
-  <h2>Chromebook AI</h2>
 
-  <input id="msg" placeholder="Ask something" />
-  <button onclick="send()">Send</button>
+<h1>Chromebook AI</h1>
 
-  <pre id="out"></pre>
+<input id="msg" placeholder="Ask something..." />
+<button onclick="send()">Send</button>
 
-  <script>
-    async function send() {
-      const text = document.getElementById("msg").value;
+<pre id="out"></pre>
 
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [{ role: "user", content: text }]
-        })
-      });
+<script>
+async function send() {
+  const text = document.getElementById("msg").value;
 
-      const data = await res.json();
-      document.getElementById("out").innerText = data.answer;
-    }
-  </script>
+  const res = await fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      messages: [{ role: "user", content: text }]
+    })
+  });
+
+  const data = await res.json();
+  document.getElementById("out").innerText = data.answer;
+}
+</script>
+
 </body>
 </html>
