@@ -9,6 +9,7 @@ app.use(express.json());
 // Serve the frontend
 app.use(express.static(path.join(__dirname, "public")));
 
+// Chat route
 app.post("/chat", async (req, res) => {
   const { messages } = req.body;
 
@@ -37,6 +38,46 @@ app.post("/chat", async (req, res) => {
     }
 
     res.json({ reply: data.choices[0].message.content });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
+// TTS route using ElevenLabs
+app.post("/tts", async (req, res) => {
+  const { text } = req.body;
+  if (!text) return res.status(400).json({ error: "No text provided" });
+
+  try {
+    const voiceId = "21m00Tcm4TlvDq8ikWAM"; // Rachel — smooth & natural
+    const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "xi-api-key": process.env.ELEVENLABS_API_KEY,
+      },
+      body: JSON.stringify({
+        text,
+        model_id: "eleven_turbo_v2",
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.75,
+          style: 0.3,
+          use_speaker_boost: true,
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      console.error("ElevenLabs error:", err);
+      return res.status(500).json({ error: "TTS failed" });
+    }
+
+    const audioBuffer = await response.arrayBuffer();
+    res.set("Content-Type", "audio/mpeg");
+    res.send(Buffer.from(audioBuffer));
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Something went wrong" });
