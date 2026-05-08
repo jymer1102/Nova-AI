@@ -142,7 +142,7 @@
   </div>
 
   <script>
-    const BACKEND_URL = "https://chromebook-ai.onrender.com";
+  const BACKEND_URL = "https://nova-ai.onrender.com";
 
     const chat = document.getElementById("chat");
     const input = document.getElementById("input");
@@ -159,7 +159,7 @@
 
     // Greeting on load
     window.addEventListener("load", () => {
-      const greeting = "Hi, I'm Nova, your personal AI assistant for your school Chromebook. How can I help you?";
+      const greeting = "Hi, I'm Nova, your personal AI assistant created by Jackson Weimer. How can I help you?";
       addMsg("ai", greeting);
       history.push({ role: "assistant", content: greeting });
     });
