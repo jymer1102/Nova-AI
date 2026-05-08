@@ -400,13 +400,22 @@
       micBtn.classList.add("recording");
     });
 
-    // TTS
-    function speak(text) {
-      if (!window.speechSynthesis) return;
-      const utt = new SpeechSynthesisUtterance(text);
-      utt.rate = 1;
-      utt.pitch = 1;
-      speechSynthesis.speak(utt);
+    // TTS via ElevenLabs
+    async function speak(text) {
+      try {
+        const res = await fetch(`${BACKEND_URL}/tts`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text }),
+        });
+        if (!res.ok) throw new Error("TTS failed");
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        audio.play();
+      } catch (err) {
+        console.error("TTS error:", err);
+      }
     }
 
     // Add message to UI
