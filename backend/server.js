@@ -20,7 +20,7 @@ app.post("/chat", async (req, res) => {
         "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: "llama-3.2-90b-vision-preview",
         max_tokens: 1024,
         messages: [
           { role: "system", content: "You are Nova, a helpful AI assistant for students using school Chromebooks. Always refer to yourself as Nova." },
