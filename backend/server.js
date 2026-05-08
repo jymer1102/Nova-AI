@@ -1,11 +1,13 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => res.send("Backend is running!"));
+// Serve the frontend
+app.use(express.static(path.join(__dirname, "public")));
 
 app.post("/chat", async (req, res) => {
   const { messages } = req.body;
