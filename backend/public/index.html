@@ -4,10 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AI Chat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: system-ui, sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       background: #0f0f0f;
       color: #f0f0f0;
       display: flex;
@@ -79,7 +82,7 @@
   </style>
 </head>
 <body>
-  <header>✨ AI Chat</header>
+  <header>🧠 AI Chat</header>
   <div id="chat"></div>
   <div id="input-area">
     <textarea id="input" placeholder="Type a message..."></textarea>
@@ -88,7 +91,7 @@
 
   <script>
     // 🔴 REPLACE THIS with your Render backend URL
-    const BACKEND_URL = "https://chromebook-ai.onrender.com";
+    const BACKEND_URL = "https://your-app-name.onrender.com";
 
     const chat = document.getElementById("chat");
     const input = document.getElementById("input");
