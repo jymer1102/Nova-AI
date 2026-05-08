@@ -9,6 +9,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+/* -----------------------
+   FIX: homepage route
+   ----------------------- */
+app.get("/", (req, res) => {
+  res.send("AI backend is running");
+});
+
+/* -----------------------
+   AI chat endpoint
+   ----------------------- */
 app.post("/chat", async (req, res) => {
   try {
     const response = await fetch(
@@ -36,14 +46,15 @@ app.post("/chat", async (req, res) => {
     res.json(data);
   } catch (err) {
     console.error(err);
-    res.status(500).json({
-      error: "AI failed",
-    });
+    res.status(500).json({ error: "AI request failed" });
   }
 });
 
+/* -----------------------
+   start server
+   ----------------------- */
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Running on ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
