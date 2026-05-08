@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AI Chat</title>
   <link rel="icon" type="image/png" href="https://i.imgur.com/UyC7wbr.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
@@ -51,12 +52,43 @@
       align-self: flex-start;
       border-bottom-left-radius: 4px;
     }
+    .msg img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-top: 0.5rem;
+      display: block;
+    }
     #input-area {
       display: flex;
+      flex-direction: column;
       padding: 1rem;
       gap: 0.5rem;
       background: #1a1a1a;
       border-top: 1px solid #333;
+    }
+    #preview-area {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    #preview-area img {
+      height: 60px;
+      border-radius: 8px;
+      border: 1px solid #444;
+    }
+    #remove-img {
+      background: #444;
+      border: none;
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    #bottom-row {
+      display: flex;
+      gap: 0.5rem;
     }
     textarea {
       flex: 1;
@@ -68,6 +100,7 @@
       font-size: 1rem;
       resize: none;
       height: 52px;
+      font-family: 'Inter', system-ui, sans-serif;
     }
     button {
       padding: 0 1.25rem;
@@ -79,47 +112,120 @@
       cursor: pointer;
     }
     button:disabled { opacity: 0.5; cursor: default; }
+    #upload-btn {
+      background: #2a2a2a;
+      border: 1px solid #444;
+      font-size: 1.3rem;
+      padding: 0 1rem;
+    }
+    #upload-btn:hover { background: #333; }
   </style>
 </head>
 <body>
   <header>🌟 AI Chat by Jackson Weimer</header>
   <div id="chat"></div>
   <div id="input-area">
-    <textarea id="input" placeholder="Type a message..."></textarea>
-    <button id="send">Send</button>
+    <div id="preview-area">
+      <img id="preview-img" src="" alt="preview" />
+      <button id="remove-img">✕</button>
+    </div>
+    <div id="bottom-row">
+      <button id="upload-btn" title="Upload image or take photo">📎</button>
+      <input type="file" id="file-input" accept="image/*" capture="environment" style="display:none" />
+      <textarea id="input" placeholder="Type a message..."></textarea>
+      <button id="send">Send</button>
+    </div>
   </div>
 
   <script>
-    // 🔴 REPLACE THIS with your Render backend URL
-   const BACKEND_URL = "https://chromebook-ai.onrender.com";
+    const BACKEND_URL = "https://chromebook-ai.onrender.com";
 
     const chat = document.getElementById("chat");
     const input = document.getElementById("input");
     const btn = document.getElementById("send");
-    const history = [];
+    const fileInput = document.getElementById("file-input");
+    const uploadBtn = document.getElementById("upload-btn");
+    const previewArea = document.getElementById("preview-area");
+    const previewImg = document.getElementById("preview-img");
+    const removeImg = document.getElementById("remove-img");
 
-    // Greeting message on load
+    const history = [];
+    let pendingImageBase64 = null;
+    let pendingImageType = null;
+
+    // Greeting on load
     window.addEventListener("load", () => {
       const greeting = "Hi, I'm Nova, your personal AI assistant for your school Chromebook. How can I help you?";
       addMsg("ai", greeting);
       history.push({ role: "assistant", content: greeting });
     });
 
-    function addMsg(role, text) {
+    uploadBtn.addEventListener("click", () => fileInput.click());
+
+    fileInput.addEventListener("change", () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const result = e.target.result;
+        pendingImageBase64 = result.split(",")[1];
+        pendingImageType = file.type;
+        previewImg.src = result;
+        previewArea.style.display = "flex";
+      };
+      reader.readAsDataURL(file);
+    });
+
+    removeImg.addEventListener("click", () => {
+      pendingImageBase64 = null;
+      pendingImageType = null;
+      previewArea.style.display = "none";
+      previewImg.src = "";
+      fileInput.value = "";
+    });
+
+    function addMsg(role, text, imgSrc = null) {
       const div = document.createElement("div");
       div.className = `msg ${role === "user" ? "user" : "ai"}`;
-      div.textContent = text;
+      if (imgSrc) {
+        const img = document.createElement("img");
+        img.src = imgSrc;
+        div.appendChild(img);
+      }
+      if (text) {
+        const p = document.createElement("span");
+        p.textContent = text;
+        div.appendChild(p);
+      }
       chat.appendChild(div);
       chat.scrollTop = chat.scrollHeight;
     }
 
     async function sendMessage() {
       const text = input.value.trim();
-      if (!text) return;
+      if (!text && !pendingImageBase64) return;
 
-      addMsg("user", text);
-      history.push({ role: "user", content: text });
+      const imgSrc = pendingImageBase64 ? `data:${pendingImageType};base64,${pendingImageBase64}` : null;
+      addMsg("user", text, imgSrc);
+
+      // Build message content for API
+      const userContent = [];
+      if (pendingImageBase64) {
+        userContent.push({
+          type: "image_url",
+          image_url: { url: `data:${pendingImageType};base64,${pendingImageBase64}` }
+        });
+      }
+      if (text) userContent.push({ type: "text", text });
+
+      history.push({ role: "user", content: userContent.length === 1 && userContent[0].type === "text" ? text : userContent });
+
       input.value = "";
+      pendingImageBase64 = null;
+      pendingImageType = null;
+      previewArea.style.display = "none";
+      previewImg.src = "";
+      fileInput.value = "";
       btn.disabled = true;
 
       const thinking = document.createElement("div");
