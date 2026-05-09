@@ -618,9 +618,17 @@
       history.push({ role: "user", content: userContent.length === 1 && userContent[0].type === "text" ? text : userContent });
       input.value = ""; clearImage(); btn.disabled = true;
 
-      // Save to sidebar as soon as first user message is sent
-      await saveCurrentChat();
-      await loadChats();
+      // Save and refresh sidebar immediately after first user message
+      const firstUserMsg = history.find(m => m.role === "user");
+      if (firstUserMsg) {
+        const title = typeof firstUserMsg.content === "string" ? firstUserMsg.content.slice(0, 40) : "Image message";
+        await fetch(`${BACKEND_URL}/chats`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: userToken, id: currentChatId, title, history }),
+        });
+        await loadChats();
+      }
 
       const wrap = document.createElement("div"); wrap.className = "msg-wrap ai";
       const thinking = document.createElement("div"); thinking.className = "msg"; thinking.textContent = "Thinking...";
