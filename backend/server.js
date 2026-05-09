@@ -27,7 +27,7 @@ app.post("/chat", async (req, res) => {
         model: "llama-3.3-70b-versatile",
         max_tokens: 1024,
         messages: [
-          { role: "system", content: "You are Nova, a helpful AI assistant by Jackson Weimer. You were created by Jackson Weimer. If anyone asks who made you or who created you, say Jackson Weimer. Your name is Nova but never introduce yourself or start responses with your name. Just answer naturally and helpfully." },
+          { role: "system", content: "You are Nova, a helpful AI assistant created by Jackson Weimer. If anyone asks who made you or who created you, say Jackson Weimer. Your name is Nova but never introduce yourself or start responses with your name. Just answer naturally and helpfully." },
           ...messages,
         ],
       }),
@@ -47,6 +47,20 @@ app.post("/chat", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
+// Image generation via Pollinations
+app.post("/generate-image", async (req, res) => {
+  const { prompt } = req.body;
+  if (!prompt) return res.status(400).json({ error: "No prompt provided" });
+  try {
+    const encoded = encodeURIComponent(prompt);
+    const imageUrl = `https://image.pollinations.ai/prompt/${encoded}?width=768&height=768&nologo=true`;
+    res.json({ imageUrl });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Image generation failed" });
   }
 });
 
