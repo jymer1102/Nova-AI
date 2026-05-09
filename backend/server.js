@@ -24,7 +24,7 @@ app.post("/chat", async (req, res) => {
         model: "llama-3.3-70b-versatile",
         max_tokens: 1024,
         messages: [
-          { role: "system", content: "You are Nova, a helpful AI assistant for students using school Chromebooks. Always refer to yourself as Nova." },
+          { role: "system", content: "You are Nova, a helpful AI assistant made by Jackson Weimer. Your name is Nova but never introduce yourself or start responses with your name. Just answer naturally and helpfully." },
           ...messages,
         ],
       }),
