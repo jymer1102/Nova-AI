@@ -650,6 +650,23 @@
     style.textContent = "@keyframes fadeout { 0%{opacity:1} 70%{opacity:1} 100%{opacity:0} }";
     document.head.appendChild(style);
 
+    // Crosshair easter egg — click the star 8 times
+    let starClicks = 0;
+    let crosshairActive = false;
+    const headerTitle = document.querySelector(".header-title");
+    headerTitle.style.cursor = "pointer";
+    headerTitle.addEventListener("click", () => {
+      starClicks++;
+      if (starClicks >= 8) {
+        starClicks = 0;
+        crosshairActive = !crosshairActive;
+        document.body.style.cursor = crosshairActive ? "crosshair" : "";
+        showEasterToast(crosshairActive ? "🎯 Crosshair mode activated!" : "🎯 Crosshair mode off!");
+      } else {
+        showEasterToast(`${8 - starClicks} more click${8 - starClicks !== 1 ? "s" : ""}...`);
+      }
+    });
+
     btn.addEventListener("click", sendMessage);
     input.addEventListener("keydown", e => {
       if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
