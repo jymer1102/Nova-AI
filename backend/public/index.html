@@ -216,6 +216,7 @@
       <button class="icon-btn" id="history-btn" title="Chat history">💬</button>
       <span class="header-title" id="header-title">🌟 Nova AI by Jackson Weimer</span>
       <div class="header-btns" id="header-btns">
+        <button class="icon-btn" id="new-chat-btn" title="New chat">✏️</button>
         <button class="icon-btn" id="logout-btn" title="Log out">🚪</button>
         <button class="icon-btn" id="clear-btn" title="Clear chat">🗑️</button>
         <button class="icon-btn" id="theme-btn" title="Toggle theme">🌙</button>
@@ -384,6 +385,17 @@
       isLight = !isLight;
       document.body.classList.toggle("light", isLight);
       themeBtn.textContent = isLight ? "☀️" : "🌙";
+    });
+
+    const newChatBtn = document.getElementById("new-chat-btn");
+
+    // New chat button
+    newChatBtn.addEventListener("click", () => {
+      saveCurrentChat();
+      history = [];
+      chatEl.innerHTML = "";
+      currentChatId = Date.now().toString();
+      addGreeting();
     });
 
     // Clear current chat
@@ -612,6 +624,10 @@
       if (text) userContent.push({ type: "text", text });
       history.push({ role: "user", content: userContent.length === 1 && userContent[0].type === "text" ? text : userContent });
       input.value = ""; clearImage(); btn.disabled = true;
+
+      // Save to sidebar as soon as first user message is sent
+      await saveCurrentChat();
+      await loadChats();
 
       const wrap = document.createElement("div"); wrap.className = "msg-wrap ai";
       const thinking = document.createElement("div"); thinking.className = "msg"; thinking.textContent = "Thinking...";
