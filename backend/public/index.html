@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Nova AI" />
   <meta property="og:title" content="Nova AI" />
-  <meta property="og:description" content="Your personal AI assistant for your school Chromebook." />
+  <meta property="og:description" content="Nova AI — your personal AI assistant by Jackson Weimer." />
   <meta property="og:image" content="https://i.imgur.com/UyC7wbr.png" />
   <meta property="og:url" content="https://nova-ai-mk9x.onrender.com" />
   <meta name="twitter:card" content="summary" />
@@ -590,6 +590,17 @@
       });
     }
 
+    // Check if message is an image generation request
+    function isImageRequest(text) {
+      const triggers = ["generate", "create", "make", "draw", "image of", "picture of", "photo of", "show me"];
+      const t = text.toLowerCase();
+      return triggers.some(w => t.includes(w)) && (t.includes("image") || t.includes("picture") || t.includes("photo") || t.includes("draw") || t.includes("generate"));
+    }
+
+    function extractImagePrompt(text) {
+      return text.replace(/generate|create|make|draw|show me|an image of|a picture of|a photo of|image of|picture of|photo of/gi, "").trim();
+    }
+
     // Send message
     async function sendMessage() {
       const text = input.value.trim();
@@ -601,9 +612,45 @@
       if (text) userContent.push({ type: "text", text });
       history.push({ role: "user", content: userContent.length === 1 && userContent[0].type === "text" ? text : userContent });
       input.value = ""; clearImage(); btn.disabled = true;
+
       const wrap = document.createElement("div"); wrap.className = "msg-wrap ai";
       const thinking = document.createElement("div"); thinking.className = "msg"; thinking.textContent = "Thinking...";
       wrap.appendChild(thinking); chatEl.appendChild(wrap); chatEl.scrollTop = chatEl.scrollHeight;
+
+      // Image generation request
+      if (text && isImageRequest(text) && !pendingImageBase64) {
+        const prompt = extractImagePrompt(text);
+        thinking.textContent = "Generating image...";
+        try {
+          const res = await fetch(`${BACKEND_URL}/generate-image`, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt }),
+          });
+          const data = await res.json();
+          if (data.imageUrl) {
+            thinking.innerHTML = "";
+            const img = document.createElement("img");
+            img.src = data.imageUrl;
+            img.style.cssText = "max-width:100%;border-radius:12px;display:block;";
+            img.alt = prompt;
+            thinking.appendChild(img);
+            const caption = document.createElement("span");
+            caption.textContent = `🎨 "${prompt}"`;
+            caption.style.cssText = "display:block;margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted)";
+            thinking.appendChild(caption);
+            const reply = `Here's an image of ${prompt}!`;
+            history.push({ role: "assistant", content: reply });
+            await saveCurrentChat();
+          } else {
+            thinking.textContent = "Couldn't generate image. Try a different prompt!";
+          }
+        } catch {
+          thinking.textContent = "Image generation failed. Try again!";
+        }
+        btn.disabled = false;
+        return;
+      }
+
       try {
         const res = await fetch(`${BACKEND_URL}/chat`, {
           method: "POST", headers: { "Content-Type": "application/json" },
