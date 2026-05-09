@@ -340,14 +340,6 @@
           authSubmit.textContent = isSignUp ? "Sign Up" : "Sign In";
           return;
         }
-        if (isSignUp && !data.session) {
-          authError.textContent = "";
-          authError.style.color = "#2ecc71";
-          authError.textContent = "Check your email to confirm your account!";
-          authSubmit.disabled = false;
-          authSubmit.textContent = "Sign Up";
-          return;
-        }
         userToken = data.session.access_token;
         localStorage.setItem("nova_token", userToken);
         localStorage.setItem("nova_name", data.user?.user_metadata?.name || name || "");
