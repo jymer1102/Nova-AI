@@ -50,6 +50,34 @@ app.post("/chat", async (req, res) => {
   }
 });
 
+// OAuth redirect
+app.get("/auth/oauth/:provider", async (req, res) => {
+  const { provider } = req.params;
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: { redirectTo: `${process.env.SITE_URL || "https://nova-ai-mk9x.onrender.com"}/auth/callback` }
+  });
+  if (error) return res.status(400).json({ error: error.message });
+  res.redirect(data.url);
+});
+
+// OAuth callback
+app.get("/auth/callback", (req, res) => {
+  res.send(`
+    <script>
+      const hash = window.location.hash;
+      const params = new URLSearchParams(hash.replace('#', ''));
+      const token = params.get('access_token');
+      if (token) {
+        localStorage.setItem('nova_token', token);
+        window.location.href = '/';
+      } else {
+        window.location.href = '/?error=oauth_failed';
+      }
+    </script>
+  `);
+});
+
 // Sign up
 app.post("/auth/signup", async (req, res) => {
   const { email, password, name, phone } = req.body;
