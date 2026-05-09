@@ -21,7 +21,7 @@ app.post("/chat", async (req, res) => {
         "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "llama-3.2-90b-vision-preview",
+        model: "llama-3.3-70b-versatile",
         max_tokens: 1024,
         messages: [
           { role: "system", content: "You are Nova, a helpful AI assistant for students using school Chromebooks. Always refer to yourself as Nova." },
@@ -44,40 +44,38 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-// TTS route using ElevenLabs
+// TTS route using Google Cloud TTS
 app.post("/tts", async (req, res) => {
   const { text } = req.body;
   if (!text) return res.status(400).json({ error: "No text provided" });
 
   try {
-    const voiceId = "21m00Tcm4TlvDq8ikWAM"; // Rachel — smooth & natural
-    const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "xi-api-key": process.env.ELEVENLABS_API_KEY,
-      },
-      body: JSON.stringify({
-        text,
-        model_id: "eleven_turbo_v2",
-        voice_settings: {
-          stability: 0.5,
-          similarity_boost: 0.75,
-          style: 0.3,
-          use_speaker_boost: true,
-        },
-      }),
-    });
+    const response = await fetch(
+      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${process.env.GOOGLE_TTS_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          input: { text },
+          voice: {
+            languageCode: "en-US",
+            name: "en-US-Journey-F", // smooth, natural female voice
+          },
+          audioConfig: { audioEncoding: "MP3" },
+        }),
+      }
+    );
 
     if (!response.ok) {
       const err = await response.text();
-      console.error("ElevenLabs error:", err);
+      console.error("Google TTS error:", err);
       return res.status(500).json({ error: "TTS failed" });
     }
 
-    const audioBuffer = await response.arrayBuffer();
+    const data = await response.json();
+    const audioBuffer = Buffer.from(data.audioContent, "base64");
     res.set("Content-Type", "audio/mpeg");
-    res.send(Buffer.from(audioBuffer));
+    res.send(audioBuffer);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Something went wrong" });
