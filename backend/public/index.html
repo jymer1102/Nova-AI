@@ -527,7 +527,7 @@
       addMsg("ai", greeting);
       history.push({ role: "assistant", content: greeting });
     }
-    window.addEventListener("load", () => { if (userToken) showApp(); });
+    window.addEventListener("load", () => { if (!userToken) return; });
 
     function compressImage(file) {
       return new Promise(resolve => {
