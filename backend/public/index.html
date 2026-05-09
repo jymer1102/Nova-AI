@@ -181,6 +181,7 @@
     <div class="auth-box">
       <h1>🌟 Nova AI</h1>
       <p id="auth-subtitle">Sign in to your account</p>
+      <input type="text" id="auth-name" placeholder="Your name" style="display:none" />
       <input type="email" id="auth-email" placeholder="Email" />
       <input type="password" id="auth-password" placeholder="Password" />
       <p class="auth-error" id="auth-error"></p>
@@ -263,6 +264,8 @@
     const headerTitle = document.getElementById("header-title");
     const logoutBtn = document.getElementById("logout-btn");
 
+    const authName = document.getElementById("auth-name");
+
     let history = [];
     let pendingImageBase64 = null;
     let pendingImageType = null;
@@ -288,6 +291,7 @@
     // Auth
     authToggle.addEventListener("click", () => {
       isSignUp = !isSignUp;
+      authName.style.display = isSignUp ? "block" : "none";
       authSubtitle.textContent = isSignUp ? "Create an account" : "Sign in to your account";
       authSubmit.textContent = isSignUp ? "Sign Up" : "Sign In";
       authToggle.textContent = isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up";
@@ -297,7 +301,8 @@
     authSubmit.addEventListener("click", async () => {
       const email = authEmail.value.trim();
       const password = authPassword.value.trim();
-      if (!email || !password) { authError.textContent = "Please fill in all fields."; return; }
+      const name = authName.value.trim();
+      if (!email || !password || (isSignUp && !name)) { authError.textContent = "Please fill in all fields."; return; }
       authSubmit.disabled = true;
       authSubmit.textContent = "Loading...";
       const endpoint = isSignUp ? "/auth/signup" : "/auth/login";
@@ -305,7 +310,7 @@
         const res = await fetch(`${BACKEND_URL}${endpoint}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ email, password, name }),
         });
         const data = await res.json();
         if (data.error) {
@@ -324,6 +329,7 @@
         }
         userToken = data.session.access_token;
         localStorage.setItem("nova_token", userToken);
+        localStorage.setItem("nova_name", data.user?.user_metadata?.name || name || "");
         showApp();
       } catch {
         authError.textContent = "Something went wrong. Try again.";
@@ -452,7 +458,8 @@
 
     // Greeting
     function addGreeting() {
-      const greeting = "Hi, I'm Nova, your personal AI assistant by Jackson Weimer. How can I help you?";
+      const name = localStorage.getItem("nova_name");
+      const greeting = `Hi${name ? ` ${name}` : ""}! I'm Nova, your personal AI assistant for your school Chromebook. How can I help you?`;
       addMsg("ai", greeting);
       history.push({ role: "assistant", content: greeting });
     }
