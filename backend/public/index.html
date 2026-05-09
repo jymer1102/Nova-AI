@@ -13,7 +13,7 @@
   <meta property="og:title" content="Nova AI" />
   <meta property="og:description" content="Your personal AI assistant for your school Chromebook." />
   <meta property="og:image" content="https://i.imgur.com/UyC7wbr.png" />
-  <meta property="og:url" content="https://chromebook-ai.onrender.com" />
+  <meta property="og:url" content="https://nova-ai-mk9x.onrender.com" />
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:image" content="https://i.imgur.com/UyC7wbr.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -172,8 +172,6 @@
     }
     .tool-btn:hover { opacity: 0.8; }
     .tool-btn.recording { background: #e03; color: white; border-color: #e03; }
-
-    /* History sidebar */
     #sidebar {
       position: fixed;
       top: 0; left: -280px;
@@ -207,6 +205,7 @@
       white-space: nowrap;
     }
     #clear-all-btn:hover { opacity: 0.8; }
+    #sidebar-list { flex: 1; overflow-y: auto; padding: 0.5rem; }
     .history-item {
       display: flex;
       align-items: center;
@@ -236,18 +235,6 @@
       flex-shrink: 0;
     }
     .delete-chat-btn:hover { background: #c0392b; color: white; }
-    #sidebar-list { flex: 1; overflow-y: auto; padding: 0.5rem; }
-    .history-item {
-      padding: 0.6rem 0.8rem;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .history-item:hover { background: var(--surface2); }
     #overlay {
       display: none;
       position: fixed;
@@ -256,8 +243,15 @@
       z-index: 99;
     }
     #overlay.show { display: block; }
-
-    .cursor { display: inline-block; width: 2px; height: 1em; background: var(--text); margin-left: 2px; animation: blink 0.7s infinite; vertical-align: text-bottom; }
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: var(--text);
+      margin-left: 2px;
+      animation: blink 0.7s infinite;
+      vertical-align: text-bottom;
+    }
     @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
   </style>
 </head>
@@ -318,6 +312,7 @@
     const overlay = document.getElementById("overlay");
     const closeSidebar = document.getElementById("close-sidebar");
     const sidebarList = document.getElementById("sidebar-list");
+    const clearAllBtn = document.getElementById("clear-all-btn");
 
     let history = [];
     let pendingImageBase64 = null;
@@ -328,6 +323,9 @@
     let savedChats = JSON.parse(localStorage.getItem("nova_chats") || "[]");
     let currentChatId = Date.now().toString();
 
+    // Keep Render awake
+    setInterval(() => fetch(`${BACKEND_URL}/`), 10 * 60 * 1000);
+
     // Theme
     themeBtn.addEventListener("click", () => {
       isLight = !isLight;
@@ -335,20 +333,21 @@
       themeBtn.textContent = isLight ? "☀️" : "🌙";
     });
 
-    // Clear chat
-    const clearAllBtn = document.getElementById("clear-all-btn");
-
-    clearAllBtn.addEventListener("click", () => {
-      if (!confirm("Delete all chat history? This can't be undone.")) return;
-      savedChats = [];
-      localStorage.setItem("nova_chats", "[]");
-      renderSidebar();
-    });
+    // Clear current chat
+    clearBtn.addEventListener("click", () => {
       saveCurrentChat();
       history = [];
       chatEl.innerHTML = "";
       currentChatId = Date.now().toString();
       addGreeting();
+    });
+
+    // Clear all history
+    clearAllBtn.addEventListener("click", () => {
+      if (!confirm("Delete all chat history? This can't be undone.")) return;
+      savedChats = [];
+      localStorage.setItem("nova_chats", "[]");
+      renderSidebar();
     });
 
     // Sidebar
@@ -403,7 +402,7 @@
       });
 
       sidebarList.querySelectorAll(".delete-chat-btn").forEach(el => {
-        el.addEventListener("click", (e) => {
+        el.addEventListener("click", e => {
           e.stopPropagation();
           savedChats = savedChats.filter(c => c.id !== el.dataset.id);
           localStorage.setItem("nova_chats", JSON.stringify(savedChats));
@@ -414,11 +413,10 @@
 
     // Greeting
     function addGreeting() {
-      const greeting = "Hi, I'm Nova, your personal AI assistant made by Jackson Weimer. How can I help you?";
+      const greeting = "Hi, I'm Nova, your personal AI assistant by Jackson Weimer. How can I help you?";
       addMsg("ai", greeting);
       history.push({ role: "assistant", content: greeting });
     }
-
     window.addEventListener("load", addGreeting);
 
     // Image upload
@@ -486,7 +484,6 @@
     function addMsg(role, text, imgSrc = null) {
       const wrap = document.createElement("div");
       wrap.className = `msg-wrap ${role === "user" ? "user" : "ai"}`;
-
       const div = document.createElement("div");
       div.className = "msg";
       if (imgSrc) {
@@ -499,10 +496,8 @@
       div.appendChild(span);
       wrap.appendChild(div);
 
-      // Action buttons
       const actions = document.createElement("div");
       actions.className = "msg-actions";
-
       const copyBtn = document.createElement("button");
       copyBtn.className = "msg-action-btn";
       copyBtn.textContent = "📋 Copy";
@@ -512,7 +507,6 @@
         setTimeout(() => copyBtn.textContent = "📋 Copy", 2000);
       });
       actions.appendChild(copyBtn);
-
       if (role === "ai") {
         const ttsBtn = document.createElement("button");
         ttsBtn.className = "msg-action-btn";
@@ -520,7 +514,6 @@
         ttsBtn.addEventListener("click", () => speak(text));
         actions.appendChild(ttsBtn);
       }
-
       wrap.appendChild(actions);
       chatEl.appendChild(wrap);
       chatEl.scrollTop = chatEl.scrollHeight;
@@ -585,7 +578,6 @@
         const span = document.createElement("span");
         thinking.appendChild(span);
 
-        // Action buttons
         const actions = document.createElement("div");
         actions.className = "msg-actions";
         const copyBtn = document.createElement("button");
