@@ -187,6 +187,13 @@
       <input type="password" id="auth-password" placeholder="Password" />
       <p class="auth-error" id="auth-error"></p>
       <button class="primary" id="auth-submit">Sign In</button>
+      <div style="display:flex;align-items:center;gap:0.5rem;margin:0.25rem 0">
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+        <span style="color:var(--text-muted);font-size:0.8rem">or</span>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+      <button class="primary" id="discord-btn" style="background:#5865F2">🎮 Continue with Discord</button>
+      <button class="primary" id="github-btn" style="background:#333">🐙 Continue with GitHub</button>
       <button class="auth-toggle" id="auth-toggle">Don't have an account? Sign up</button>
     </div>
   </div>
@@ -291,6 +298,13 @@
     }
 
     // Auth
+    document.getElementById("discord-btn").addEventListener("click", () => {
+      window.location.href = `${BACKEND_URL}/auth/oauth/discord`;
+    });
+    document.getElementById("github-btn").addEventListener("click", () => {
+      window.location.href = `${BACKEND_URL}/auth/oauth/github`;
+    });
+
     authToggle.addEventListener("click", () => {
       isSignUp = !isSignUp;
       authName.style.display = isSignUp ? "block" : "none";
