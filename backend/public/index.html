@@ -349,7 +349,7 @@
 
     // Greeting
     function addGreeting() {
-      const greeting = "Hi, I'm Nova, your personal AI assistant by Jackson Weimer. How can I help you?";
+      const greeting = "Hi, I'm Nova, your personal AI assistant for your school Chromebook. How can I help you?";
       addMsg("ai", greeting);
       history.push({ role: "assistant", content: greeting });
     }
@@ -401,22 +401,20 @@
       micBtn.classList.add("recording");
     });
 
-    // TTS via ElevenLabs
-    async function speak(text) {
-      try {
-        const res = await fetch(`${BACKEND_URL}/tts`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text }),
-        });
-        if (!res.ok) throw new Error("TTS failed");
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
-        const audio = new Audio(url);
-        audio.play();
-      } catch (err) {
-        console.error("TTS error:", err);
-      }
+    // TTS with best available voice
+    function speak(text) {
+      if (!window.speechSynthesis) return;
+      speechSynthesis.cancel();
+      const utt = new SpeechSynthesisUtterance(text);
+      const voices = speechSynthesis.getVoices();
+      const preferred = voices.find(v =>
+        ["Samantha", "Karen", "Moira", "Fiona", "Victoria", "Allison", "Ava"].includes(v.name)
+      ) || voices.find(v => v.lang === "en-US" && !v.name.includes("Google")) || voices[0];
+      if (preferred) utt.voice = preferred;
+      utt.rate = 0.95;
+      utt.pitch = 1.05;
+      utt.volume = 1;
+      speechSynthesis.speak(utt);
     }
 
     // Add message to UI
