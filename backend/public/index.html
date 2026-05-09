@@ -769,6 +769,7 @@
 
     // Easter egg — dino game
     let dinoGameActive = false;
+    let dinoUnlocked = localStorage.getItem("nova_dino") === "true";
     const dinoOverlay = document.createElement("div");
     dinoOverlay.style.cssText = "display:none;position:fixed;inset:0;background:#000;z-index:1000;";
     const dinoClose = document.createElement("button");
@@ -779,6 +780,13 @@
     dinoCanvas.width = 800; dinoCanvas.height = 300;
     dinoOverlay.appendChild(dinoClose); dinoOverlay.appendChild(dinoCanvas);
     document.body.appendChild(dinoOverlay);
+
+    const dinoBtn = document.createElement("button");
+    dinoBtn.className = "icon-btn"; dinoBtn.title = "Play Dino Game";
+    dinoBtn.textContent = "🦖"; dinoBtn.style.display = dinoUnlocked ? "block" : "none";
+    headerBtns.prepend(dinoBtn);
+    dinoBtn.addEventListener("click", toggleDino);
+
     let dinoGame = null;
 
     function startDinoGame() {
@@ -853,7 +861,11 @@
     input.addEventListener("input", () => {
       const val = input.value.trim().toLowerCase();
       if (val === "jymer1102") { input.value = ""; toggleEaster(); showToast(easterActive ? "Easter egg unlocked! 🔓🎉" : "Background off!"); }
-      if (val === "dinosaur") { input.value = ""; toggleDino(); showToast("🦕 Dino game!"); }
+      if (val === "dinosaur") {
+        input.value = "";
+        if (!dinoUnlocked) { dinoUnlocked = true; localStorage.setItem("nova_dino", "true"); dinoBtn.style.display = "block"; showToast("🦕 Dino game unlocked!"); }
+        toggleDino();
+      }
     });
   </script>
 </body>
