@@ -459,7 +459,7 @@
     // Greeting
     function addGreeting() {
       const name = localStorage.getItem("nova_name");
-      const greeting = `Hi${name ? ` ${name}` : ""}! I'm Nova, your personal AI assistant for your school Chromebook. How can I help you?`;
+      const greeting = `Hi${name ? ` ${name}` : ""}! I'm Nova, your personal AI assistant by Jackson Weimer. How can I help you?`;
       addMsg("ai", greeting);
       history.push({ role: "assistant", content: greeting });
     }
