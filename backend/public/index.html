@@ -182,6 +182,7 @@
       <h1>🌟 Nova AI</h1>
       <p id="auth-subtitle">Sign in to your account</p>
       <input type="text" id="auth-name" placeholder="Your name" style="display:none" />
+      <input type="tel" id="auth-phone" placeholder="Phone number" style="display:none" />
       <input type="email" id="auth-email" placeholder="Email" />
       <input type="password" id="auth-password" placeholder="Password" />
       <p class="auth-error" id="auth-error"></p>
@@ -265,6 +266,7 @@
     const logoutBtn = document.getElementById("logout-btn");
 
     const authName = document.getElementById("auth-name");
+    const authPhone = document.getElementById("auth-phone");
 
     let history = [];
     let pendingImageBase64 = null;
@@ -292,6 +294,7 @@
     authToggle.addEventListener("click", () => {
       isSignUp = !isSignUp;
       authName.style.display = isSignUp ? "block" : "none";
+      authPhone.style.display = isSignUp ? "block" : "none";
       authSubtitle.textContent = isSignUp ? "Create an account" : "Sign in to your account";
       authSubmit.textContent = isSignUp ? "Sign Up" : "Sign In";
       authToggle.textContent = isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up";
@@ -302,6 +305,7 @@
       const email = authEmail.value.trim();
       const password = authPassword.value.trim();
       const name = authName.value.trim();
+      const phone = authPhone.value.trim();
       if (!email || !password || (isSignUp && !name)) { authError.textContent = "Please fill in all fields."; return; }
       authSubmit.disabled = true;
       authSubmit.textContent = "Loading...";
@@ -310,7 +314,7 @@
         const res = await fetch(`${BACKEND_URL}${endpoint}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, name }),
+          body: JSON.stringify({ email, password, name, phone }),
         });
         const data = await res.json();
         if (data.error) {
