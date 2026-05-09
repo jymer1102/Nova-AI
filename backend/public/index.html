@@ -612,38 +612,49 @@
     input.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
 
     // Easter egg — type jymer1102
-    let easterActive = false;
+    let easterActive = localStorage.getItem("nova_easter") === "true";
     const easterBtn = document.createElement("button");
     easterBtn.className = "icon-btn"; easterBtn.title = "Toggle background";
-    easterBtn.textContent = "🖼️"; easterBtn.style.display = "none";
+    easterBtn.textContent = "🖼️"; easterBtn.style.display = easterActive ? "block" : "none";
     headerBtns.prepend(easterBtn);
-    function toggleEaster() {
-      easterActive = !easterActive;
+    function applyEaster() {
       document.body.style.backgroundImage = easterActive ? "url('https://images.pexels.com/photos/31265958/pexels-photo-31265958.jpeg')" : "";
       document.body.style.backgroundSize = easterActive ? "cover" : "";
       document.body.style.backgroundPosition = easterActive ? "center" : "";
       document.body.style.backgroundAttachment = easterActive ? "fixed" : "";
-      easterBtn.style.display = "block";
+      easterBtn.style.display = easterActive ? "block" : "none";
     }
+    function toggleEaster() {
+      easterActive = !easterActive;
+      localStorage.setItem("nova_easter", easterActive);
+      applyEaster();
+    }
+    applyEaster();
     easterBtn.addEventListener("click", toggleEaster);
     input.addEventListener("input", () => {
-      if (input.value.trim() === "jymer1102") { input.value = ""; toggleEaster(); showToast("Easter egg unlocked! 🔓🎉"); }
+      if (input.value.trim() === "jymer1102") { input.value = ""; if (!easterActive) { toggleEaster(); showToast("Easter egg unlocked! 🔓🎉"); } else { toggleEaster(); } }
     });
 
     // Star cursor — click title 8 times
-    let starClicks = 0; let starCursorActive = false;
+    let starClicks = 0;
+    let starCursorActive = localStorage.getItem("nova_star") === "true";
     const starSVG = `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><text y='26' font-size='26'>⭐</text></svg>`;
     const starCursorURL = `url("data:image/svg+xml,${encodeURIComponent(starSVG)}") 16 16, auto`;
     const starBtn = document.createElement("button");
     starBtn.className = "icon-btn"; starBtn.title = "Toggle star cursor";
-    starBtn.textContent = "⭐"; starBtn.style.display = "none";
+    starBtn.textContent = "⭐"; starBtn.style.display = starCursorActive ? "block" : "none";
     headerBtns.prepend(starBtn);
+    function applyStarCursor() {
+      document.body.style.cursor = starCursorActive ? starCursorURL : "";
+      starBtn.style.display = starCursorActive ? "block" : "none";
+    }
     function toggleStarCursor() {
       starCursorActive = !starCursorActive;
-      document.body.style.cursor = starCursorActive ? starCursorURL : "";
-      starBtn.style.display = "block";
+      localStorage.setItem("nova_star", starCursorActive);
+      applyStarCursor();
       showToast(starCursorActive ? "⭐ Star cursor on!" : "⭐ Star cursor off!");
     }
+    applyStarCursor();
     starBtn.addEventListener("click", toggleStarCursor);
     headerTitle.addEventListener("click", () => {
       starClicks++;
