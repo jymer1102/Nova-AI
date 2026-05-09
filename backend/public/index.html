@@ -198,7 +198,7 @@
       </div>
       <span class="header-title" id="header-title">🌟 Nova AI by Jackson Weimer</span>
       <div class="header-btns" id="header-btns">
-        <button class="icon-btn" id="profile-btn" title="Profile">👤</button>
+        <button class="icon-btn" id="profile-btn" title="Profile" style="padding:0;overflow:hidden;width:34px;height:34px;"><img id="profile-icon" src="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:8px;" /><span id="profile-icon-fallback">👤</span></button>
         <button class="icon-btn" id="logout-btn" title="Log out">🚪</button>
         <button class="icon-btn" id="clear-btn" title="Clear chat">🗑️</button>
         <button class="icon-btn" id="theme-btn" title="Toggle theme">🌙</button>
@@ -316,6 +316,17 @@
     const avatarInput = document.getElementById("avatar-input");
     const avatarPreview = document.getElementById("avatar-preview");
 
+    function updateProfileIcon(src) {
+      const icon = document.getElementById("profile-icon");
+      const fallback = document.getElementById("profile-icon-fallback");
+      if (src) { icon.src = src; icon.style.display = "block"; fallback.style.display = "none"; }
+      else { icon.style.display = "none"; fallback.style.display = "block"; }
+    }
+
+    // Load saved avatar on startup
+    const savedAvatar = localStorage.getItem("nova_avatar");
+    if (savedAvatar) updateProfileIcon(savedAvatar);
+
     avatarInput.addEventListener("change", async () => {
       const file = avatarInput.files[0];
       if (!file) return;
@@ -349,6 +360,7 @@
         if (data.error) { profileMsg.style.color = "#e74c3c"; profileMsg.textContent = data.error; }
         else {
           if (name) localStorage.setItem("nova_name", name);
+          if (pendingAvatarBase64) { localStorage.setItem("nova_avatar", pendingAvatarBase64); updateProfileIcon(pendingAvatarBase64); }
           profileMsg.style.color = "#2ecc71"; profileMsg.textContent = "Saved!";
           setTimeout(() => { profileModal.style.display = "none"; profileMsg.textContent = ""; }, 1500);
         }
