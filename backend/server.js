@@ -113,7 +113,8 @@ app.post("/auth/login", async (req, res) => {
 
 // Save chat
 app.post("/chats", async (req, res) => {
-  const { token, id, title, history } = req.body;
+  const { id, title, history } = req.body;
+  const token = req.headers.authorization?.split(" ")[1] || req.body.token;
   const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
   if (authErr || !user) return res.status(401).json({ error: "Unauthorized" });
   const { error } = await supabase.from("chats").upsert({
