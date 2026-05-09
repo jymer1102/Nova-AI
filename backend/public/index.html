@@ -484,18 +484,14 @@
 
     // Image upload
     uploadBtn.addEventListener("click", () => fileInput.click());
-    fileInput.addEventListener("change", () => {
+    fileInput.addEventListener("change", async () => {
       const file = fileInput.files[0];
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        const result = e.target.result;
-        pendingImageBase64 = result.split(",")[1];
-        pendingImageType = file.type;
-        previewImg.src = result;
-        previewArea.style.display = "flex";
-      };
-      reader.readAsDataURL(file);
+      const compressed = await compressImage(file);
+      pendingImageBase64 = compressed.split(",")[1];
+      pendingImageType = "image/jpeg";
+      previewImg.src = compressed;
+      previewArea.style.display = "flex";
     });
     removeImg.addEventListener("click", clearImage);
     function clearImage() {
