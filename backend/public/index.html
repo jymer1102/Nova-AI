@@ -434,11 +434,10 @@
     }
 
     async function saveCurrentChat() {
-      if (history.length <= 1 || !userToken) return;
+      if (history.length < 1 || !userToken) return;
       const firstUserMsg = history.find(m => m.role === "user");
-      const title = firstUserMsg
-        ? (typeof firstUserMsg.content === "string" ? firstUserMsg.content : "Image message").slice(0, 40)
-        : "Chat";
+      if (!firstUserMsg) return;
+      const title = typeof firstUserMsg.content === "string" ? firstUserMsg.content.slice(0, 40) : "Image message";
       await fetch(`${BACKEND_URL}/chats`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
