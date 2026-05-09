@@ -715,26 +715,141 @@
     // Dino game easter egg
     let dinoGameActive = false;
     const dinoOverlay = document.createElement("div");
-    dinoOverlay.style.cssText = "display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;flex-direction:column;align-items:center;justify-content:center;";
+    const dinoOverlay = document.createElement("div");
+    dinoOverlay.style.cssText = "display:none;position:fixed;inset:0;background:#000;z-index:1000;";
     const dinoClose = document.createElement("button");
     dinoClose.textContent = "✕ Close";
-    dinoClose.style.cssText = "position:absolute;top:1rem;right:1rem;background:#333;border:none;color:white;padding:0.5rem 1rem;border-radius:8px;cursor:pointer;font-size:1rem;z-index:1001;";
-    const dinoWrapper = document.createElement("div");
-    dinoWrapper.style.cssText = "position:relative;width:100%;height:100%;";
-    const dinoFrame = document.createElement("iframe");
-    dinoFrame.src = "https://chromedino.com/";
-    dinoFrame.setAttribute("frameborder", "0");
-    dinoFrame.setAttribute("scrolling", "no");
-    dinoFrame.setAttribute("loading", "lazy");
-    dinoFrame.style.cssText = "position:absolute;width:100%;height:100%;z-index:999;border:none;";
-    dinoWrapper.appendChild(dinoFrame);
+    dinoClose.style.cssText = "position:fixed;top:1rem;right:1rem;background:#333;border:none;color:white;padding:0.5rem 1rem;border-radius:8px;cursor:pointer;font-size:1rem;z-index:1002;";
+    const dinoCanvas = document.createElement("canvas");
+    dinoCanvas.id = "dinoCanvas";
+    dinoCanvas.style.cssText = "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1001;";
+    dinoCanvas.width = 800;
+    dinoCanvas.height = 300;
     dinoOverlay.appendChild(dinoClose);
-    dinoOverlay.appendChild(dinoWrapper);
+    dinoOverlay.appendChild(dinoCanvas);
+    document.body.appendChild(dinoOverlay);
+
+    let dinoGame = null;
+
+    function startDinoGame() {
+      const canvas = dinoCanvas;
+      const ctx = canvas.getContext("2d");
+      let animId;
+      let score = 0;
+      let speed = 5;
+      let gameOver = false;
+      let started = false;
+
+      const dino = { x: 80, y: 220, w: 40, h: 50, vy: 0, jumping: false };
+      const ground = 270;
+      const gravity = 0.8;
+      const jumpForce = -15;
+      let cacti = [];
+      let cactusTimer = 0;
+      let cactusInterval = 90;
+
+      function jump() {
+        if (!started) started = true;
+        if (gameOver) { resetGame(); return; }
+        if (!dino.jumping) { dino.vy = jumpForce; dino.jumping = true; }
+      }
+
+      function resetGame() {
+        score = 0; speed = 5; gameOver = false; started = false;
+        dino.y = 220; dino.vy = 0; dino.jumping = false;
+        cacti = []; cactusTimer = 0;
+        loop();
+      }
+
+      function spawnCactus() {
+        const h = 30 + Math.random() * 40;
+        cacti.push({ x: 820, y: ground - h, w: 20, h });
+      }
+
+      function loop() {
+        cancelAnimationFrame(animId);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Ground
+        ctx.fillStyle = "#555";
+        ctx.fillRect(0, ground, canvas.width, 2);
+
+        if (started && !gameOver) {
+          // Dino physics
+          dino.vy += gravity;
+          dino.y += dino.vy;
+          if (dino.y >= 220) { dino.y = 220; dino.vy = 0; dino.jumping = false; }
+
+          // Cacti
+          cactusTimer++;
+          if (cactusTimer >= cactusInterval) { spawnCactus(); cactusTimer = 0; cactusInterval = 60 + Math.random() * 60; }
+          cacti.forEach(c => c.x -= speed);
+          cacti = cacti.filter(c => c.x > -50);
+
+          // Collision
+          cacti.forEach(c => {
+            if (dino.x + 30 > c.x + 4 && dino.x + 10 < c.x + c.w - 4 && dino.y + 10 < c.y + c.h && dino.y + dino.h > c.y + 4) {
+              gameOver = true;
+            }
+          });
+
+          score++;
+          speed = 5 + Math.floor(score / 200) * 0.5;
+        }
+
+        // Draw dino
+        ctx.fillStyle = "#333";
+        ctx.fillRect(dino.x, dino.y, dino.w, dino.h);
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(dino.x + 24, dino.y + 6, 8, 8);
+        ctx.fillStyle = "#333";
+        ctx.fillRect(dino.x + 28, dino.y + 8, 4, 4);
+
+        // Draw cacti
+        ctx.fillStyle = "#2d6a2d";
+        cacti.forEach(c => ctx.fillRect(c.x, c.y, c.w, c.h));
+
+        // Score
+        ctx.fillStyle = "#333";
+        ctx.font = "bold 20px monospace";
+        ctx.fillText(`Score: ${Math.floor(score / 5)}`, 620, 30);
+
+        // Messages
+        if (!started) {
+          ctx.fillStyle = "#333";
+          ctx.font = "bold 22px monospace";
+          ctx.fillText("Press Space or Tap to Start", 220, 150);
+        }
+        if (gameOver) {
+          ctx.fillStyle = "#c0392b";
+          ctx.font = "bold 28px monospace";
+          ctx.fillText("Game Over!", 300, 130);
+          ctx.font = "18px monospace";
+          ctx.fillStyle = "#333";
+          ctx.fillText("Press Space or Tap to Restart", 220, 170);
+        }
+
+        if (!gameOver) animId = requestAnimationFrame(loop);
+      }
+
+      canvas.addEventListener("click", jump);
+      dinoGame = { jump, stop: () => cancelAnimationFrame(animId) };
+      document.addEventListener("keydown", function dinoKey(e) {
+        if (e.code === "Space" && dinoGameActive) { e.preventDefault(); jump(); }
+        if (!dinoGameActive) document.removeEventListener("keydown", dinoKey);
+      });
+
+      loop();
+    }
     document.body.appendChild(dinoOverlay);
 
     function toggleDino() {
       dinoGameActive = !dinoGameActive;
-      dinoOverlay.style.display = dinoGameActive ? "flex" : "none";
+      dinoOverlay.style.display = dinoGameActive ? "block" : "none";
+      if (dinoGameActive) startDinoGame();
+      else if (dinoGame) dinoGame.stop();
     }
     dinoClose.addEventListener("click", toggleDino);
 
