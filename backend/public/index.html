@@ -431,7 +431,7 @@
     function showApp() {
       authScreen.style.display = "none";
       appEl.style.display = "flex";
-      addGreeting();
+      if (history.length === 0) addGreeting();
       loadChats();
     }
 
