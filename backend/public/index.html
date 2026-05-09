@@ -349,6 +349,7 @@
       localStorage.setItem("nova_chats", "[]");
       renderSidebar();
     });
+
     // Sidebar
     historyBtn.addEventListener("click", () => {
       saveCurrentChat();
@@ -412,7 +413,7 @@
 
     // Greeting
     function addGreeting() {
-      const greeting = "Hi, I'm Nova, your personal AI assistant by Jackson Weimer. How can I help you?";
+      const greeting = "Hi, I'm Nova, your personal AI assistant for your school Chromebook. How can I help you?";
       addMsg("ai", greeting);
       history.push({ role: "assistant", content: greeting });
     }
@@ -604,6 +605,50 @@
 
       btn.disabled = false;
     }
+
+    // Easter egg toggle button
+    const easterBtn = document.createElement("button");
+    easterBtn.className = "icon-btn";
+    easterBtn.title = "Toggle background";
+    easterBtn.textContent = "🖼️";
+    easterBtn.style.display = "none";
+    document.querySelector(".header-btns").prepend(easterBtn);
+    easterBtn.addEventListener("click", () => toggleEaster());
+
+    // Easter egg
+    let easterBuffer = "";
+    const EASTER_CODE = "jymer1102";
+    let easterActive = false;
+
+    function toggleEaster(silent = false) {
+      easterActive = !easterActive;
+      document.body.style.backgroundImage = easterActive ? "url('https://i.imgur.com/myaBjZq.jpeg')" : "";
+      document.body.style.backgroundSize = easterActive ? "cover" : "";
+      document.body.style.backgroundPosition = easterActive ? "center" : "";
+      document.body.style.backgroundAttachment = easterActive ? "fixed" : "";
+      easterBtn.style.display = "block";
+    }
+
+    function showEasterToast(msg) {
+      const toast = document.createElement("div");
+      toast.style.cssText = "position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#2f6feb;color:white;padding:0.6rem 1.2rem;border-radius:12px;font-size:0.9rem;z-index:999;animation:fadeout 3s forwards";
+      toast.textContent = msg;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    // Detect code typed in chat box
+    input.addEventListener("input", () => {
+      if (input.value.trim() === EASTER_CODE) {
+        input.value = "";
+        toggleEaster();
+        showEasterToast("Easter egg unlocked! 🔓🎉");
+      }
+    });
+
+    const style = document.createElement("style");
+    style.textContent = "@keyframes fadeout { 0%{opacity:1} 70%{opacity:1} 100%{opacity:0} }";
+    document.head.appendChild(style);
 
     btn.addEventListener("click", sendMessage);
     input.addEventListener("keydown", e => {
