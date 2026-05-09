@@ -13,6 +13,11 @@ const supabase = createClient(
   process.env.SUPABASE_ANON_KEY
 );
 
+const supabaseAdmin = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
+
 // Chat route
 app.post("/chat", async (req, res) => {
   const { messages } = req.body;
@@ -84,7 +89,7 @@ app.post("/auth/update", async (req, res) => {
   if (password) updates.password = password;
   if (name || avatar_url) updates.data = { ...user.user_metadata, ...(name && { name }), ...(avatar_url && { avatar_url }) };
 
-  const { data, error } = await supabase.auth.admin.updateUserById(user.id, updates);
+  const { data, error } = await supabaseAdmin.auth.admin.updateUserById(user.id, updates);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true, user: data.user });
 });
