@@ -432,8 +432,8 @@
       const title = typeof firstUserMsg.content === "string" ? firstUserMsg.content.slice(0, 40) : "Image message";
       await fetch(`${BACKEND_URL}/chats`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: userToken, id: currentChatId, title, history }),
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${userToken}` },
+        body: JSON.stringify({ id: currentChatId, title, history }),
       });
     }
 
@@ -624,8 +624,8 @@
         const title = typeof firstUserMsg.content === "string" ? firstUserMsg.content.slice(0, 40) : "Image message";
         await fetch(`${BACKEND_URL}/chats`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token: userToken, id: currentChatId, title, history }),
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${userToken}` },
+          body: JSON.stringify({ id: currentChatId, title, history }),
         });
         await loadChats();
       }
@@ -894,3 +894,4 @@
   </script>
 </body>
 </html>
+
