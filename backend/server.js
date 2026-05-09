@@ -52,10 +52,10 @@ app.post("/chat", async (req, res) => {
 
 // Sign up
 app.post("/auth/signup", async (req, res) => {
-  const { email, password, name } = req.body;
+  const { email, password, name, phone } = req.body;
   const { data, error } = await supabase.auth.signUp({
     email, password,
-    options: { data: { name } }
+    options: { data: { name, phone } }
   });
   if (error) return res.status(400).json({ error: error.message });
   res.json({ user: data.user, session: data.session });
