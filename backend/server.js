@@ -64,6 +64,31 @@ app.post("/generate-image", async (req, res) => {
   }
 });
 
+// Refresh token
+app.post("/auth/refresh", async (req, res) => {
+  const { refresh_token } = req.body;
+  const { data, error } = await supabase.auth.refreshSession({ refresh_token });
+  if (error) return res.status(401).json({ error: error.message });
+  res.json({ session: data.session });
+});
+
+// Update profile
+app.post("/auth/update", async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  const { name, email, password, avatar_url } = req.body;
+  const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
+  if (authErr || !user) return res.status(401).json({ error: "Unauthorized" });
+
+  const updates = {};
+  if (email) updates.email = email;
+  if (password) updates.password = password;
+  if (name || avatar_url) updates.data = { ...user.user_metadata, ...(name && { name }), ...(avatar_url && { avatar_url }) };
+
+  const { data, error } = await supabase.auth.admin.updateUserById(user.id, updates);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true, user: data.user });
+});
+
 // OAuth redirect
 app.get("/auth/oauth/:provider", async (req, res) => {
   const { provider } = req.params;
