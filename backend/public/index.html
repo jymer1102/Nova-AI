@@ -323,9 +323,10 @@
       }
     });
 
-    function showApp() {
+    async function showApp() {
       authScreen.style.display = "none";
       appEl.style.display = "flex";
+      await refreshToken();
       if (history.length === 0) addGreeting();
       loadChats();
     }
@@ -341,22 +342,25 @@
 
     // Token refresh
     async function refreshToken() {
-      const refreshToken = localStorage.getItem("nova_refresh_token");
-      if (!refreshToken) { showAuth(); return; }
+      const storedRefresh = localStorage.getItem("nova_refresh_token");
+      if (!storedRefresh) { showAuth(); return; }
       try {
         const res = await fetch(`${BACKEND_URL}/auth/refresh`, {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ refresh_token: refreshToken }),
+          body: JSON.stringify({ refresh_token: storedRefresh }),
         });
         const data = await res.json();
         if (data.session) {
           userToken = data.session.access_token;
           localStorage.setItem("nova_token", userToken);
           localStorage.setItem("nova_refresh_token", data.session.refresh_token);
-        } else showAuth();
+        } else { showAuth(); }
       } catch { showAuth(); }
     }
-    setInterval(refreshToken, 50 * 60 * 1000);
+
+    // Refresh on load and every 10 mins
+    if (userToken) { refreshToken(); }
+    setInterval(refreshToken, 10 * 60 * 1000);
 
     logoutBtn.addEventListener("click", () => { if (!confirm("Log out?")) return; showAuth(); });
     themeBtn.addEventListener("click", () => {
