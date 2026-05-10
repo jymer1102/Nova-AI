@@ -97,6 +97,18 @@ app.post("/auth/update", async (req, res) => {
   res.json({ success: true, user: data.user });
 });
 
+// Delete account
+app.delete("/auth/delete", async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  const { data: userData, error: authErr } = await supabase.auth.getUser(token);
+  if (authErr || !userData.user) return res.status(401).json({ error: "Unauthorized" });
+  const userId = userData.user.id;
+  await supabase.from("chats").delete().eq("user_id", userId);
+  const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true });
+});
+
 // OAuth redirect
 app.get("/auth/oauth/:provider", async (req, res) => {
   const { provider } = req.params;
