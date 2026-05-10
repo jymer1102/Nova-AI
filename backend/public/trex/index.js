@@ -273,3 +273,7 @@ function onDocumentLoad() {
 }
 
 document.addEventListener('DOMContentLoaded', onDocumentLoad);
+// Start the game
+document.addEventListener('DOMContentLoaded', function() {
+  new Runner('.interstitial-wrapper');
+});
