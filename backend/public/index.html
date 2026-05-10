@@ -772,9 +772,7 @@
     dinoBtn.addEventListener("click", toggleDino);
 
     function toggleDino() {
-      dinoGameActive = !dinoGameActive;
-      if (dinoGameActive && !dinoFrame.src.includes("trex")) dinoFrame.src = "/trex/index.html";
-      dinoOverlay.style.display = dinoGameActive ? "block" : "none";
+      window.open("/trex/index.html", "_blank");
     }
     dinoClose.addEventListener("click", toggleDino);
 
@@ -786,8 +784,7 @@
         input.value = "";
         if (!dinoUnlocked) { dinoUnlocked = true; localStorage.setItem("nova_dino", "true"); dinoBtn.style.display = "block"; showToast("🦖 Dino game unlocked!"); }
         toggleDino();
-      }
-    });
+      }    });
   </script>
 </body>
 </html>
