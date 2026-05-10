@@ -148,13 +148,24 @@ app.post("/auth/login", async (req, res) => {
 app.post("/chats", async (req, res) => {
   const { id, title, history } = req.body;
   const token = req.headers.authorization?.split(" ")[1] || req.body.token;
-  const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
-  if (authErr || !user) return res.status(401).json({ error: "Unauthorized" });
-  const { error } = await supabase.from("chats").upsert({
-    id, user_id: user.id, title, history, created_at: new Date().toISOString()
-  });
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ success: true });
+  try {
+    const { data: userData, error: authErr } = await supabase.auth.getUser(token);
+    if (authErr || !userData.user) {
+      console.error("Chat save auth error:", authErr);
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    const { error } = await supabase.from("chats").upsert({
+      id, user_id: userData.user.id, title, history, created_at: new Date().toISOString()
+    });
+    if (error) {
+      console.error("Chat save DB error:", error);
+      return res.status(500).json({ error: error.message });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Chat save unexpected error:", err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
 });
 
 // Get chats
