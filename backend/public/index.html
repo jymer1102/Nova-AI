@@ -759,7 +759,8 @@
     dinoFrame.src = "/trex/index.html";
     dinoFrame.setAttribute("frameborder", "0");
     dinoFrame.setAttribute("scrolling", "no");
-    dinoFrame.style.cssText = "position:fixed;inset:0;width:100%;height:100%;border:none;z-index:1001;";
+    dinoFrame.setAttribute("allow", "autoplay");
+    dinoFrame.style.cssText = "position:fixed;inset:0;width:100%;height:100%;border:none;z-index:1001;background:#fff;";
     dinoOverlay.appendChild(dinoClose);
     dinoOverlay.appendChild(dinoFrame);
     document.body.appendChild(dinoOverlay);
@@ -772,6 +773,7 @@
 
     function toggleDino() {
       dinoGameActive = !dinoGameActive;
+      if (dinoGameActive && !dinoFrame.src.includes("trex")) dinoFrame.src = "/trex/index.html";
       dinoOverlay.style.display = dinoGameActive ? "block" : "none";
     }
     dinoClose.addEventListener("click", toggleDino);
