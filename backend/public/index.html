@@ -265,109 +265,6 @@
     let userToken = localStorage.getItem("nova_token") || null;
     let isSignUp = false;
 
-    // Token refresh
-    async function refreshToken() {
-      const refreshToken = localStorage.getItem("nova_refresh_token");
-      if (!refreshToken) { showAuth(); return; }
-      try {
-        const res = await fetch(`${BACKEND_URL}/auth/refresh`, {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ refresh_token: refreshToken }),
-        });
-        const data = await res.json();
-        if (data.session) {
-          userToken = data.session.access_token;
-          localStorage.setItem("nova_token", userToken);
-          localStorage.setItem("nova_refresh_token", data.session.refresh_token);
-        } else showAuth();
-      } catch { showAuth(); }
-    }
-
-    // Auto refresh every 50 mins
-    setInterval(refreshToken, 50 * 60 * 1000);
-
-    // Profile modal
-    const profileModal = document.createElement("div");
-    profileModal.style.cssText = "display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;";
-    const profileBox = document.createElement("div");
-    profileBox.style.cssText = "background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2rem;width:100%;max-width:380px;display:flex;flex-direction:column;gap:1rem;";
-    profileBox.innerHTML = `
-      <h2 style="font-size:1.2rem;font-weight:600">👤 Profile Settings</h2>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem">
-        <img id="avatar-preview" src="" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--border);display:none" />
-        <label style="cursor:pointer;color:var(--accent);font-size:0.9rem">
-          📷 Change profile picture
-          <input type="file" id="avatar-input" accept="image/*" style="display:none" />
-        </label>
-      </div>
-      <input type="text" id="profile-name" placeholder="New name" style="padding:0.75rem;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:1rem;font-family:Inter,sans-serif;width:100%" />
-      <input type="email" id="profile-email" placeholder="New email" style="padding:0.75rem;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:1rem;font-family:Inter,sans-serif;width:100%" />
-      <input type="password" id="profile-password" placeholder="New password" style="padding:0.75rem;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:1rem;font-family:Inter,sans-serif;width:100%" />
-      <p id="profile-msg" style="font-size:0.85rem;text-align:center;color:var(--text-muted)"></p>
-      <div style="display:flex;gap:0.5rem">
-        <button id="profile-save" style="flex:1;padding:0.75rem;border-radius:10px;border:none;background:var(--accent);color:white;font-size:1rem;cursor:pointer;font-family:Inter,sans-serif">Save</button>
-        <button id="profile-close" style="flex:1;padding:0.75rem;border-radius:10px;border:none;background:var(--surface2);color:var(--text);font-size:1rem;cursor:pointer;font-family:Inter,sans-serif;border:1px solid var(--border)">Cancel</button>
-      </div>
-    `;
-    profileModal.appendChild(profileBox);
-    document.body.appendChild(profileModal);
-
-    let pendingAvatarBase64 = null;
-    const avatarInput = document.getElementById("avatar-input");
-    const avatarPreview = document.getElementById("avatar-preview");
-
-    function updateProfileIcon(src) {
-      const icon = document.getElementById("profile-icon");
-      const fallback = document.getElementById("profile-icon-fallback");
-      if (src) { icon.src = src; icon.style.display = "block"; fallback.style.display = "none"; }
-      else { icon.style.display = "none"; fallback.style.display = "block"; }
-    }
-
-    // Load saved avatar on startup
-    const savedAvatar = localStorage.getItem("nova_avatar");
-    if (savedAvatar) updateProfileIcon(savedAvatar);
-
-    avatarInput.addEventListener("change", async () => {
-      const file = avatarInput.files[0];
-      if (!file) return;
-      const compressed = await compressImage(file);
-      pendingAvatarBase64 = compressed;
-      avatarPreview.src = compressed;
-      avatarPreview.style.display = "block";
-    });
-
-    document.getElementById("profile-btn").addEventListener("click", () => {
-      profileModal.style.display = "flex";
-      document.getElementById("profile-name").value = localStorage.getItem("nova_name") || "";
-    });
-    document.getElementById("profile-close").addEventListener("click", () => {
-      profileModal.style.display = "none";
-    });
-    document.getElementById("profile-save").addEventListener("click", async () => {
-      const name = document.getElementById("profile-name").value.trim();
-      const email = document.getElementById("profile-email").value.trim();
-      const password = document.getElementById("profile-password").value.trim();
-      const profileMsg = document.getElementById("profile-msg");
-      const saveBtn = document.getElementById("profile-save");
-      saveBtn.disabled = true; saveBtn.textContent = "Saving...";
-      try {
-        const res = await fetch(`${BACKEND_URL}/auth/update`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${userToken}` },
-          body: JSON.stringify({ name: name || undefined, email: email || undefined, password: password || undefined, avatar_url: pendingAvatarBase64 || undefined }),
-        });
-        const data = await res.json();
-        if (data.error) { profileMsg.style.color = "#e74c3c"; profileMsg.textContent = data.error; }
-        else {
-          if (name) localStorage.setItem("nova_name", name);
-          if (pendingAvatarBase64) { localStorage.setItem("nova_avatar", pendingAvatarBase64); updateProfileIcon(pendingAvatarBase64); }
-          profileMsg.style.color = "#2ecc71"; profileMsg.textContent = "Saved!";
-          setTimeout(() => { profileModal.style.display = "none"; profileMsg.textContent = ""; }, 1500);
-        }
-      } catch { profileMsg.style.color = "#e74c3c"; profileMsg.textContent = "Something went wrong."; }
-      saveBtn.disabled = false; saveBtn.textContent = "Save";
-    });
-
     setInterval(() => fetch(`${BACKEND_URL}/`), 10 * 60 * 1000);
 
     function showToast(msg) {
@@ -401,12 +298,10 @@
       const name = authName.value.trim();
       const phone = authPhone.value.trim();
       if (!email || !password || (isSignUp && !name)) { authError.textContent = "Please fill in all fields."; return; }
-      authSubmit.disabled = true;
-      authSubmit.textContent = "Loading...";
+      authSubmit.disabled = true; authSubmit.textContent = "Loading...";
       try {
         const res = await fetch(`${BACKEND_URL}${isSignUp ? "/auth/signup" : "/auth/login"}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+          method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password, name, phone }),
         });
         const data = await res.json();
@@ -444,11 +339,26 @@
 
     if (userToken) showApp();
 
-    logoutBtn.addEventListener("click", () => {
-      if (!confirm("Log out?")) return;
-      showAuth();
-    });
+    // Token refresh
+    async function refreshToken() {
+      const refreshToken = localStorage.getItem("nova_refresh_token");
+      if (!refreshToken) { showAuth(); return; }
+      try {
+        const res = await fetch(`${BACKEND_URL}/auth/refresh`, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refresh_token: refreshToken }),
+        });
+        const data = await res.json();
+        if (data.session) {
+          userToken = data.session.access_token;
+          localStorage.setItem("nova_token", userToken);
+          localStorage.setItem("nova_refresh_token", data.session.refresh_token);
+        } else showAuth();
+      } catch { showAuth(); }
+    }
+    setInterval(refreshToken, 50 * 60 * 1000);
 
+    logoutBtn.addEventListener("click", () => { if (!confirm("Log out?")) return; showAuth(); });
     themeBtn.addEventListener("click", () => {
       isLight = !isLight;
       document.body.classList.toggle("light", isLight);
@@ -457,16 +367,14 @@
 
     newChatBtn.addEventListener("click", () => {
       saveCurrentChat();
-      history = [];
-      chatEl.innerHTML = "";
+      history = []; chatEl.innerHTML = "";
       currentChatId = Date.now().toString();
       addGreeting();
     });
 
     clearBtn.addEventListener("click", () => {
       saveCurrentChat();
-      history = [];
-      chatEl.innerHTML = "";
+      history = []; chatEl.innerHTML = "";
       currentChatId = Date.now().toString();
       addGreeting();
     });
@@ -478,10 +386,8 @@
     });
 
     historyBtn.addEventListener("click", async () => {
-      await saveCurrentChat();
-      await loadChats();
-      sidebar.classList.add("open");
-      overlay.classList.add("show");
+      await saveCurrentChat(); await loadChats();
+      sidebar.classList.add("open"); overlay.classList.add("show");
     });
     closeSidebar.addEventListener("click", closeSidebarFn);
     overlay.addEventListener("click", closeSidebarFn);
@@ -517,9 +423,7 @@
         el.addEventListener("click", () => {
           const c = chats.find(x => x.id === el.closest(".history-item").dataset.id);
           if (!c) return;
-          history = c.history;
-          currentChatId = c.id;
-          chatEl.innerHTML = "";
+          history = c.history; currentChatId = c.id; chatEl.innerHTML = "";
           history.forEach(m => { if (m.role !== "system") addMsg(m.role, typeof m.content === "string" ? m.content : "[image message]"); });
           closeSidebarFn();
         });
@@ -566,8 +470,7 @@
 
     uploadBtn.addEventListener("click", () => fileInput.click());
     fileInput.addEventListener("change", async () => {
-      const file = fileInput.files[0];
-      if (!file) return;
+      const file = fileInput.files[0]; if (!file) return;
       const compressed = await compressImage(file);
       pendingImageBase64 = compressed.split(",")[1];
       pendingImageType = "image/jpeg";
@@ -721,6 +624,83 @@
     btn.addEventListener("click", sendMessage);
     input.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
 
+    // Profile modal
+    const profileModal = document.createElement("div");
+    profileModal.style.cssText = "display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;";
+    const profileBox = document.createElement("div");
+    profileBox.style.cssText = "background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2rem;width:100%;max-width:380px;display:flex;flex-direction:column;gap:1rem;";
+    profileBox.innerHTML = `
+      <h2 style="font-size:1.2rem;font-weight:600">👤 Profile Settings</h2>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem">
+        <img id="avatar-preview" src="" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--border);display:none" />
+        <label style="cursor:pointer;color:var(--accent);font-size:0.9rem">
+          📷 Change profile picture
+          <input type="file" id="avatar-input" accept="image/*" style="display:none" />
+        </label>
+      </div>
+      <input type="text" id="profile-name" placeholder="New name" style="padding:0.75rem;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:1rem;font-family:Inter,sans-serif;width:100%" />
+      <input type="email" id="profile-email" placeholder="New email" style="padding:0.75rem;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:1rem;font-family:Inter,sans-serif;width:100%" />
+      <input type="password" id="profile-password" placeholder="New password" style="padding:0.75rem;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:1rem;font-family:Inter,sans-serif;width:100%" />
+      <p id="profile-msg" style="font-size:0.85rem;text-align:center;color:var(--text-muted)"></p>
+      <div style="display:flex;gap:0.5rem">
+        <button id="profile-save" style="flex:1;padding:0.75rem;border-radius:10px;border:none;background:var(--accent);color:white;font-size:1rem;cursor:pointer;font-family:Inter,sans-serif">Save</button>
+        <button id="profile-close" style="flex:1;padding:0.75rem;border-radius:10px;border:none;background:var(--surface2);color:var(--text);font-size:1rem;cursor:pointer;font-family:Inter,sans-serif;border:1px solid var(--border)">Cancel</button>
+      </div>
+    `;
+    profileModal.appendChild(profileBox);
+    document.body.appendChild(profileModal);
+
+    let pendingAvatarBase64 = null;
+    const avatarInput = document.getElementById("avatar-input");
+    const avatarPreview = document.getElementById("avatar-preview");
+
+    function updateProfileIcon(src) {
+      const icon = document.getElementById("profile-icon");
+      const fallback = document.getElementById("profile-icon-fallback");
+      if (src) { icon.src = src; icon.style.display = "block"; fallback.style.display = "none"; }
+      else { icon.style.display = "none"; fallback.style.display = "block"; }
+    }
+    const savedAvatar = localStorage.getItem("nova_avatar");
+    if (savedAvatar) updateProfileIcon(savedAvatar);
+
+    avatarInput.addEventListener("change", async () => {
+      const file = avatarInput.files[0]; if (!file) return;
+      const compressed = await compressImage(file);
+      pendingAvatarBase64 = compressed;
+      avatarPreview.src = compressed;
+      avatarPreview.style.display = "block";
+    });
+
+    document.getElementById("profile-btn").addEventListener("click", () => {
+      profileModal.style.display = "flex";
+      document.getElementById("profile-name").value = localStorage.getItem("nova_name") || "";
+    });
+    document.getElementById("profile-close").addEventListener("click", () => { profileModal.style.display = "none"; });
+    document.getElementById("profile-save").addEventListener("click", async () => {
+      const name = document.getElementById("profile-name").value.trim();
+      const email = document.getElementById("profile-email").value.trim();
+      const password = document.getElementById("profile-password").value.trim();
+      const profileMsg = document.getElementById("profile-msg");
+      const saveBtn = document.getElementById("profile-save");
+      saveBtn.disabled = true; saveBtn.textContent = "Saving...";
+      try {
+        const res = await fetch(`${BACKEND_URL}/auth/update`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${userToken}` },
+          body: JSON.stringify({ name: name || undefined, email: email || undefined, password: password || undefined, avatar_url: pendingAvatarBase64 || undefined }),
+        });
+        const data = await res.json();
+        if (data.error) { profileMsg.style.color = "#e74c3c"; profileMsg.textContent = data.error; }
+        else {
+          if (name) localStorage.setItem("nova_name", name);
+          if (pendingAvatarBase64) { localStorage.setItem("nova_avatar", pendingAvatarBase64); updateProfileIcon(pendingAvatarBase64); }
+          profileMsg.style.color = "#2ecc71"; profileMsg.textContent = "Saved!";
+          setTimeout(() => { profileModal.style.display = "none"; profileMsg.textContent = ""; }, 1500);
+        }
+      } catch { profileMsg.style.color = "#e74c3c"; profileMsg.textContent = "Something went wrong."; }
+      saveBtn.disabled = false; saveBtn.textContent = "Save";
+    });
+
     // Easter egg — background
     let easterActive = localStorage.getItem("nova_easter") === "true";
     const easterBtn = document.createElement("button");
@@ -771,14 +751,17 @@
     let dinoGameActive = false;
     let dinoUnlocked = localStorage.getItem("nova_dino") === "true";
     const dinoOverlay = document.createElement("div");
-    dinoOverlay.style.cssText = "display:none;position:fixed;inset:0;background:#000;z-index:1000;";
+    dinoOverlay.style.cssText = "display:none;position:fixed;inset:0;background:#fff;z-index:1000;";
     const dinoClose = document.createElement("button");
     dinoClose.textContent = "✕ Close";
     dinoClose.style.cssText = "position:fixed;top:1rem;right:1rem;background:#333;border:none;color:white;padding:0.5rem 1rem;border-radius:8px;cursor:pointer;font-size:1rem;z-index:1002;";
-    const dinoCanvas = document.createElement("canvas");
-    dinoCanvas.style.cssText = "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1001;";
-    dinoCanvas.width = 800; dinoCanvas.height = 300;
-    dinoOverlay.appendChild(dinoClose); dinoOverlay.appendChild(dinoCanvas);
+    const dinoFrame = document.createElement("iframe");
+    dinoFrame.src = "/trex/index.html";
+    dinoFrame.setAttribute("frameborder", "0");
+    dinoFrame.setAttribute("scrolling", "no");
+    dinoFrame.style.cssText = "position:fixed;inset:0;width:100%;height:100%;border:none;z-index:1001;";
+    dinoOverlay.appendChild(dinoClose);
+    dinoOverlay.appendChild(dinoFrame);
     document.body.appendChild(dinoOverlay);
 
     const dinoBtn = document.createElement("button");
@@ -787,73 +770,9 @@
     headerBtns.prepend(dinoBtn);
     dinoBtn.addEventListener("click", toggleDino);
 
-    let dinoGame = null;
-
-    function startDinoGame() {
-      const ctx = dinoCanvas.getContext("2d");
-      let animId, score = 0, speed = 5, gameOver = false, started = false;
-      const dino = { x: 80, y: 220, w: 40, h: 50, vy: 0, jumping: false };
-      const ground = 270, gravity = 0.8, jumpForce = -15;
-      let cacti = [], cactusTimer = 0, cactusInterval = 90;
-
-      function jump() {
-        if (!started) started = true;
-        if (gameOver) { resetGame(); return; }
-        if (!dino.jumping) { dino.vy = jumpForce; dino.jumping = true; }
-      }
-      function resetGame() {
-        score = 0; speed = 5; gameOver = false; started = false;
-        dino.y = 220; dino.vy = 0; dino.jumping = false;
-        cacti = []; cactusTimer = 0; loop();
-      }
-      function loop() {
-        cancelAnimationFrame(animId);
-        ctx.clearRect(0, 0, 800, 300);
-        ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, 800, 300);
-        ctx.fillStyle = "#555"; ctx.fillRect(0, ground, 800, 2);
-        if (started && !gameOver) {
-          dino.vy += gravity; dino.y += dino.vy;
-          if (dino.y >= 220) { dino.y = 220; dino.vy = 0; dino.jumping = false; }
-          cactusTimer++;
-          if (cactusTimer >= cactusInterval) {
-            const h = 30 + Math.random() * 40;
-            cacti.push({ x: 820, y: ground - h, w: 20, h });
-            cactusTimer = 0; cactusInterval = 60 + Math.random() * 60;
-          }
-          cacti.forEach(c => c.x -= speed);
-          cacti = cacti.filter(c => c.x > -50);
-          cacti.forEach(c => {
-            if (dino.x + 30 > c.x + 4 && dino.x + 10 < c.x + c.w - 4 && dino.y + 10 < c.y + c.h && dino.y + dino.h > c.y + 4) gameOver = true;
-          });
-          score++; speed = 5 + Math.floor(score / 200) * 0.5;
-        }
-        ctx.fillStyle = "#333"; ctx.fillRect(dino.x, dino.y, dino.w, dino.h);
-        ctx.fillStyle = "#fff"; ctx.fillRect(dino.x + 24, dino.y + 6, 8, 8);
-        ctx.fillStyle = "#333"; ctx.fillRect(dino.x + 28, dino.y + 8, 4, 4);
-        ctx.fillStyle = "#2d6a2d"; cacti.forEach(c => ctx.fillRect(c.x, c.y, c.w, c.h));
-        ctx.fillStyle = "#333"; ctx.font = "bold 20px monospace";
-        ctx.fillText(`Score: ${Math.floor(score / 5)}`, 620, 30);
-        if (!started) { ctx.font = "bold 22px monospace"; ctx.fillText("Press Space or Tap to Start", 220, 150); }
-        if (gameOver) {
-          ctx.fillStyle = "#c0392b"; ctx.font = "bold 28px monospace"; ctx.fillText("Game Over!", 300, 130);
-          ctx.fillStyle = "#333"; ctx.font = "18px monospace"; ctx.fillText("Press Space or Tap to Restart", 220, 170);
-        }
-        if (!gameOver) animId = requestAnimationFrame(loop);
-      }
-      dinoCanvas.addEventListener("click", jump);
-      document.addEventListener("keydown", function dinoKey(e) {
-        if (e.code === "Space" && dinoGameActive) { e.preventDefault(); jump(); }
-        if (!dinoGameActive) document.removeEventListener("keydown", dinoKey);
-      });
-      dinoGame = { stop: () => cancelAnimationFrame(animId) };
-      loop();
-    }
-
     function toggleDino() {
       dinoGameActive = !dinoGameActive;
       dinoOverlay.style.display = dinoGameActive ? "block" : "none";
-      if (dinoGameActive) startDinoGame();
-      else if (dinoGame) dinoGame.stop();
     }
     dinoClose.addEventListener("click", toggleDino);
 
@@ -863,7 +782,7 @@
       if (val === "jymer1102") { input.value = ""; toggleEaster(); showToast(easterActive ? "Easter egg unlocked! 🔓🎉" : "Background off!"); }
       if (val === "dinosaur") {
         input.value = "";
-        if (!dinoUnlocked) { dinoUnlocked = true; localStorage.setItem("nova_dino", "true"); dinoBtn.style.display = "block"; showToast("🦕 Dino game unlocked!"); }
+        if (!dinoUnlocked) { dinoUnlocked = true; localStorage.setItem("nova_dino", "true"); dinoBtn.style.display = "block"; showToast("🦖 Dino game unlocked!"); }
         toggleDino();
       }
     });
