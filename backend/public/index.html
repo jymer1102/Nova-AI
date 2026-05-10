@@ -650,6 +650,7 @@
         <button id="profile-save" style="flex:1;padding:0.75rem;border-radius:10px;border:none;background:var(--accent);color:white;font-size:1rem;cursor:pointer;font-family:Inter,sans-serif">Save</button>
         <button id="profile-close" style="flex:1;padding:0.75rem;border-radius:10px;border:none;background:var(--surface2);color:var(--text);font-size:1rem;cursor:pointer;font-family:Inter,sans-serif;border:1px solid var(--border)">Cancel</button>
       </div>
+      <button id="profile-delete" style="width:100%;padding:0.75rem;border-radius:10px;border:none;background:#c0392b;color:white;font-size:1rem;cursor:pointer;font-family:Inter,sans-serif">🗑️ Delete Account</button>
     `;
     profileModal.appendChild(profileBox);
     document.body.appendChild(profileModal);
@@ -675,7 +676,20 @@
       avatarPreview.style.display = "block";
     });
 
-    document.getElementById("profile-btn").addEventListener("click", () => {
+    document.getElementById("profile-delete").addEventListener("click", async () => {
+      if (!confirm("Are you sure you want to delete your account? This can't be undone!")) return;
+      if (!confirm("Last chance — all your chats will be permanently deleted too. Continue?")) return;
+      try {
+        const res = await fetch(`${BACKEND_URL}/auth/delete`, {
+          method: "DELETE",
+          headers: { "Authorization": `Bearer ${userToken}` },
+        });
+        const data = await res.json();
+        if (data.error) { alert("Error: " + data.error); return; }
+        localStorage.clear();
+        showAuth();
+      } catch { alert("Something went wrong. Try again."); }
+    });
       profileModal.style.display = "flex";
       document.getElementById("profile-name").value = localStorage.getItem("nova_name") || "";
     });
