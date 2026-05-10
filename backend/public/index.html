@@ -20,790 +20,650 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
-    :root {
-      --bg: #0f0f0f; --surface: #1a1a1a; --surface2: #2a2a2a;
-      --border: #333; --text: #f0f0f0; --text-muted: #888;
-      --accent: #2f6feb; --ai-bg: #1e1e1e;
-    }
-    .light {
-      --bg: #f5f5f5; --surface: #ffffff; --surface2: #ececec;
-      --border: #ddd; --text: #111; --text-muted: #666;
-      --accent: #2f6feb; --ai-bg: #e8e8e8;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      background: var(--bg); color: var(--text);
-      display: flex; flex-direction: column; height: 100vh;
-      transition: background 0.2s, color 0.2s;
-    }
-    #auth-screen {
-      flex: 1; display: flex; align-items: center;
-      justify-content: center; padding: 1rem;
-    }
-    .auth-box {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 16px; padding: 2rem; width: 100%; max-width: 360px;
-      display: flex; flex-direction: column; gap: 1rem;
-    }
-    .auth-box h1 { font-size: 1.4rem; text-align: center; }
-    .auth-box p { font-size: 0.85rem; color: var(--text-muted); text-align: center; }
-    .auth-box input {
-      padding: 0.75rem; border-radius: 10px;
-      border: 1px solid var(--border); background: var(--surface2);
-      color: var(--text); font-size: 1rem; font-family: 'Inter', sans-serif; width: 100%;
-    }
-    .auth-box button.primary {
-      padding: 0.75rem; border-radius: 10px; border: none;
-      background: var(--accent); color: white; font-size: 1rem;
-      cursor: pointer; width: 100%; font-family: 'Inter', sans-serif;
-    }
-    .auth-box button.primary:hover { opacity: 0.9; }
-    .auth-toggle {
-      background: none; border: none; color: var(--accent);
-      cursor: pointer; font-size: 0.9rem; text-align: center;
-      font-family: 'Inter', sans-serif;
-    }
-    .auth-error { font-size: 0.85rem; text-align: center; }
-    #app { display: none; flex-direction: column; height: 100vh; }
-    header {
-      padding: 0.75rem 1rem; background: var(--surface);
-      display: flex; align-items: center; justify-content: space-between;
-      border-bottom: 1px solid var(--border);
-    }
-    .header-title { font-size: 1.1rem; font-weight: 600; cursor: pointer; user-select: none; }
-    .header-btns { display: flex; gap: 0.5rem; }
-    .icon-btn {
-      background: var(--surface2); border: 1px solid var(--border);
-      color: var(--text); border-radius: 8px; padding: 0.4rem 0.6rem;
-      cursor: pointer; font-size: 1rem;
-    }
-    .icon-btn:hover { opacity: 0.8; }
-    #chat {
-      flex: 1; overflow-y: auto; padding: 1rem;
-      display: flex; flex-direction: column; gap: 0.75rem;
-    }
-    .msg-wrap { display: flex; flex-direction: column; gap: 0.25rem; }
-    .msg-wrap.user { align-items: flex-end; }
-    .msg-wrap.ai { align-items: flex-start; }
-    .msg { max-width: 75%; padding: 0.75rem 1rem; border-radius: 18px; line-height: 1.5; white-space: pre-wrap; }
-    .user .msg { background: var(--accent); color: white; border-bottom-right-radius: 4px; }
-    .ai .msg { background: var(--ai-bg); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
-    .msg img { max-width: 100%; border-radius: 10px; margin-top: 0.5rem; display: block; }
-    .msg-actions { display: flex; gap: 0.4rem; }
-    .msg-action-btn {
-      background: none; border: none; color: var(--text-muted);
-      cursor: pointer; font-size: 0.8rem; padding: 0.2rem 0.4rem; border-radius: 6px;
-    }
-    .msg-action-btn:hover { background: var(--surface2); color: var(--text); }
-    #input-area {
-      display: flex; flex-direction: column; padding: 1rem;
-      gap: 0.5rem; background: var(--surface); border-top: 1px solid var(--border);
-    }
-    #preview-area { display: none; align-items: center; gap: 0.5rem; }
-    #preview-area img { height: 60px; border-radius: 8px; border: 1px solid var(--border); }
-    #remove-img {
-      background: var(--surface2); border: 1px solid var(--border);
-      color: var(--text); border-radius: 50%; width: 24px; height: 24px;
-      cursor: pointer; font-size: 0.8rem;
-    }
-    #bottom-row { display: flex; gap: 0.5rem; }
-    textarea {
-      flex: 1; padding: 0.75rem; border-radius: 12px;
-      border: 1px solid var(--border); background: var(--surface2);
-      color: var(--text); font-size: 1rem; resize: none; height: 52px;
-      font-family: 'Inter', system-ui, sans-serif;
-    }
-    button { padding: 0 1.25rem; border-radius: 12px; border: none; background: var(--accent); color: white; font-size: 1rem; cursor: pointer; }
-    button:disabled { opacity: 0.5; cursor: default; }
-    .tool-btn {
-      background: var(--surface2); border: 1px solid var(--border);
-      color: var(--text); font-size: 1.2rem; padding: 0 0.9rem;
-      border-radius: 12px; cursor: pointer;
-    }
-    .tool-btn:hover { opacity: 0.8; }
-    .tool-btn.recording { background: #e03; color: white; border-color: #e03; }
-    #sidebar {
-      position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
-      background: var(--surface); border-right: 1px solid var(--border);
-      z-index: 100; transition: left 0.25s; display: flex; flex-direction: column;
-    }
-    #sidebar.open { left: 0; }
-    #sidebar-header {
-      padding: 1rem; font-weight: 600; border-bottom: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;
-    }
-    #clear-all-btn {
-      background: #c0392b; border: none; color: white; border-radius: 8px;
-      padding: 0.3rem 0.6rem; cursor: pointer; font-size: 0.8rem; white-space: nowrap;
-    }
-    #clear-all-btn:hover { opacity: 0.8; }
-    #sidebar-list { flex: 1; overflow-y: auto; padding: 0.5rem; }
-    .history-item { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
-    .history-item-title {
-      flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      cursor: pointer; padding: 0.6rem 0.4rem; border-radius: 8px; font-size: 0.9rem; color: var(--text);
-    }
-    .history-item-title:hover { background: var(--surface2); }
-    .delete-chat-btn {
-      background: none; border: none; color: var(--text-muted);
-      cursor: pointer; font-size: 0.9rem; padding: 0.3rem 0.5rem; border-radius: 6px; flex-shrink: 0;
-    }
-    .delete-chat-btn:hover { background: #c0392b; color: white; }
-    #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 99; }
-    #overlay.show { display: block; }
-    .cursor { display: inline-block; width: 2px; height: 1em; background: var(--text); margin-left: 2px; animation: blink 0.7s infinite; vertical-align: text-bottom; }
+    :root { --bg:#0f0f0f; --surface:#1a1a1a; --surface2:#2a2a2a; --border:#333; --text:#f0f0f0; --text-muted:#888; --accent:#2f6feb; --ai-bg:#1e1e1e; }
+    .light { --bg:#f5f5f5; --surface:#ffffff; --surface2:#ececec; --border:#ddd; --text:#111; --text-muted:#666; --accent:#2f6feb; --ai-bg:#e8e8e8; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--text); display:flex; flex-direction:column; height:100vh; transition:background 0.2s,color 0.2s; }
+    #auth-screen { flex:1; display:flex; align-items:center; justify-content:center; padding:1rem; }
+    .auth-box { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:2rem; width:100%; max-width:360px; display:flex; flex-direction:column; gap:1rem; }
+    .auth-box h1 { font-size:1.4rem; text-align:center; }
+    .auth-box p { font-size:0.85rem; color:var(--text-muted); text-align:center; }
+    .auth-box input { padding:0.75rem; border-radius:10px; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-size:1rem; font-family:'Inter',sans-serif; width:100%; }
+    .auth-box button.primary { padding:0.75rem; border-radius:10px; border:none; background:var(--accent); color:white; font-size:1rem; cursor:pointer; width:100%; font-family:'Inter',sans-serif; }
+    .auth-box button.primary:hover { opacity:0.9; }
+    .auth-toggle { background:none; border:none; color:var(--accent); cursor:pointer; font-size:0.9rem; text-align:center; font-family:'Inter',sans-serif; }
+    .auth-error { font-size:0.85rem; text-align:center; }
+    #app { display:none; flex-direction:column; height:100vh; }
+    header { padding:0.75rem 1rem; background:var(--surface); display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); }
+    .header-title { font-size:1.1rem; font-weight:600; cursor:pointer; user-select:none; }
+    .header-btns { display:flex; gap:0.5rem; }
+    .icon-btn { background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:8px; padding:0.4rem 0.6rem; cursor:pointer; font-size:1rem; }
+    .icon-btn:hover { opacity:0.8; }
+    #chat { flex:1; overflow-y:auto; padding:1rem; display:flex; flex-direction:column; gap:0.75rem; }
+    .msg-wrap { display:flex; flex-direction:column; gap:0.25rem; }
+    .msg-wrap.user { align-items:flex-end; }
+    .msg-wrap.ai { align-items:flex-start; }
+    .msg { max-width:75%; padding:0.75rem 1rem; border-radius:18px; line-height:1.5; white-space:pre-wrap; }
+    .user .msg { background:var(--accent); color:white; border-bottom-right-radius:4px; }
+    .ai .msg { background:var(--ai-bg); border:1px solid var(--border); border-bottom-left-radius:4px; }
+    .msg img { max-width:100%; border-radius:10px; margin-top:0.5rem; display:block; }
+    .msg-actions { display:flex; gap:0.4rem; }
+    .msg-action-btn { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.8rem; padding:0.2rem 0.4rem; border-radius:6px; }
+    .msg-action-btn:hover { background:var(--surface2); color:var(--text); }
+    #input-area { display:flex; flex-direction:column; padding:1rem; gap:0.5rem; background:var(--surface); border-top:1px solid var(--border); }
+    #preview-area { display:none; align-items:center; gap:0.5rem; }
+    #preview-area img { height:60px; border-radius:8px; border:1px solid var(--border); }
+    #remove-img { background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:50%; width:24px; height:24px; cursor:pointer; font-size:0.8rem; }
+    #bottom-row { display:flex; gap:0.5rem; }
+    textarea { flex:1; padding:0.75rem; border-radius:12px; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-size:1rem; resize:none; height:52px; font-family:'Inter',system-ui,sans-serif; }
+    button { padding:0 1.25rem; border-radius:12px; border:none; background:var(--accent); color:white; font-size:1rem; cursor:pointer; }
+    button:disabled { opacity:0.5; cursor:default; }
+    .tool-btn { background:var(--surface2); border:1px solid var(--border); color:var(--text); font-size:1.2rem; padding:0 0.9rem; border-radius:12px; cursor:pointer; }
+    .tool-btn:hover { opacity:0.8; }
+    .tool-btn.recording { background:#e03; color:white; border-color:#e03; }
+    #sidebar { position:fixed; top:0; left:-280px; width:280px; height:100%; background:var(--surface); border-right:1px solid var(--border); z-index:100; transition:left 0.25s; display:flex; flex-direction:column; }
+    #sidebar.open { left:0; }
+    #sidebar-header { padding:1rem; font-weight:600; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:0.5rem; }
+    #clear-all-btn { background:#c0392b; border:none; color:white; border-radius:8px; padding:0.3rem 0.6rem; cursor:pointer; font-size:0.8rem; white-space:nowrap; }
+    #clear-all-btn:hover { opacity:0.8; }
+    #sidebar-list { flex:1; overflow-y:auto; padding:0.5rem; }
+    .history-item { display:flex; align-items:center; justify-content:space-between; gap:0.5rem; }
+    .history-item-title { flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer; padding:0.6rem 0.4rem; border-radius:8px; font-size:0.9rem; color:var(--text); }
+    .history-item-title:hover { background:var(--surface2); }
+    .delete-chat-btn { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.9rem; padding:0.3rem 0.5rem; border-radius:6px; flex-shrink:0; }
+    .delete-chat-btn:hover { background:#c0392b; color:white; }
+    #overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:99; }
+    #overlay.show { display:block; }
+    .cursor { display:inline-block; width:2px; height:1em; background:var(--text); margin-left:2px; animation:blink 0.7s infinite; vertical-align:text-bottom; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
     @keyframes fadeout { 0%{opacity:1} 70%{opacity:1} 100%{opacity:0} }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center; }
+    .modal-overlay.open { display:flex; }
+    .modal-box { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:2rem; width:100%; max-width:380px; display:flex; flex-direction:column; gap:1rem; }
+    .modal-input { padding:0.75rem; border-radius:10px; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-size:1rem; font-family:Inter,sans-serif; width:100%; }
+    .modal-btn { padding:0.75rem; border-radius:10px; border:none; font-size:1rem; cursor:pointer; font-family:Inter,sans-serif; }
   </style>
 </head>
 <body>
-  <div id="auth-screen">
-    <div class="auth-box">
-      <h1>🌟 Nova AI</h1>
-      <p id="auth-subtitle">Sign in to your account</p>
-      <input type="text" id="auth-name" placeholder="Your name" style="display:none" />
-      <input type="tel" id="auth-phone" placeholder="Phone number (optional)" style="display:none" />
-      <input type="email" id="auth-email" placeholder="Email" />
-      <input type="password" id="auth-password" placeholder="Password" />
-      <p class="auth-error" id="auth-error"></p>
-      <button class="primary" id="auth-submit">Sign In</button>
-      <div style="display:flex;align-items:center;gap:0.5rem;margin:0.25rem 0">
-        <div style="flex:1;height:1px;background:var(--border)"></div>
-        <span style="color:var(--text-muted);font-size:0.8rem">or</span>
-        <div style="flex:1;height:1px;background:var(--border)"></div>
+
+<div id="auth-screen">
+  <div class="auth-box">
+    <h1>🌟 Nova AI</h1>
+    <p id="auth-subtitle">Sign in to your account</p>
+    <input type="text" id="auth-name" placeholder="Your name" style="display:none" />
+    <input type="tel" id="auth-phone" placeholder="Phone number (optional)" style="display:none" />
+    <input type="email" id="auth-email" placeholder="Email" />
+    <input type="password" id="auth-password" placeholder="Password" />
+    <p class="auth-error" id="auth-error"></p>
+    <button class="primary" id="auth-submit">Sign In</button>
+    <div style="display:flex;align-items:center;gap:0.5rem;margin:0.25rem 0">
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+      <span style="color:var(--text-muted);font-size:0.8rem">or</span>
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+    </div>
+    <button class="primary" id="discord-btn" style="background:#5865F2">🎮 Continue with Discord</button>
+    <button class="primary" id="github-btn" style="background:#333">🐙 Continue with GitHub</button>
+    <button class="auth-toggle" id="auth-toggle">Don't have an account? Sign up</button>
+  </div>
+</div>
+
+<div id="app">
+  <div id="sidebar">
+    <div id="sidebar-header">
+      💬 Chat History
+      <div style="display:flex;gap:0.5rem;align-items:center">
+        <button id="clear-all-btn">🗑️ Clear All</button>
+        <button class="icon-btn" id="close-sidebar">✕</button>
       </div>
-      <button class="primary" id="discord-btn" style="background:#5865F2">🎮 Continue with Discord</button>
-      <button class="primary" id="github-btn" style="background:#333">🐙 Continue with GitHub</button>
-      <button class="auth-toggle" id="auth-toggle">Don't have an account? Sign up</button>
+    </div>
+    <div id="sidebar-list"></div>
+  </div>
+  <div id="overlay"></div>
+  <header>
+    <div style="display:flex;gap:0.5rem">
+      <button class="icon-btn" id="history-btn" title="Chat history">💬</button>
+      <button class="icon-btn" id="new-chat-btn" title="New chat">✏️</button>
+    </div>
+    <span class="header-title" id="header-title">🌟 Nova AI by Jackson Weimer</span>
+    <div class="header-btns" id="header-btns">
+      <button class="icon-btn" id="profile-btn" title="Profile" style="padding:0;overflow:hidden;width:34px;height:34px;">
+        <img id="profile-icon" src="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:8px;" />
+        <span id="profile-icon-fallback">👤</span>
+      </button>
+      <button class="icon-btn" id="logout-btn" title="Log out">🚪</button>
+      <button class="icon-btn" id="clear-btn" title="Clear chat">🗑️</button>
+      <button class="icon-btn" id="theme-btn" title="Toggle theme">🌙</button>
+    </div>
+  </header>
+  <div id="chat"></div>
+  <div id="input-area">
+    <div id="preview-area">
+      <img id="preview-img" src="" alt="preview" />
+      <button id="remove-img">✕</button>
+    </div>
+    <div id="bottom-row">
+      <button class="tool-btn" id="upload-btn" title="Upload image">📎</button>
+      <input type="file" id="file-input" accept="image/*" style="display:none" />
+      <button class="tool-btn" id="mic-btn" title="Voice input">🎤</button>
+      <textarea id="input" placeholder="Type a message..."></textarea>
+      <button id="send">Send</button>
     </div>
   </div>
+</div>
 
-  <div id="app">
-    <div id="sidebar">
-      <div id="sidebar-header">
-        💬 Chat History
-        <div style="display:flex;gap:0.5rem;align-items:center">
-          <button id="clear-all-btn">🗑️ Clear All</button>
-          <button class="icon-btn" id="close-sidebar">✕</button>
-        </div>
-      </div>
-      <div id="sidebar-list"></div>
+<!-- Profile Modal -->
+<div class="modal-overlay" id="profile-modal">
+  <div class="modal-box">
+    <h2 style="font-size:1.2rem;font-weight:600">👤 Profile Settings</h2>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem">
+      <img id="avatar-preview" src="" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--border);display:none" />
+      <label style="cursor:pointer;color:var(--accent);font-size:0.9rem">
+        📷 Change profile picture
+        <input type="file" id="avatar-input" accept="image/*" style="display:none" />
+      </label>
     </div>
-    <div id="overlay"></div>
-    <header>
-      <div style="display:flex;gap:0.5rem">
-        <button class="icon-btn" id="history-btn" title="Chat history">💬</button>
-        <button class="icon-btn" id="new-chat-btn" title="New chat">✏️</button>
-      </div>
-      <span class="header-title" id="header-title">🌟 Nova AI by Jackson Weimer</span>
-      <div class="header-btns" id="header-btns">
-        <button class="icon-btn" id="profile-btn" title="Profile" style="padding:0;overflow:hidden;width:34px;height:34px;"><img id="profile-icon" src="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:8px;" /><span id="profile-icon-fallback">👤</span></button>
-        <button class="icon-btn" id="logout-btn" title="Log out">🚪</button>
-        <button class="icon-btn" id="clear-btn" title="Clear chat">🗑️</button>
-        <button class="icon-btn" id="theme-btn" title="Toggle theme">🌙</button>
-      </div>
-    </header>
-    <div id="chat"></div>
-    <div id="input-area">
-      <div id="preview-area">
-        <img id="preview-img" src="" alt="preview" />
-        <button id="remove-img">✕</button>
-      </div>
-      <div id="bottom-row">
-        <button class="tool-btn" id="upload-btn" title="Upload image">📎</button>
-        <input type="file" id="file-input" accept="image/*" style="display:none" />
-        <button class="tool-btn" id="mic-btn" title="Voice input">🎤</button>
-        <textarea id="input" placeholder="Type a message..."></textarea>
-        <button id="send">Send</button>
-      </div>
+    <input type="text" id="profile-name" class="modal-input" placeholder="New name" />
+    <input type="email" id="profile-email" class="modal-input" placeholder="New email" />
+    <input type="password" id="profile-password" class="modal-input" placeholder="New password" />
+    <p id="profile-msg" style="font-size:0.85rem;text-align:center;color:var(--text-muted)"></p>
+    <div style="display:flex;gap:0.5rem">
+      <button id="profile-save" class="modal-btn" style="flex:1;background:var(--accent);color:white">Save</button>
+      <button id="profile-close" class="modal-btn" style="flex:1;background:var(--surface2);color:var(--text);border:1px solid var(--border)">Cancel</button>
     </div>
+    <button id="profile-delete" class="modal-btn" style="width:100%;background:#c0392b;color:white">🗑️ Delete Account</button>
   </div>
+</div>
 
-  <script>
-    const BACKEND_URL = "https://nova-ai-mk9x.onrender.com";
+<script>
+  const BACKEND_URL = "https://nova-ai-mk9x.onrender.com";
 
-    const authScreen = document.getElementById("auth-screen");
-    const appEl = document.getElementById("app");
-    const authName = document.getElementById("auth-name");
-    const authPhone = document.getElementById("auth-phone");
-    const authEmail = document.getElementById("auth-email");
-    const authPassword = document.getElementById("auth-password");
-    const authSubmit = document.getElementById("auth-submit");
-    const authToggle = document.getElementById("auth-toggle");
-    const authError = document.getElementById("auth-error");
-    const authSubtitle = document.getElementById("auth-subtitle");
-    const chatEl = document.getElementById("chat");
-    const input = document.getElementById("input");
-    const btn = document.getElementById("send");
-    const fileInput = document.getElementById("file-input");
-    const uploadBtn = document.getElementById("upload-btn");
-    const previewArea = document.getElementById("preview-area");
-    const previewImg = document.getElementById("preview-img");
-    const removeImg = document.getElementById("remove-img");
-    const themeBtn = document.getElementById("theme-btn");
-    const clearBtn = document.getElementById("clear-btn");
-    const micBtn = document.getElementById("mic-btn");
-    const historyBtn = document.getElementById("history-btn");
-    const newChatBtn = document.getElementById("new-chat-btn");
-    const sidebar = document.getElementById("sidebar");
-    const overlay = document.getElementById("overlay");
-    const closeSidebar = document.getElementById("close-sidebar");
-    const sidebarList = document.getElementById("sidebar-list");
-    const clearAllBtn = document.getElementById("clear-all-btn");
-    const headerBtns = document.getElementById("header-btns");
-    const headerTitle = document.getElementById("header-title");
-    const logoutBtn = document.getElementById("logout-btn");
+  // Elements
+  const authScreen = document.getElementById("auth-screen");
+  const appEl = document.getElementById("app");
+  const authName = document.getElementById("auth-name");
+  const authPhone = document.getElementById("auth-phone");
+  const authEmail = document.getElementById("auth-email");
+  const authPassword = document.getElementById("auth-password");
+  const authSubmit = document.getElementById("auth-submit");
+  const authToggle = document.getElementById("auth-toggle");
+  const authError = document.getElementById("auth-error");
+  const authSubtitle = document.getElementById("auth-subtitle");
+  const chatEl = document.getElementById("chat");
+  const input = document.getElementById("input");
+  const btn = document.getElementById("send");
+  const fileInput = document.getElementById("file-input");
+  const uploadBtn = document.getElementById("upload-btn");
+  const previewArea = document.getElementById("preview-area");
+  const previewImg = document.getElementById("preview-img");
+  const removeImgBtn = document.getElementById("remove-img");
+  const themeBtn = document.getElementById("theme-btn");
+  const clearBtn = document.getElementById("clear-btn");
+  const micBtn = document.getElementById("mic-btn");
+  const historyBtn = document.getElementById("history-btn");
+  const newChatBtn = document.getElementById("new-chat-btn");
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("overlay");
+  const closeSidebarBtn = document.getElementById("close-sidebar");
+  const sidebarList = document.getElementById("sidebar-list");
+  const clearAllBtn = document.getElementById("clear-all-btn");
+  const headerBtns = document.getElementById("header-btns");
+  const headerTitle = document.getElementById("header-title");
+  const logoutBtn = document.getElementById("logout-btn");
+  const profileModal = document.getElementById("profile-modal");
+  const profileBtn = document.getElementById("profile-btn");
+  const profileClose = document.getElementById("profile-close");
+  const profileSave = document.getElementById("profile-save");
+  const profileDelete = document.getElementById("profile-delete");
+  const profileMsg = document.getElementById("profile-msg");
+  const avatarInput = document.getElementById("avatar-input");
+  const avatarPreview = document.getElementById("avatar-preview");
 
-    let history = [];
-    let pendingImageBase64 = null;
-    let pendingImageType = null;
-    let isLight = false;
-    let recognition = null;
-    let isRecording = false;
-    let currentChatId = Date.now().toString();
-    let userToken = localStorage.getItem("nova_token") || null;
-    let isSignUp = false;
+  let history = [];
+  let pendingImageBase64 = null;
+  let pendingImageType = null;
+  let pendingAvatarBase64 = null;
+  let isLight = false;
+  let recognition = null;
+  let isRecording = false;
+  let currentChatId = Date.now().toString();
+  let userToken = localStorage.getItem("nova_token") || null;
+  let isSignUp = false;
 
-    setInterval(() => fetch(`${BACKEND_URL}/`), 10 * 60 * 1000);
+  // Keep Render awake
+  setInterval(() => fetch(`${BACKEND_URL}/`), 10 * 60 * 1000);
 
-    function showToast(msg) {
-      const toast = document.createElement("div");
-      toast.style.cssText = "position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#2f6feb;color:white;padding:0.6rem 1.2rem;border-radius:12px;font-size:0.9rem;z-index:999;animation:fadeout 3s forwards;white-space:nowrap";
-      toast.textContent = msg;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 3000);
-    }
+  // Toast
+  function showToast(msg) {
+    const toast = document.createElement("div");
+    toast.style.cssText = "position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#2f6feb;color:white;padding:0.6rem 1.2rem;border-radius:12px;font-size:0.9rem;z-index:9999;animation:fadeout 3s forwards;white-space:nowrap";
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
 
-    document.getElementById("discord-btn").addEventListener("click", () => {
-      window.location.href = `${BACKEND_URL}/auth/oauth/discord`;
-    });
-    document.getElementById("github-btn").addEventListener("click", () => {
-      window.location.href = `${BACKEND_URL}/auth/oauth/github`;
-    });
-
-    authToggle.addEventListener("click", () => {
-      isSignUp = !isSignUp;
-      authName.style.display = isSignUp ? "block" : "none";
-      authPhone.style.display = isSignUp ? "block" : "none";
-      authSubtitle.textContent = isSignUp ? "Create an account" : "Sign in to your account";
-      authSubmit.textContent = isSignUp ? "Sign Up" : "Sign In";
-      authToggle.textContent = isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up";
-      authError.textContent = "";
-    });
-
-    authSubmit.addEventListener("click", async () => {
-      const email = authEmail.value.trim();
-      const password = authPassword.value.trim();
-      const name = authName.value.trim();
-      const phone = authPhone.value.trim();
-      if (!email || !password || (isSignUp && !name)) { authError.textContent = "Please fill in all fields."; return; }
-      authSubmit.disabled = true; authSubmit.textContent = "Loading...";
-      try {
-        const res = await fetch(`${BACKEND_URL}${isSignUp ? "/auth/signup" : "/auth/login"}`, {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, name, phone }),
-        });
-        const data = await res.json();
-        if (data.error) {
-          authError.textContent = data.error;
-          authSubmit.disabled = false;
-          authSubmit.textContent = isSignUp ? "Sign Up" : "Sign In";
-          return;
-        }
+  // Token refresh
+  async function refreshToken() {
+    const storedRefresh = localStorage.getItem("nova_refresh_token");
+    if (!storedRefresh) return;
+    try {
+      const res = await fetch(`${BACKEND_URL}/auth/refresh`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: storedRefresh }),
+      });
+      const data = await res.json();
+      if (data.session) {
         userToken = data.session.access_token;
         localStorage.setItem("nova_token", userToken);
         localStorage.setItem("nova_refresh_token", data.session.refresh_token);
-        localStorage.setItem("nova_name", data.user?.user_metadata?.name || name || "");
-        showApp();
-      } catch {
-        authError.textContent = "Something went wrong. Try again.";
-        authSubmit.disabled = false;
-        authSubmit.textContent = isSignUp ? "Sign Up" : "Sign In";
-      }
-    });
+      } else { showAuth(); }
+    } catch { console.error("Token refresh failed"); }
+  }
+  setInterval(refreshToken, 10 * 60 * 1000);
 
-    async function showApp() {
-      authScreen.style.display = "none";
-      appEl.style.display = "flex";
-      await refreshToken();
-      if (history.length === 0) addGreeting();
-      loadChats();
-    }
+  // Auth
+  document.getElementById("discord-btn").addEventListener("click", () => { window.location.href = `${BACKEND_URL}/auth/oauth/discord`; });
+  document.getElementById("github-btn").addEventListener("click", () => { window.location.href = `${BACKEND_URL}/auth/oauth/github`; });
 
-    function showAuth() {
-      appEl.style.display = "none";
-      authScreen.style.display = "flex";
-      userToken = null;
-      localStorage.removeItem("nova_token");
-    }
+  authToggle.addEventListener("click", () => {
+    isSignUp = !isSignUp;
+    authName.style.display = isSignUp ? "block" : "none";
+    authPhone.style.display = isSignUp ? "block" : "none";
+    authSubtitle.textContent = isSignUp ? "Create an account" : "Sign in to your account";
+    authSubmit.textContent = isSignUp ? "Sign Up" : "Sign In";
+    authToggle.textContent = isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up";
+    authError.textContent = "";
+  });
 
-    if (userToken) showApp();
+  authSubmit.addEventListener("click", async () => {
+    const email = authEmail.value.trim();
+    const password = authPassword.value.trim();
+    const name = authName.value.trim();
+    const phone = authPhone.value.trim();
+    if (!email || !password || (isSignUp && !name)) { authError.textContent = "Please fill in all fields."; return; }
+    authSubmit.disabled = true; authSubmit.textContent = "Loading...";
+    try {
+      const res = await fetch(`${BACKEND_URL}${isSignUp ? "/auth/signup" : "/auth/login"}`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, name, phone }),
+      });
+      const data = await res.json();
+      if (data.error) { authError.textContent = data.error; authSubmit.disabled = false; authSubmit.textContent = isSignUp ? "Sign Up" : "Sign In"; return; }
+      userToken = data.session.access_token;
+      localStorage.setItem("nova_token", userToken);
+      localStorage.setItem("nova_refresh_token", data.session.refresh_token);
+      localStorage.setItem("nova_name", data.user?.user_metadata?.name || name || "");
+      showApp();
+    } catch { authError.textContent = "Something went wrong. Try again."; authSubmit.disabled = false; authSubmit.textContent = isSignUp ? "Sign Up" : "Sign In"; }
+  });
 
-    // Token refresh
-    async function refreshToken() {
-      const storedRefresh = localStorage.getItem("nova_refresh_token");
-      if (!storedRefresh) { showAuth(); return; }
-      try {
-        const res = await fetch(`${BACKEND_URL}/auth/refresh`, {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ refresh_token: storedRefresh }),
-        });
-        const data = await res.json();
-        if (data.session) {
-          userToken = data.session.access_token;
-          localStorage.setItem("nova_token", userToken);
-          localStorage.setItem("nova_refresh_token", data.session.refresh_token);
-        } else { showAuth(); }
-      } catch { showAuth(); }
-    }
+  async function showApp() {
+    authScreen.style.display = "none";
+    appEl.style.display = "flex";
+    await refreshToken();
+    if (history.length === 0) addGreeting();
+    loadChats();
+  }
 
-    // Refresh on load and every 10 mins
-    if (userToken) { refreshToken(); }
-    setInterval(refreshToken, 10 * 60 * 1000);
+  function showAuth() {
+    appEl.style.display = "none";
+    authScreen.style.display = "flex";
+    userToken = null;
+    localStorage.removeItem("nova_token");
+    localStorage.removeItem("nova_refresh_token");
+  }
 
-    logoutBtn.addEventListener("click", () => { if (!confirm("Log out?")) return; showAuth(); });
-    themeBtn.addEventListener("click", () => {
-      isLight = !isLight;
-      document.body.classList.toggle("light", isLight);
-      themeBtn.textContent = isLight ? "☀️" : "🌙";
-    });
+  if (userToken) showApp();
 
-    newChatBtn.addEventListener("click", () => {
-      saveCurrentChat();
-      history = []; chatEl.innerHTML = "";
-      currentChatId = Date.now().toString();
-      addGreeting();
-    });
+  // Profile
+  function updateProfileIcon(src) {
+    const icon = document.getElementById("profile-icon");
+    const fallback = document.getElementById("profile-icon-fallback");
+    if (src) { icon.src = src; icon.style.display = "block"; fallback.style.display = "none"; }
+    else { icon.style.display = "none"; fallback.style.display = "block"; }
+  }
+  const savedAvatar = localStorage.getItem("nova_avatar");
+  if (savedAvatar) updateProfileIcon(savedAvatar);
 
-    clearBtn.addEventListener("click", () => {
-      saveCurrentChat();
-      history = []; chatEl.innerHTML = "";
-      currentChatId = Date.now().toString();
-      addGreeting();
-    });
+  profileBtn.addEventListener("click", () => {
+    document.getElementById("profile-name").value = localStorage.getItem("nova_name") || "";
+    document.getElementById("profile-email").value = "";
+    document.getElementById("profile-password").value = "";
+    profileMsg.textContent = "";
+    profileModal.classList.add("open");
+  });
+  profileClose.addEventListener("click", () => { profileModal.classList.remove("open"); });
+  profileModal.addEventListener("click", (e) => { if (e.target === profileModal) profileModal.classList.remove("open"); });
 
-    clearAllBtn.addEventListener("click", async () => {
-      if (!confirm("Delete all chat history? This can't be undone.")) return;
-      await fetch(`${BACKEND_URL}/chats`, { method: "DELETE", headers: { "Authorization": `Bearer ${userToken}` } });
-      renderSidebar([]);
-    });
+  avatarInput.addEventListener("change", async () => {
+    const file = avatarInput.files[0]; if (!file) return;
+    const compressed = await compressImage(file);
+    pendingAvatarBase64 = compressed;
+    avatarPreview.src = compressed;
+    avatarPreview.style.display = "block";
+  });
 
-    historyBtn.addEventListener("click", async () => {
-      await saveCurrentChat(); await loadChats();
-      sidebar.classList.add("open"); overlay.classList.add("show");
-    });
-    closeSidebar.addEventListener("click", closeSidebarFn);
-    overlay.addEventListener("click", closeSidebarFn);
-    function closeSidebarFn() { sidebar.classList.remove("open"); overlay.classList.remove("show"); }
-
-    async function saveCurrentChat() {
-      if (history.length < 1 || !userToken) return;
-      const firstUserMsg = history.find(m => m.role === "user");
-      if (!firstUserMsg) return;
-      const title = typeof firstUserMsg.content === "string" ? firstUserMsg.content.slice(0, 40) : "Image message";
-      await fetch(`${BACKEND_URL}/chats`, {
+  profileSave.addEventListener("click", async () => {
+    const name = document.getElementById("profile-name").value.trim();
+    const email = document.getElementById("profile-email").value.trim();
+    const password = document.getElementById("profile-password").value.trim();
+    profileSave.disabled = true; profileSave.textContent = "Saving...";
+    try {
+      const res = await fetch(`${BACKEND_URL}/auth/update`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${userToken}` },
-        body: JSON.stringify({ id: currentChatId, title, history }),
+        body: JSON.stringify({ name: name || undefined, email: email || undefined, password: password || undefined, avatar_url: pendingAvatarBase64 || undefined }),
       });
-    }
+      const data = await res.json();
+      if (data.error) { profileMsg.style.color = "#e74c3c"; profileMsg.textContent = data.error; }
+      else {
+        if (name) localStorage.setItem("nova_name", name);
+        if (pendingAvatarBase64) { localStorage.setItem("nova_avatar", pendingAvatarBase64); updateProfileIcon(pendingAvatarBase64); }
+        profileMsg.style.color = "#2ecc71"; profileMsg.textContent = "Saved!";
+        setTimeout(() => { profileModal.classList.remove("open"); profileMsg.textContent = ""; }, 1500);
+      }
+    } catch { profileMsg.style.color = "#e74c3c"; profileMsg.textContent = "Something went wrong."; }
+    profileSave.disabled = false; profileSave.textContent = "Save";
+  });
 
-    async function loadChats() {
+  profileDelete.addEventListener("click", async () => {
+    if (!confirm("Are you sure you want to delete your account? This can't be undone!")) return;
+    if (!confirm("Last chance — all your chats will be permanently deleted too. Continue?")) return;
+    try {
+      const res = await fetch(`${BACKEND_URL}/auth/delete`, { method: "DELETE", headers: { "Authorization": `Bearer ${userToken}` } });
+      const data = await res.json();
+      if (data.error) { alert("Error: " + data.error); return; }
+      localStorage.clear(); showAuth();
+    } catch { alert("Something went wrong. Try again."); }
+  });
+
+  // Logout
+  logoutBtn.addEventListener("click", () => { if (!confirm("Log out?")) return; showAuth(); });
+
+  // Theme
+  themeBtn.addEventListener("click", () => {
+    isLight = !isLight;
+    document.body.classList.toggle("light", isLight);
+    themeBtn.textContent = isLight ? "☀️" : "🌙";
+  });
+
+  // New / Clear chat
+  newChatBtn.addEventListener("click", () => { saveCurrentChat(); history = []; chatEl.innerHTML = ""; currentChatId = Date.now().toString(); addGreeting(); });
+  clearBtn.addEventListener("click", () => { saveCurrentChat(); history = []; chatEl.innerHTML = ""; currentChatId = Date.now().toString(); addGreeting(); });
+
+  // Clear all chats
+  clearAllBtn.addEventListener("click", async () => {
+    if (!confirm("Delete all chat history? This can't be undone.")) return;
+    await fetch(`${BACKEND_URL}/chats`, { method: "DELETE", headers: { "Authorization": `Bearer ${userToken}` } });
+    renderSidebar([]);
+  });
+
+  // Sidebar
+  historyBtn.addEventListener("click", async () => { await saveCurrentChat(); await loadChats(); sidebar.classList.add("open"); overlay.classList.add("show"); });
+  closeSidebarBtn.addEventListener("click", closeSidebarFn);
+  overlay.addEventListener("click", closeSidebarFn);
+  function closeSidebarFn() { sidebar.classList.remove("open"); overlay.classList.remove("show"); }
+
+  async function saveCurrentChat() {
+    if (history.length < 1 || !userToken) return;
+    const firstUserMsg = history.find(m => m.role === "user");
+    if (!firstUserMsg) return;
+    const title = typeof firstUserMsg.content === "string" ? firstUserMsg.content.slice(0, 40) : "Image message";
+    await fetch(`${BACKEND_URL}/chats`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${userToken}` },
+      body: JSON.stringify({ id: currentChatId, title, history }),
+    });
+  }
+
+  async function loadChats() {
+    try {
       const res = await fetch(`${BACKEND_URL}/chats`, { headers: { "Authorization": `Bearer ${userToken}` } });
       const data = await res.json();
       renderSidebar(data.chats || []);
-    }
+    } catch { console.error("Failed to load chats"); }
+  }
 
-    function renderSidebar(chats) {
-      sidebarList.innerHTML = chats.length === 0
-        ? `<p style="padding:1rem;color:var(--text-muted);font-size:0.9rem">No saved chats yet</p>`
-        : chats.map(c => `
-            <div class="history-item" data-id="${c.id}">
-              <span class="history-item-title">${c.title}</span>
-              <button class="delete-chat-btn" data-id="${c.id}">✕</button>
-            </div>`).join("");
-      sidebarList.querySelectorAll(".history-item-title").forEach(el => {
-        el.addEventListener("click", () => {
-          const c = chats.find(x => x.id === el.closest(".history-item").dataset.id);
-          if (!c) return;
-          history = c.history; currentChatId = c.id; chatEl.innerHTML = "";
-          history.forEach(m => { if (m.role !== "system") addMsg(m.role, typeof m.content === "string" ? m.content : "[image message]"); });
-          closeSidebarFn();
-        });
+  function renderSidebar(chats) {
+    sidebarList.innerHTML = chats.length === 0
+      ? `<p style="padding:1rem;color:var(--text-muted);font-size:0.9rem">No saved chats yet</p>`
+      : chats.map(c => `<div class="history-item" data-id="${c.id}"><span class="history-item-title">${c.title}</span><button class="delete-chat-btn" data-id="${c.id}">✕</button></div>`).join("");
+    sidebarList.querySelectorAll(".history-item-title").forEach(el => {
+      el.addEventListener("click", () => {
+        const c = chats.find(x => x.id === el.closest(".history-item").dataset.id);
+        if (!c) return;
+        history = c.history; currentChatId = c.id; chatEl.innerHTML = "";
+        history.forEach(m => { if (m.role !== "system") addMsg(m.role, typeof m.content === "string" ? m.content : "[image message]"); });
+        closeSidebarFn();
       });
-      sidebarList.querySelectorAll(".delete-chat-btn").forEach(el => {
-        el.addEventListener("click", async e => {
-          e.stopPropagation();
-          await fetch(`${BACKEND_URL}/chats/${el.dataset.id}`, { method: "DELETE", headers: { "Authorization": `Bearer ${userToken}` } });
-          await loadChats();
-        });
+    });
+    sidebarList.querySelectorAll(".delete-chat-btn").forEach(el => {
+      el.addEventListener("click", async e => {
+        e.stopPropagation();
+        await fetch(`${BACKEND_URL}/chats/${el.dataset.id}`, { method: "DELETE", headers: { "Authorization": `Bearer ${userToken}` } });
+        await loadChats();
       });
-    }
+    });
+  }
 
-    function addGreeting() {
-      const name = localStorage.getItem("nova_name");
-      const greeting = `Hi${name ? ` ${name}` : ""}! I'm Nova, your personal AI assistant by Jackson Weimer. How can I help you?`;
-      addMsg("ai", greeting);
-      history.push({ role: "assistant", content: greeting });
-    }
-    window.addEventListener("load", () => { if (!userToken) return; });
+  // Greeting
+  function addGreeting() {
+    const name = localStorage.getItem("nova_name");
+    const greeting = `Hi${name ? ` ${name}` : ""}! I'm Nova, your personal AI assistant by Jackson Weimer. How can I help you?`;
+    addMsg("ai", greeting);
+    history.push({ role: "assistant", content: greeting });
+  }
 
-    function compressImage(file) {
-      return new Promise(resolve => {
-        const reader = new FileReader();
-        reader.onload = e => {
-          const img = new Image();
-          img.onload = () => {
-            const canvas = document.createElement("canvas");
-            const maxSize = 800;
-            let w = img.width, h = img.height;
-            if (w > maxSize || h > maxSize) {
-              if (w > h) { h = (h / w) * maxSize; w = maxSize; }
-              else { w = (w / h) * maxSize; h = maxSize; }
-            }
-            canvas.width = w; canvas.height = h;
-            canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-            resolve(canvas.toDataURL("image/jpeg", 0.7));
-          };
-          img.src = e.target.result;
+  // Image compression
+  function compressImage(file) {
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const maxSize = 800;
+          let w = img.width, h = img.height;
+          if (w > maxSize || h > maxSize) { if (w > h) { h = (h/w)*maxSize; w = maxSize; } else { w = (w/h)*maxSize; h = maxSize; } }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL("image/jpeg", 0.7));
         };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    uploadBtn.addEventListener("click", () => fileInput.click());
-    fileInput.addEventListener("change", async () => {
-      const file = fileInput.files[0]; if (!file) return;
-      const compressed = await compressImage(file);
-      pendingImageBase64 = compressed.split(",")[1];
-      pendingImageType = "image/jpeg";
-      previewImg.src = compressed;
-      previewArea.style.display = "flex";
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
     });
-    removeImg.addEventListener("click", clearImage);
-    function clearImage() {
-      pendingImageBase64 = null; pendingImageType = null;
-      previewArea.style.display = "none"; previewImg.src = ""; fileInput.value = "";
-    }
+  }
 
-    if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SR();
-      recognition.continuous = false; recognition.interimResults = false;
-      recognition.onresult = e => { input.value = e.results[0][0].transcript; micBtn.classList.remove("recording"); isRecording = false; };
-      recognition.onend = () => { micBtn.classList.remove("recording"); isRecording = false; };
+  // Image upload
+  uploadBtn.addEventListener("click", () => fileInput.click());
+  fileInput.addEventListener("change", async () => {
+    const file = fileInput.files[0]; if (!file) return;
+    const compressed = await compressImage(file);
+    pendingImageBase64 = compressed.split(",")[1];
+    pendingImageType = "image/jpeg";
+    previewImg.src = compressed;
+    previewArea.style.display = "flex";
+  });
+  removeImgBtn.addEventListener("click", clearImage);
+  function clearImage() { pendingImageBase64 = null; pendingImageType = null; previewArea.style.display = "none"; previewImg.src = ""; fileInput.value = ""; }
+
+  // Voice input
+  if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SR();
+    recognition.continuous = false; recognition.interimResults = false;
+    recognition.onresult = e => { input.value = e.results[0][0].transcript; micBtn.classList.remove("recording"); isRecording = false; };
+    recognition.onend = () => { micBtn.classList.remove("recording"); isRecording = false; };
+  }
+  micBtn.addEventListener("click", () => {
+    if (!recognition) return alert("Voice input not supported in this browser.");
+    if (isRecording) { recognition.stop(); return; }
+    recognition.start(); isRecording = true; micBtn.classList.add("recording");
+  });
+
+  // TTS
+  function speak(text) {
+    if (!window.speechSynthesis) return;
+    speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance(text);
+    const voices = speechSynthesis.getVoices();
+    const preferred = voices.find(v => ["Samantha","Karen","Moira","Fiona","Victoria","Allison","Ava"].includes(v.name)) || voices.find(v => v.lang === "en-US" && !v.name.includes("Google")) || voices[0];
+    if (preferred) utt.voice = preferred;
+    utt.rate = 0.95; utt.pitch = 1.05; utt.volume = 1;
+    speechSynthesis.speak(utt);
+  }
+
+  // Add message
+  function addMsg(role, text, imgSrc = null) {
+    const wrap = document.createElement("div");
+    wrap.className = `msg-wrap ${role === "user" ? "user" : "ai"}`;
+    const div = document.createElement("div"); div.className = "msg";
+    if (imgSrc) { const img = document.createElement("img"); img.src = imgSrc; div.appendChild(img); }
+    const span = document.createElement("span"); span.textContent = text || ""; div.appendChild(span); wrap.appendChild(div);
+    const actions = document.createElement("div"); actions.className = "msg-actions";
+    const copyBtn = document.createElement("button"); copyBtn.className = "msg-action-btn"; copyBtn.textContent = "📋 Copy";
+    copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(text || ""); copyBtn.textContent = "✅ Copied"; setTimeout(() => copyBtn.textContent = "📋 Copy", 2000); });
+    actions.appendChild(copyBtn);
+    if (role === "ai") {
+      const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-btn"; ttsBtn.textContent = "🔊 Listen";
+      ttsBtn.addEventListener("click", () => speak(text)); actions.appendChild(ttsBtn);
     }
-    micBtn.addEventListener("click", () => {
-      if (!recognition) return alert("Voice input not supported in this browser.");
-      if (isRecording) { recognition.stop(); return; }
-      recognition.start(); isRecording = true; micBtn.classList.add("recording");
+    wrap.appendChild(actions); chatEl.appendChild(wrap); chatEl.scrollTop = chatEl.scrollHeight;
+    return span;
+  }
+
+  // Typing animation
+  function typeText(span, text) {
+    return new Promise(resolve => {
+      const cursor = document.createElement("span"); cursor.className = "cursor"; span.appendChild(cursor);
+      let i = 0;
+      const interval = setInterval(() => {
+        span.insertBefore(document.createTextNode(text[i]), cursor); i++;
+        chatEl.scrollTop = chatEl.scrollHeight;
+        if (i >= text.length) { clearInterval(interval); cursor.remove(); resolve(); }
+      }, 15);
     });
+  }
 
-    function speak(text) {
-      if (!window.speechSynthesis) return;
-      speechSynthesis.cancel();
-      const utt = new SpeechSynthesisUtterance(text);
-      const voices = speechSynthesis.getVoices();
-      const preferred = voices.find(v => ["Samantha","Karen","Moira","Fiona","Victoria","Allison","Ava"].includes(v.name))
-        || voices.find(v => v.lang === "en-US" && !v.name.includes("Google")) || voices[0];
-      if (preferred) utt.voice = preferred;
-      utt.rate = 0.95; utt.pitch = 1.05; utt.volume = 1;
-      speechSynthesis.speak(utt);
+  // Image generation detection
+  function isImageRequest(text) {
+    const t = text.toLowerCase();
+    const triggers = ["generate","create","make","draw","image of","picture of","photo of","show me"];
+    return triggers.some(w => t.includes(w)) && (t.includes("image")||t.includes("picture")||t.includes("photo")||t.includes("draw")||t.includes("generate"));
+  }
+  function extractImagePrompt(text) { return text.replace(/generate|create|make|draw|show me|an image of|a picture of|a photo of|image of|picture of|photo of/gi,"").trim(); }
+
+  // Send message
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text && !pendingImageBase64) return;
+    const imgSrc = pendingImageBase64 ? `data:${pendingImageType};base64,${pendingImageBase64}` : null;
+    addMsg("user", text, imgSrc);
+    const userContent = [];
+    if (pendingImageBase64) userContent.push({ type:"image_url", image_url:{ url:`data:${pendingImageType};base64,${pendingImageBase64}` } });
+    if (text) userContent.push({ type:"text", text });
+    history.push({ role:"user", content: userContent.length===1 && userContent[0].type==="text" ? text : userContent });
+    input.value = ""; clearImage(); btn.disabled = true;
+
+    // Save immediately
+    const firstUserMsg = history.find(m => m.role === "user");
+    if (firstUserMsg && userToken) {
+      const title = typeof firstUserMsg.content === "string" ? firstUserMsg.content.slice(0,40) : "Image message";
+      fetch(`${BACKEND_URL}/chats`, {
+        method:"POST",
+        headers:{"Content-Type":"application/json","Authorization":`Bearer ${userToken}`},
+        body:JSON.stringify({ id:currentChatId, title, history }),
+      }).then(() => loadChats()).catch(console.error);
     }
 
-    function addMsg(role, text, imgSrc = null) {
-      const wrap = document.createElement("div");
-      wrap.className = `msg-wrap ${role === "user" ? "user" : "ai"}`;
-      const div = document.createElement("div"); div.className = "msg";
-      if (imgSrc) { const img = document.createElement("img"); img.src = imgSrc; div.appendChild(img); }
-      const span = document.createElement("span"); span.textContent = text || ""; div.appendChild(span); wrap.appendChild(div);
+    const wrap = document.createElement("div"); wrap.className = "msg-wrap ai";
+    const thinking = document.createElement("div"); thinking.className = "msg"; thinking.textContent = "Thinking...";
+    wrap.appendChild(thinking); chatEl.appendChild(wrap); chatEl.scrollTop = chatEl.scrollHeight;
+
+    if (text && isImageRequest(text) && !pendingImageBase64) {
+      const prompt = extractImagePrompt(text);
+      thinking.textContent = "Generating image...";
+      try {
+        const res = await fetch(`${BACKEND_URL}/generate-image`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ prompt }) });
+        const data = await res.json();
+        if (data.imageUrl) {
+          thinking.innerHTML = "";
+          const img = document.createElement("img"); img.src = data.imageUrl; img.style.cssText = "max-width:100%;border-radius:12px;display:block;"; img.alt = prompt;
+          thinking.appendChild(img);
+          const caption = document.createElement("span"); caption.textContent = `🎨 "${prompt}"`; caption.style.cssText = "display:block;margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted)";
+          thinking.appendChild(caption);
+          history.push({ role:"assistant", content:`Here's an image of ${prompt}!` });
+          saveCurrentChat();
+        } else { thinking.textContent = "Couldn't generate image. Try a different prompt!"; }
+      } catch { thinking.textContent = "Image generation failed. Try again!"; }
+      btn.disabled = false; return;
+    }
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/chat`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ messages:history }) });
+      const data = await res.json();
+      const reply = data.reply || data.error || "Something went wrong.";
+      thinking.innerHTML = "";
+      const span = document.createElement("span"); thinking.appendChild(span);
       const actions = document.createElement("div"); actions.className = "msg-actions";
       const copyBtn = document.createElement("button"); copyBtn.className = "msg-action-btn"; copyBtn.textContent = "📋 Copy";
-      copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(text || ""); copyBtn.textContent = "✅ Copied"; setTimeout(() => copyBtn.textContent = "📋 Copy", 2000); });
-      actions.appendChild(copyBtn);
-      if (role === "ai") {
-        const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-btn"; ttsBtn.textContent = "🔊 Listen";
-        ttsBtn.addEventListener("click", () => speak(text)); actions.appendChild(ttsBtn);
-      }
-      wrap.appendChild(actions); chatEl.appendChild(wrap); chatEl.scrollTop = chatEl.scrollHeight;
-      return span;
-    }
+      copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(reply); copyBtn.textContent = "✅ Copied"; setTimeout(() => copyBtn.textContent = "📋 Copy", 2000); });
+      const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-btn"; ttsBtn.textContent = "🔊 Listen";
+      ttsBtn.addEventListener("click", () => speak(reply));
+      actions.appendChild(copyBtn); actions.appendChild(ttsBtn); wrap.appendChild(actions);
+      await typeText(span, reply);
+      if (data.reply) history.push({ role:"assistant", content:reply });
+      saveCurrentChat();
+    } catch { thinking.textContent = "Error reaching the server. Is your backend running?"; }
+    btn.disabled = false;
+  }
 
-    function typeText(span, text) {
-      return new Promise(resolve => {
-        const cursor = document.createElement("span"); cursor.className = "cursor"; span.appendChild(cursor);
-        let i = 0;
-        const interval = setInterval(() => {
-          span.insertBefore(document.createTextNode(text[i]), cursor); i++;
-          chatEl.scrollTop = chatEl.scrollHeight;
-          if (i >= text.length) { clearInterval(interval); cursor.remove(); resolve(); }
-        }, 15);
-      });
-    }
+  btn.addEventListener("click", sendMessage);
+  input.addEventListener("keydown", e => { if (e.key==="Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
 
-    function isImageRequest(text) {
-      const triggers = ["generate", "create", "make", "draw", "image of", "picture of", "photo of", "show me"];
-      const t = text.toLowerCase();
-      return triggers.some(w => t.includes(w)) && (t.includes("image") || t.includes("picture") || t.includes("photo") || t.includes("draw") || t.includes("generate"));
-    }
+  // Easter egg — background
+  let easterActive = localStorage.getItem("nova_easter") === "true";
+  const easterBtn = document.createElement("button");
+  easterBtn.className = "icon-btn"; easterBtn.title = "Toggle background"; easterBtn.textContent = "🖼️"; easterBtn.style.display = easterActive ? "block" : "none";
+  headerBtns.prepend(easterBtn);
+  function applyEaster() {
+    document.body.style.backgroundImage = easterActive ? "url('https://images.pexels.com/photos/31265958/pexels-photo-31265958.jpeg')" : "";
+    document.body.style.backgroundSize = easterActive ? "cover" : "";
+    document.body.style.backgroundPosition = easterActive ? "center" : "";
+    document.body.style.backgroundAttachment = easterActive ? "fixed" : "";
+  }
+  function toggleEaster() { easterActive = !easterActive; localStorage.setItem("nova_easter", easterActive); applyEaster(); easterBtn.style.display = "block"; }
+  applyEaster();
+  easterBtn.addEventListener("click", toggleEaster);
 
-    function extractImagePrompt(text) {
-      return text.replace(/generate|create|make|draw|show me|an image of|a picture of|a photo of|image of|picture of|photo of/gi, "").trim();
-    }
+  // Easter egg — star cursor
+  let starCursorActive = localStorage.getItem("nova_star") === "true";
+  let starClicks = 0;
+  const starSVG = `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><text y='26' font-size='26'>⭐</text></svg>`;
+  const starCursorURL = `url("data:image/svg+xml,${encodeURIComponent(starSVG)}") 16 16, auto`;
+  const starBtn = document.createElement("button");
+  starBtn.className = "icon-btn"; starBtn.title = "Toggle star cursor"; starBtn.textContent = "⭐"; starBtn.style.display = starCursorActive ? "block" : "none";
+  headerBtns.prepend(starBtn);
+  function applyStarCursor() { document.body.style.cursor = starCursorActive ? starCursorURL : ""; }
+  function toggleStarCursor() { starCursorActive = !starCursorActive; localStorage.setItem("nova_star", starCursorActive); applyStarCursor(); starBtn.style.display = "block"; showToast(starCursorActive ? "⭐ Star cursor on!" : "⭐ Star cursor off!"); }
+  applyStarCursor();
+  starBtn.addEventListener("click", toggleStarCursor);
+  headerTitle.addEventListener("click", () => { starClicks++; if (starClicks >= 8) { starClicks = 0; toggleStarCursor(); } else showToast(`${8-starClicks} more click${8-starClicks!==1?"s":""}...`); });
 
-    async function sendMessage() {
-      const text = input.value.trim();
-      if (!text && !pendingImageBase64) return;
-      const imgSrc = pendingImageBase64 ? `data:${pendingImageType};base64,${pendingImageBase64}` : null;
-      addMsg("user", text, imgSrc);
-      const userContent = [];
-      if (pendingImageBase64) userContent.push({ type: "image_url", image_url: { url: `data:${pendingImageType};base64,${pendingImageBase64}` } });
-      if (text) userContent.push({ type: "text", text });
-      history.push({ role: "user", content: userContent.length === 1 && userContent[0].type === "text" ? text : userContent });
-      input.value = ""; clearImage(); btn.disabled = true;
+  // Easter egg — dino game
+  let dinoUnlocked = localStorage.getItem("nova_dino") === "true";
+  const dinoBtn = document.createElement("button");
+  dinoBtn.className = "icon-btn"; dinoBtn.title = "Play Dino Game"; dinoBtn.textContent = "🦖"; dinoBtn.style.display = dinoUnlocked ? "block" : "none";
+  headerBtns.prepend(dinoBtn);
+  function toggleDino() { window.open("/trex/index.html", "_blank"); }
+  dinoBtn.addEventListener("click", toggleDino);
 
-      const firstUserMsg = history.find(m => m.role === "user");
-      if (firstUserMsg) {
-        const title = typeof firstUserMsg.content === "string" ? firstUserMsg.content.slice(0, 40) : "Image message";
-        await fetch(`${BACKEND_URL}/chats`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${userToken}` },
-          body: JSON.stringify({ id: currentChatId, title, history }),
-        });
-        await loadChats();
-      }
-
-      const wrap = document.createElement("div"); wrap.className = "msg-wrap ai";
-      const thinking = document.createElement("div"); thinking.className = "msg"; thinking.textContent = "Thinking...";
-      wrap.appendChild(thinking); chatEl.appendChild(wrap); chatEl.scrollTop = chatEl.scrollHeight;
-
-      if (text && isImageRequest(text) && !pendingImageBase64) {
-        const prompt = extractImagePrompt(text);
-        thinking.textContent = "Generating image...";
-        try {
-          const res = await fetch(`${BACKEND_URL}/generate-image`, {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ prompt }),
-          });
-          const data = await res.json();
-          if (data.imageUrl) {
-            thinking.innerHTML = "";
-            const img = document.createElement("img");
-            img.src = data.imageUrl; img.style.cssText = "max-width:100%;border-radius:12px;display:block;"; img.alt = prompt;
-            thinking.appendChild(img);
-            const caption = document.createElement("span");
-            caption.textContent = `🎨 "${prompt}"`;
-            caption.style.cssText = "display:block;margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted)";
-            thinking.appendChild(caption);
-            history.push({ role: "assistant", content: `Here's an image of ${prompt}!` });
-            await saveCurrentChat();
-          } else { thinking.textContent = "Couldn't generate image. Try a different prompt!"; }
-        } catch { thinking.textContent = "Image generation failed. Try again!"; }
-        btn.disabled = false; return;
-      }
-
-      try {
-        const res = await fetch(`${BACKEND_URL}/chat`, {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages: history }),
-        });
-        const data = await res.json();
-        const reply = data.reply || data.error || "Something went wrong.";
-        thinking.innerHTML = "";
-        const span = document.createElement("span"); thinking.appendChild(span);
-        const actions = document.createElement("div"); actions.className = "msg-actions";
-        const copyBtn = document.createElement("button"); copyBtn.className = "msg-action-btn"; copyBtn.textContent = "📋 Copy";
-        copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(reply); copyBtn.textContent = "✅ Copied"; setTimeout(() => copyBtn.textContent = "📋 Copy", 2000); });
-        const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-btn"; ttsBtn.textContent = "🔊 Listen";
-        ttsBtn.addEventListener("click", () => speak(reply));
-        actions.appendChild(copyBtn); actions.appendChild(ttsBtn); wrap.appendChild(actions);
-        await typeText(span, reply);
-        if (data.reply) history.push({ role: "assistant", content: reply });
-        await saveCurrentChat();
-      } catch { thinking.textContent = "Error reaching the server. Is your backend running?"; }
-      btn.disabled = false;
-    }
-
-    btn.addEventListener("click", sendMessage);
-    input.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
-
-    // Profile modal
-    const profileModal = document.createElement("div");
-    profileModal.style.cssText = "display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;";
-    const profileBox = document.createElement("div");
-    profileBox.style.cssText = "background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2rem;width:100%;max-width:380px;display:flex;flex-direction:column;gap:1rem;";
-    profileBox.innerHTML = `
-      <h2 style="font-size:1.2rem;font-weight:600">👤 Profile Settings</h2>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem">
-        <img id="avatar-preview" src="" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--border);display:none" />
-        <label style="cursor:pointer;color:var(--accent);font-size:0.9rem">
-          📷 Change profile picture
-          <input type="file" id="avatar-input" accept="image/*" style="display:none" />
-        </label>
-      </div>
-      <input type="text" id="profile-name" placeholder="New name" style="padding:0.75rem;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:1rem;font-family:Inter,sans-serif;width:100%" />
-      <input type="email" id="profile-email" placeholder="New email" style="padding:0.75rem;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:1rem;font-family:Inter,sans-serif;width:100%" />
-      <input type="password" id="profile-password" placeholder="New password" style="padding:0.75rem;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:1rem;font-family:Inter,sans-serif;width:100%" />
-      <p id="profile-msg" style="font-size:0.85rem;text-align:center;color:var(--text-muted)"></p>
-      <div style="display:flex;gap:0.5rem">
-        <button id="profile-save" style="flex:1;padding:0.75rem;border-radius:10px;border:none;background:var(--accent);color:white;font-size:1rem;cursor:pointer;font-family:Inter,sans-serif">Save</button>
-        <button id="profile-close" style="flex:1;padding:0.75rem;border-radius:10px;border:none;background:var(--surface2);color:var(--text);font-size:1rem;cursor:pointer;font-family:Inter,sans-serif;border:1px solid var(--border)">Cancel</button>
-      </div>
-      <button id="profile-delete" style="width:100%;padding:0.75rem;border-radius:10px;border:none;background:#c0392b;color:white;font-size:1rem;cursor:pointer;font-family:Inter,sans-serif">🗑️ Delete Account</button>
-    `;
-    profileModal.appendChild(profileBox);
-    document.body.appendChild(profileModal);
-    profileModal.style.display = "none";
-
-    let pendingAvatarBase64 = null;
-    const avatarInput = document.getElementById("avatar-input");
-    const avatarPreview = document.getElementById("avatar-preview");
-
-    function updateProfileIcon(src) {
-      const icon = document.getElementById("profile-icon");
-      const fallback = document.getElementById("profile-icon-fallback");
-      if (src) { icon.src = src; icon.style.display = "block"; fallback.style.display = "none"; }
-      else { icon.style.display = "none"; fallback.style.display = "block"; }
-    }
-    const savedAvatar = localStorage.getItem("nova_avatar");
-    if (savedAvatar) updateProfileIcon(savedAvatar);
-
-    avatarInput.addEventListener("change", async () => {
-      const file = avatarInput.files[0]; if (!file) return;
-      const compressed = await compressImage(file);
-      pendingAvatarBase64 = compressed;
-      avatarPreview.src = compressed;
-      avatarPreview.style.display = "block";
-    });
-
-    document.getElementById("profile-delete").addEventListener("click", async () => {
-      if (!confirm("Are you sure you want to delete your account? This can't be undone!")) return;
-      if (!confirm("Last chance — all your chats will be permanently deleted too. Continue?")) return;
-      try {
-        const res = await fetch(`${BACKEND_URL}/auth/delete`, {
-          method: "DELETE",
-          headers: { "Authorization": `Bearer ${userToken}` },
-        });
-        const data = await res.json();
-        if (data.error) { alert("Error: " + data.error); return; }
-        localStorage.clear();
-        showAuth();
-      } catch { alert("Something went wrong. Try again."); }
-    });
-      profileModal.style.display = "flex";
-      document.getElementById("profile-name").value = localStorage.getItem("nova_name") || "";
-    ;
-    document.getElementById("profile-close").addEventListener("click", () => { profileModal.style.display = "none"; });
-    document.getElementById("profile-save").addEventListener("click", async () => {
-      const name = document.getElementById("profile-name").value.trim();
-      const email = document.getElementById("profile-email").value.trim();
-      const password = document.getElementById("profile-password").value.trim();
-      const profileMsg = document.getElementById("profile-msg");
-      const saveBtn = document.getElementById("profile-save");
-      saveBtn.disabled = true; saveBtn.textContent = "Saving...";
-      try {
-        const res = await fetch(`${BACKEND_URL}/auth/update`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${userToken}` },
-          body: JSON.stringify({ name: name || undefined, email: email || undefined, password: password || undefined, avatar_url: pendingAvatarBase64 || undefined }),
-        });
-        const data = await res.json();
-        if (data.error) { profileMsg.style.color = "#e74c3c"; profileMsg.textContent = data.error; }
-        else {
-          if (name) localStorage.setItem("nova_name", name);
-          if (pendingAvatarBase64) { localStorage.setItem("nova_avatar", pendingAvatarBase64); updateProfileIcon(pendingAvatarBase64); }
-          profileMsg.style.color = "#2ecc71"; profileMsg.textContent = "Saved!";
-          setTimeout(() => { profileModal.style.display = "none"; profileMsg.textContent = ""; }, 1500);
-        }
-      } catch { profileMsg.style.color = "#e74c3c"; profileMsg.textContent = "Something went wrong."; }
-      saveBtn.disabled = false; saveBtn.textContent = "Save";
-    });
-
-    // Easter egg — background
-    let easterActive = localStorage.getItem("nova_easter") === "true";
-    const easterBtn = document.createElement("button");
-    easterBtn.className = "icon-btn"; easterBtn.title = "Toggle background";
-    easterBtn.textContent = "🖼️"; easterBtn.style.display = easterActive ? "block" : "none";
-    headerBtns.prepend(easterBtn);
-    function applyEaster() {
-      document.body.style.backgroundImage = easterActive ? "url('https://images.pexels.com/photos/31265958/pexels-photo-31265958.jpeg')" : "";
-      document.body.style.backgroundSize = easterActive ? "cover" : "";
-      document.body.style.backgroundPosition = easterActive ? "center" : "";
-      document.body.style.backgroundAttachment = easterActive ? "fixed" : "";
-    }
-    function toggleEaster() {
-      easterActive = !easterActive;
-      localStorage.setItem("nova_easter", easterActive);
-      applyEaster();
-      easterBtn.style.display = "block";
-    }
-    applyEaster();
-    easterBtn.addEventListener("click", toggleEaster);
-
-    // Easter egg — star cursor
-    let starCursorActive = localStorage.getItem("nova_star") === "true";
-    let starClicks = 0;
-    const starSVG = `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><text y='26' font-size='26'>⭐</text></svg>`;
-    const starCursorURL = `url("data:image/svg+xml,${encodeURIComponent(starSVG)}") 16 16, auto`;
-    const starBtn = document.createElement("button");
-    starBtn.className = "icon-btn"; starBtn.title = "Toggle star cursor";
-    starBtn.textContent = "⭐"; starBtn.style.display = starCursorActive ? "block" : "none";
-    headerBtns.prepend(starBtn);
-    function applyStarCursor() { document.body.style.cursor = starCursorActive ? starCursorURL : ""; }
-    function toggleStarCursor() {
-      starCursorActive = !starCursorActive;
-      localStorage.setItem("nova_star", starCursorActive);
-      applyStarCursor();
-      starBtn.style.display = "block";
-      showToast(starCursorActive ? "⭐ Star cursor on!" : "⭐ Star cursor off!");
-    }
-    applyStarCursor();
-    starBtn.addEventListener("click", toggleStarCursor);
-    headerTitle.addEventListener("click", () => {
-      starClicks++;
-      if (starClicks >= 8) { starClicks = 0; toggleStarCursor(); }
-      else showToast(`${8 - starClicks} more click${8 - starClicks !== 1 ? "s" : ""}...`);
-    });
-
-    // Easter egg — dino game
-    let dinoGameActive = false;
-    let dinoUnlocked = localStorage.getItem("nova_dino") === "true";
-    const dinoOverlay = document.createElement("div");
-    dinoOverlay.style.cssText = "display:none;position:fixed;inset:0;background:#fff;z-index:1000;";
-    const dinoClose = document.createElement("button");
-    dinoClose.textContent = "✕ Close";
-    dinoClose.style.cssText = "position:fixed;top:1rem;right:1rem;background:#333;border:none;color:white;padding:0.5rem 1rem;border-radius:8px;cursor:pointer;font-size:1rem;z-index:1002;";
-    const dinoFrame = document.createElement("iframe");
-    dinoFrame.src = "/trex/index.html";
-    dinoFrame.setAttribute("frameborder", "0");
-    dinoFrame.setAttribute("scrolling", "no");
-    dinoFrame.setAttribute("allow", "autoplay");
-    dinoFrame.style.cssText = "position:fixed;inset:0;width:100%;height:100%;border:none;z-index:1001;background:#fff;";
-    dinoOverlay.appendChild(dinoClose);
-    dinoOverlay.appendChild(dinoFrame);
-    document.body.appendChild(dinoOverlay);
-
-    const dinoBtn = document.createElement("button");
-    dinoBtn.className = "icon-btn"; dinoBtn.title = "Play Dino Game";
-    dinoBtn.textContent = "🦖"; dinoBtn.style.display = dinoUnlocked ? "block" : "none";
-    headerBtns.prepend(dinoBtn);
-    dinoBtn.addEventListener("click", toggleDino);
-
-    function toggleDino() {
-      window.open("/trex/index.html", "_blank");
-    }
-    dinoClose.addEventListener("click", toggleDino);
-
-    // Input easter egg detection
-    input.addEventListener("input", () => {
-      const val = input.value.trim().toLowerCase();
-      if (val === "jymer1102") { input.value = ""; toggleEaster(); showToast(easterActive ? "Easter egg unlocked! 🔓🎉" : "Background off!"); }
-      if (val === "dinosaur") {
-        input.value = "";
-        if (!dinoUnlocked) { dinoUnlocked = true; localStorage.setItem("nova_dino", "true"); dinoBtn.style.display = "block"; showToast("🦖 Dino game unlocked!"); }
-        toggleDino();
-      }    });
-  </script>
+  // Input easter egg detection
+  input.addEventListener("input", () => {
+    const val = input.value.trim().toLowerCase();
+    if (val === "jymer1102") { input.value = ""; toggleEaster(); showToast(easterActive ? "Easter egg unlocked! 🔓🎉" : "Background off!"); }
+    if (val === "dinosaur") { input.value = ""; if (!dinoUnlocked) { dinoUnlocked = true; localStorage.setItem("nova_dino","true"); dinoBtn.style.display = "block"; showToast("🦖 Dino game unlocked!"); } toggleDino(); }
+  });
+</script>
 </body>
 </html>
