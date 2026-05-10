@@ -654,6 +654,7 @@
     `;
     profileModal.appendChild(profileBox);
     document.body.appendChild(profileModal);
+    profileModal.style.display = "none";
 
     let pendingAvatarBase64 = null;
     const avatarInput = document.getElementById("avatar-input");
@@ -692,7 +693,7 @@
     });
       profileModal.style.display = "flex";
       document.getElementById("profile-name").value = localStorage.getItem("nova_name") || "";
-    ;
+    });
     document.getElementById("profile-close").addEventListener("click", () => { profileModal.style.display = "none"; });
     document.getElementById("profile-save").addEventListener("click", async () => {
       const name = document.getElementById("profile-name").value.trim();
