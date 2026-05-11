@@ -3,21 +3,23 @@
 
 <head>
 <style>
-  /* 1. Force the background of the entire page to change */
-  html.inverted, 
-  body.inverted {
-    background-color: #202124 !important;
+  /* Base transition for smoothness */
+  body {
+    transition: background-color 1s ease !important;
   }
 
-  /* 2. Flip the colors of the game canvas */
+  /* THE MAGIC STICK: If body has 'inverted' class, force EVERYTHING inside to be dark */
+  body.inverted, 
+  body.inverted * {
+    background-color: #202124 !important;
+    color: #f7f7f7 !important;
+    border-color: #555 !important;
+  }
+
+  /* Keep the canvas (the actual game drawings) transparent so the filter works */
   body.inverted .runner-canvas {
     filter: invert(1) !important;
     background-color: transparent !important;
-  }
-
-  /* 3. Smooth transition so it feels like a fade */
-  body {
-    transition: background-color 1s ease !important;
   }
 </style>
     
