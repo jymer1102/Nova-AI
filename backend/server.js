@@ -1,3 +1,8 @@
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err);
+  process.exit(1);
+});
+
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
