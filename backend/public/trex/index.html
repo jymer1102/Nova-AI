@@ -30,58 +30,28 @@
     </div>
     <p id="sendingText" style="text-align: center;font-family:Arial, Helvetica, sans-serif;display:none;">Saving highscore...</p>
 
-    <script>
-        console.log("Nova Sync: BRUTE FORCE ENGINE STARTING...");
-
-        // This function will run every 100 milliseconds
-        setInterval(() => {
-            const body = document.body;
-            const isInverted = body.classList.contains('inverted');
-
-            if (isInverted) {
-                // 1. Force the page to dark grey
-                body.style.setProperty('background-color', '#202124', 'important');
-                
-                // 2. Force the game wrapper and its children to be dark
-                const wrapper = document.querySelector('.interstitial-wrapper');
-                if (wrapper) {
-                    wrapper.style.setProperty('background-color', '#202124', 'important');
-                    // Get all children of the wrapper
-                    const allChildren = wrapper.querySelectorAll('*');
-                    allChildren.forEach(el => {
-                        if (el.tagName !== 'CANVAS') {
-                            el.style.setProperty('background-color', '#202124', 'important');
-                            el.style.setProperty('color', '#f7f7f7', 'important');
-                        }
-                    });
-                }
-
-                // 3. Flip the Dino and Cacti to white
-                const canvas = document.querySelector('.runner-canvas');
-                if (canvas) {
-                    canvas.style.setProperty('filter', 'invert(1)', 'important');
-                    canvas.style.setProperty('background-color', 'transparent', 'important');
-                }
-            } else {
-                // 4. Reset to light mode if class is removed
-                if (body.style.backgroundColor === 'rgb(32, 33, 36)') {
-                    body.style.backgroundColor = '';
-                    const wrapper = document.querySelector('.interstitial-wrapper');
-                    if (wrapper) {
-                        wrapper.style.backgroundColor = '';
-                        wrapper.querySelectorAll('*').forEach(el => {
-                            el.style.backgroundColor = '';
-                            el.style.color = '';
-                        });
-                    }
-                    const canvas = document.querySelector('.runner-canvas');
-                    if (canvas) canvas.style.filter = '';
-                }
-            }
-        }, 100);
-
-        // Verification log
-        console.log("Nova Sync: Loop active. Waiting for 'inverted' class...");
-    </script>
+   <script>
+  // This loop watches the game state 10 times a second and forces the colors
+  setInterval(() => {
+    const isInverted = document.body.classList.contains('inverted');
+    const gameCanvas = document.querySelector('.runner-canvas');
+    
+    if (isInverted) {
+      // Paint the background dark
+      document.body.style.setProperty('background-color', '#202124', 'important');
+      // Flip the game canvas colors
+      if (gameCanvas) {
+        gameCanvas.style.setProperty('filter', 'invert(1)', 'important');
+      }
+    } else {
+      // Reset to day mode
+      document.body.style.backgroundColor = '';
+      if (gameCanvas) {
+        gameCanvas.style.filter = '';
+      }
+    }
+  }, 100);
+</script>
+    
 </body>
 </html>
