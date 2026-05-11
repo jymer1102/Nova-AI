@@ -48,31 +48,40 @@
      <p id="sendingText" style="text-align: center;font-family:Arial, Helvetica, sans-serif;display:none;">Saving highscore...</p>
   
   <script>
-  // This script watches for the "inverted" class and forces the colors
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.attributeName === 'class') {
-        const isInverted = document.body.classList.contains('inverted');
-        
-        if (isInverted) {
-          // FORCE DARK MODE
-          document.body.style.backgroundColor = '#202124';
-          document.documentElement.style.backgroundColor = '#202124';
-          // Find the game canvas and flip its colors
-          const canvas = document.querySelector('.runner-canvas');
-          if (canvas) canvas.style.filter = 'invert(1)';
-        } else {
-          // FORCE LIGHT MODE
-          document.body.style.backgroundColor = '#f7f7f7';
-          document.documentElement.style.backgroundColor = '#f7f7f7';
-          const canvas = document.querySelector('.runner-canvas');
-          if (canvas) canvas.style.filter = 'none';
+  (function() {
+    // This is the function that worked for you in the console
+    function forceTheme(isDark) {
+      const bgColor = isDark ? '#202124' : '#f7f7f7';
+      const canvasFilter = isDark ? 'invert(1)' : 'none';
+      
+      // Force EVERY element to the color you want
+      document.querySelectorAll('*').forEach(el => {
+        // We don't want to paint the canvas background, just the page
+        if (el.tagName !== 'CANVAS') {
+          el.style.backgroundColor = bgColor;
+          el.style.color = isDark ? '#f7f7f7' : '#535353';
         }
-      }
-    });
-  });
+      });
 
-  observer.observe(document.body, { attributes: true });
+      // Handle the game canvas specifically
+      const canvas = document.querySelector('.runner-canvas');
+      if (canvas) {
+        canvas.style.filter = canvasFilter;
+        canvas.style.backgroundColor = 'transparent';
+      }
+    }
+
+    // This "hooks" into the game engine's built-in inversion logic
+    const originalInvert = Runner.prototype.invert;
+    Runner.prototype.invert = function() {
+      // Run the original logic first
+      originalInvert.apply(this, arguments);
+      
+      // Then run our "Force" function based on the game's state
+      console.log("Nova Sync: Toggling Night Mode -", this.invertTrigger);
+      forceTheme(this.invertTrigger);
+    };
+  })();
 </script>
   
 </body>
