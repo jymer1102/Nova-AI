@@ -2738,35 +2738,14 @@ document.addEventListener('DOMContentLoaded', onDocumentLoad);
 (function enableNightMode() {
     console.log("Nova Sync: Day/Night Cycle Engine Loaded.");
 
-    // 1. Inject the CSS dynamically (bypasses HTML and index.css completely)
-    const style = document.createElement('style');
-   style.innerHTML = `
-        body {
-            transition: background-color 0.8s ease !important;
-            background-color: #f7f7f7;
+    setInterval(function() {
+        var isDark = document.body.classList.contains('inverted');
+        document.body.parentElement.style.backgroundColor = isDark ? '#202124' : '#f7f7f7';
+        document.body.style.backgroundColor = isDark ? '#202124' : '#f7f7f7';
+        var canvas = document.querySelector('.runner-canvas');
+        if (canvas) {
+            canvas.style.filter = isDark ? 'invert(1)' : '';
         }
-
-        body.inverted {
-            background-color: #202124 !important;
-        }
-
-        body.inverted .runner-canvas {
-            filter: invert(1) !important;
-        }
-    `;
-    document.head.appendChild(style);
-
-    // 2. Watch the body for the 'inverted' class and enforce the background
-   const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            if (mutation.attributeName === 'class') {
-                const isDark = document.body.classList.contains('inverted');
-                document.documentElement.classList.toggle('inverted', isDark);
-                document.body.parentElement.style.backgroundColor = isDark ? '#202124' : '#f7f7f7';
-                document.body.style.backgroundColor = isDark ? '#202124' : '#f7f7f7';
-            }
-        });
-    });
-    observer.observe(document.body, { attributes: true });
+    }, 100);
 })();
 // ==========================================
