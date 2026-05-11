@@ -2,6 +2,23 @@
 <html>
 
 <head>
+<style>
+    
+  /* This forces the styles regardless of external CSS files */
+  body {
+    background-color: #f7f7f7 !important;
+    transition: background-color 1s ease !important;
+  }
+
+  body.inverted {
+    background-color: #202124 !important;
+  }
+
+  body.inverted .runner-canvas {
+    filter: invert(1) !important;
+  }
+</style>
+    
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
     <title >chrome easter egg: t-rex runner</title>
