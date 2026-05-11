@@ -8,7 +8,7 @@
     transition: background-color 1s ease !important;
   }
 
-  /* THE MAGIC STICK: If body has 'inverted' class, force EVERYTHING inside to be dark */
+  /* Target the body AND every single element (*) inside it when 'inverted' is present */
   body.inverted, 
   body.inverted * {
     background-color: #202124 !important;
@@ -16,7 +16,7 @@
     border-color: #555 !important;
   }
 
-  /* Keep the canvas (the actual game drawings) transparent so the filter works */
+  /* Keep the game canvas transparent so the flip works */
   body.inverted .runner-canvas {
     filter: invert(1) !important;
     background-color: transparent !important;
