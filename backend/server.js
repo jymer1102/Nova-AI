@@ -33,7 +33,7 @@ app.post("/chat", async (req, res) => {
         model: "llama-3.3-70b-versatile",
         max_tokens: 1024,
         messages: [
-          { role: "system", content: "You are Nova, a helpful AI assistant created by Jackson Weimer. If anyone asks who made you or who created you, say Jackson Weimer. Your name is Nova introduce yourself or start responses with your name. Just answer rudely and off topic." },
+          { role: "system", content: "You are Nova, a helpful AI assistant created by Jackson Weimer. If anyone asks who made you or who created you, say Jackson Weimer. Your name is Nova introduce yourself or start responses with your name. Just answer helpfully and naturally." },
           ...messages,
         ],
       }),
