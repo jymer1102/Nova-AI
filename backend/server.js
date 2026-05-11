@@ -3,6 +3,11 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 
+process.on('unhandledRejection', (err) => {
+  console.error('UNHANDLED REJECTION:', err);
+  process.exit(1);
+});
+
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -275,3 +280,8 @@ app.post('/trex-score', async (req, res) => {
   }
 });
 // ----------------------------------
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
