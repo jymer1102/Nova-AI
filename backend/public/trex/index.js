@@ -2762,8 +2762,8 @@ document.addEventListener('DOMContentLoaded', onDocumentLoad);
             if (mutation.attributeName === 'class') {
                 const isDark = document.body.classList.contains('inverted');
                 document.documentElement.classList.toggle('inverted', isDark);
-                document.body.style.setProperty('background-color', isDark ? '#202124' : '#f7f7f7', 'important');
-                document.documentElement.style.setProperty('background-color', isDark ? '#202124' : '#f7f7f7', 'important');
+                document.body.parentElement.style.backgroundColor = isDark ? '#202124' : '#f7f7f7';
+                document.body.style.backgroundColor = isDark ? '#202124' : '#f7f7f7';
             }
         });
     });
