@@ -2730,3 +2730,51 @@ function onDocumentLoad() {
 }
 
 document.addEventListener('DOMContentLoaded', onDocumentLoad);
+
+
+// ==========================================
+// NOVA SYNC: DYNAMIC DAY/NIGHT CYCLE
+// ==========================================
+(function enableNightMode() {
+    console.log("Nova Sync: Day/Night Cycle Engine Loaded.");
+
+    // 1. Inject the CSS dynamically (bypasses HTML and index.css completely)
+    const style = document.createElement('style');
+    style.innerHTML = `
+        /* Smooth fade transition */
+        body, html {
+            transition: background-color 0.8s ease !important;
+            background-color: #f7f7f7 !important;
+            margin: 0;
+            height: 100%;
+        }
+        
+        /* When inverted class is active, paint the whole screen dark */
+        body.inverted, 
+        html.inverted,
+        body.inverted * {
+            background-color: #202124 !important;
+            color: #f7f7f7 !important;
+        }
+
+        /* Target the game canvas and flip the colors like a photo negative */
+        body.inverted .runner-canvas {
+            filter: invert(1) !important;
+            background-color: transparent !important;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // 2. Watch the body for the 'inverted' class and enforce the background
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.attributeName === 'class') {
+                const isDark = document.body.classList.contains('inverted');
+                document.documentElement.classList.toggle('inverted', isDark);
+            }
+        });
+    });
+
+    observer.observe(document.body, { attributes: true });
+})();
+// ==========================================
