@@ -47,41 +47,41 @@
      </div>   
      <p id="sendingText" style="text-align: center;font-family:Arial, Helvetica, sans-serif;display:none;">Saving highscore...</p>
   
-  <script>
-  (function() {
-    // This is the function that worked for you in the console
-    function forceTheme(isDark) {
-      const bgColor = isDark ? '#202124' : '#f7f7f7';
-      const canvasFilter = isDark ? 'invert(1)' : 'none';
-      
-      // Force EVERY element to the color you want
+<script>
+  console.log("Nova Sync: Brute Force Script Loaded");
+
+  setInterval(() => {
+    // Check if the body has the 'inverted' class
+    const isInverted = document.body.classList.contains('inverted');
+
+    if (isInverted) {
+      // 1. Force the background of EVERYTHING to dark
       document.querySelectorAll('*').forEach(el => {
-        // We don't want to paint the canvas background, just the page
         if (el.tagName !== 'CANVAS') {
-          el.style.backgroundColor = bgColor;
-          el.style.color = isDark ? '#f7f7f7' : '#535353';
+          el.style.setProperty('background-color', '#202124', 'important');
+          el.style.setProperty('color', '#f7f7f7', 'important');
         }
       });
 
-      // Handle the game canvas specifically
+      // 2. Flip the Dino and Cacti
       const canvas = document.querySelector('.runner-canvas');
       if (canvas) {
-        canvas.style.filter = canvasFilter;
-        canvas.style.backgroundColor = 'transparent';
+        canvas.style.setProperty('filter', 'invert(1)', 'important');
+        canvas.style.setProperty('background-color', 'transparent', 'important');
+      }
+    } else {
+      // 3. Optional: Reset if it's NOT inverted (Day Mode)
+      // If the background is currently dark, wipe the forced styles
+      if (document.body.style.backgroundColor === 'rgb(32, 33, 36)') {
+        document.querySelectorAll('*').forEach(el => {
+          el.style.backgroundColor = '';
+          el.style.color = '';
+        });
+        const canvas = document.querySelector('.runner-canvas');
+        if (canvas) canvas.style.filter = '';
       }
     }
-
-    // This "hooks" into the game engine's built-in inversion logic
-    const originalInvert = Runner.prototype.invert;
-    Runner.prototype.invert = function() {
-      // Run the original logic first
-      originalInvert.apply(this, arguments);
-      
-      // Then run our "Force" function based on the game's state
-      console.log("Nova Sync: Toggling Night Mode -", this.invertTrigger);
-      forceTheme(this.invertTrigger);
-    };
-  })();
+  }, 100); // This runs 10 times every second
 </script>
   
 </body>
