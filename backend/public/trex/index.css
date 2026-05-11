@@ -157,3 +157,11 @@ body.inverted .runner-canvas {
   max-width: 600px;
   margin: 0 auto;
 }
+
+html {
+  background-color: #f7f7f7 !important;
+}
+
+html.inverted {
+  background-color: #202124 !important;
+}
