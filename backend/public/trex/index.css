@@ -134,3 +134,26 @@ html, body {
     padding: 0 8px;
   }
 }
+
+/* 1. The smooth transition for the whole page */
+body {
+  background-color: #f7f7f7;
+  transition: background-color 1s ease;
+  margin: 0;
+}
+
+/* 2. What happens when the JS adds the 'inverted' class */
+body.inverted {
+  background-color: #202124;
+}
+
+/* 3. Flip the colors of the Dino, obstacles, and text */
+body.inverted .runner-canvas {
+  filter: invert(1);
+}
+
+/* 4. Ensure the game container looks right */
+.interstitial-wrapper {
+  max-width: 600px;
+  margin: 0 auto;
+}
