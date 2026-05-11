@@ -2757,15 +2757,16 @@ document.addEventListener('DOMContentLoaded', onDocumentLoad);
     document.head.appendChild(style);
 
     // 2. Watch the body for the 'inverted' class and enforce the background
-    const observer = new MutationObserver((mutations) => {
+   const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
             if (mutation.attributeName === 'class') {
                 const isDark = document.body.classList.contains('inverted');
                 document.documentElement.classList.toggle('inverted', isDark);
+                document.body.style.setProperty('background-color', isDark ? '#202124' : '#f7f7f7', 'important');
+                document.documentElement.style.setProperty('background-color', isDark ? '#202124' : '#f7f7f7', 'important');
             }
         });
     });
-
     observer.observe(document.body, { attributes: true });
 })();
 // ==========================================
