@@ -2740,27 +2740,18 @@ document.addEventListener('DOMContentLoaded', onDocumentLoad);
 
     // 1. Inject the CSS dynamically (bypasses HTML and index.css completely)
     const style = document.createElement('style');
-    style.innerHTML = `
-        /* Smooth fade transition */
-        body, html {
+   style.innerHTML = `
+        body {
             transition: background-color 0.8s ease !important;
-            background-color: #f7f7f7 !important;
-            margin: 0;
-            height: 100%;
-        }
-        
-        /* When inverted class is active, paint the whole screen dark */
-        body.inverted, 
-        html.inverted,
-        body.inverted * {
-            background-color: #202124 !important;
-            color: #f7f7f7 !important;
+            background-color: #f7f7f7;
         }
 
-        /* Target the game canvas and flip the colors like a photo negative */
+        body.inverted {
+            background-color: #202124 !important;
+        }
+
         body.inverted .runner-canvas {
             filter: invert(1) !important;
-            background-color: transparent !important;
         }
     `;
     document.head.appendChild(style);
