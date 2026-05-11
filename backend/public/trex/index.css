@@ -144,12 +144,12 @@ body {
 
 /* 2. What happens when the JS adds the 'inverted' class */
 body.inverted {
-  background-color: #202124;
+  background-color: #202124 !important;
 }
 
 /* 3. Flip the colors of the Dino, obstacles, and text */
 body.inverted .runner-canvas {
-  filter: invert(1);
+  filter: invert(1) !important;
 }
 
 /* 4. Ensure the game container looks right */
