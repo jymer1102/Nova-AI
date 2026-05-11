@@ -3,15 +3,21 @@
 
 <head>
 <style>
-  /* Use !important to override everything else */
-  body.inverted, body.inverted * {
+  /* 1. Force the background of the entire page to change */
+  html.inverted, 
+  body.inverted {
     background-color: #202124 !important;
-    color: #f7f7f7 !important;
   }
 
+  /* 2. Flip the colors of the game canvas */
   body.inverted .runner-canvas {
     filter: invert(1) !important;
     background-color: transparent !important;
+  }
+
+  /* 3. Smooth transition so it feels like a fade */
+  body {
+    transition: background-color 1s ease !important;
   }
 </style>
     
