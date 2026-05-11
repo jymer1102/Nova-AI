@@ -240,11 +240,12 @@ app.post('/trex-score', async (req, res) => {
     }
 
     // 4. Fetch the current user's profile
+    // THE FIX: Used .maybeSingle() so it doesn't crash on new users!
     const { data: profile, error: fetchError } = await supabase
       .from('profiles') 
       .select('trex_high_score')
       .eq('id', user.id)
-      .single();
+      .maybeSingle(); 
 
     const currentHighScore = profile?.trex_high_score || 0;
 
@@ -269,6 +270,3 @@ app.post('/trex-score', async (req, res) => {
   }
 });
 // ----------------------------------
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
