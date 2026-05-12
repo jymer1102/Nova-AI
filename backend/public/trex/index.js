@@ -309,20 +309,22 @@
         loadSounds: function () {
             if (!IS_IOS) {
                 this.audioContext = new AudioContext();
+                
+                // URLs to the original Chrome Dino MP3 files hosted on GitHub
+                const soundUrls = {
+                    BUTTON_PRESS: 'https://raw.githubusercontent.com/arnellebalane/trex-runner/master/sounds/button-press.mp3',
+                    HIT: 'https://raw.githubusercontent.com/arnellebalane/trex-runner/master/sounds/hit.mp3',
+                    SCORE: 'https://raw.githubusercontent.com/arnellebalane/trex-runner/master/sounds/score-reached.mp3'
+                };
 
-                var resourceTemplate =
-                    document.getElementById(this.config.RESOURCE_TEMPLATE_ID).content;
-
-                for (var sound in Runner.sounds) {
-                    var soundSrc =
-                        resourceTemplate.getElementById(Runner.sounds[sound]).src;
-                    soundSrc = soundSrc.substr(soundSrc.indexOf(',') + 1);
-                    var buffer = decodeBase64ToArrayBuffer(soundSrc);
-
-                    // Async, so no guarantee of order in array.
-                    this.audioContext.decodeAudioData(buffer, function (index, audioData) {
-                        this.soundFx[index] = audioData;
-                    }.bind(this, sound));
+                for (let sound in Runner.sounds) {
+                    fetch(soundUrls[sound])
+                        .then(response => response.arrayBuffer())
+                        .then(buffer => this.audioContext.decodeAudioData(buffer))
+                        .then(audioData => {
+                            this.soundFx[sound] = audioData;
+                        })
+                        .catch(err => console.log("Audio failed to load:", err));
                 }
             }
         },
