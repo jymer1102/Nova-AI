@@ -292,6 +292,18 @@
       localStorage.setItem("nova_token", userToken);
       localStorage.setItem("nova_refresh_token", data.session.refresh_token);
       localStorage.setItem("nova_name", data.user?.user_metadata?.name || name || "");
+      
+      // --- NEW: Download their profile picture from the database! ---
+      const savedAvatar = data.user?.user_metadata?.avatar_url;
+      if (savedAvatar) {
+        localStorage.setItem("nova_avatar", savedAvatar);
+        updateProfileIcon(savedAvatar);
+      } else {
+        localStorage.removeItem("nova_avatar");
+        updateProfileIcon(null);
+      }
+      // --------------------------------------------------------------
+
       showApp();
     } catch { authError.textContent = "Something went wrong. Try again."; authSubmit.disabled = false; authSubmit.textContent = isSignUp ? "Sign Up" : "Sign In"; }
   });
