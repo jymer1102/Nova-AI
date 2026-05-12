@@ -101,7 +101,7 @@ app.post("/auth/update", async (req, res) => {
   const updates = {};
   if (email) updates.email = email;
   if (password) updates.password = password;
-  if (name || avatar_url) updates.data = { ...user.user_metadata, ...(name && { name }), ...(avatar_url && { avatar_url }) };
+if (name || avatar_url) updates.user_metadata = { ...user.user_metadata, ...(name && { name }), ...(avatar_url && { avatar_url }) };
   const { data, error } = await supabaseAdmin.auth.admin.updateUserById(user.id, updates);
   if (error) { console.error("Update error:", error); return res.status(500).json({ error: error.message }); }
   res.json({ success: true, user: data.user });
