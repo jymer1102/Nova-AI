@@ -234,11 +234,9 @@ app.post('/trex-score', async (req, res) => {
 
     // 1. Check if token exists
     const token = req.body.token || (authHeader && authHeader.split(' ')[1]);
-if (!token) {
-    return res.status(401).json({ error: 'Missing or invalid token' });
-}
-  const token = authHeader ? authHeader.split(' ')[1] : req.body.token;
-
+    if (!token) {
+      return res.status(401).json({ error: 'Missing or invalid token' });
+    }
     // 2. Authenticate the user securely via Supabase
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     if (authError || !user) {
