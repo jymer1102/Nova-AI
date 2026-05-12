@@ -231,6 +231,10 @@ app.post('/trex-score', async (req, res) => {
   try {
     const { score } = req.body;
     const authHeader = req.headers.authorization;
+    console.log('Token received:', token ? token.substring(0, 20) + '...' : 'none');
+const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+console.log('Auth error:', authError);
+console.log('User:', user?.id);
 
     // 1. Check if token exists
     const token = req.body.token || (authHeader && authHeader.split(' ')[1]);
