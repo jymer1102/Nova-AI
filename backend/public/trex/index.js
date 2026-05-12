@@ -2098,14 +2098,13 @@
                 // Make sure to use your actual live URL if testing on the live site
                 const BACKEND_URL = "https://nova-ai-mk9x.onrender.com"; 
 
-                fetch(`${BACKEND_URL}/trex-score`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ score: distance })
-                })
+               fetch(`${BACKEND_URL}/trex-score`, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ score: distance, token: token })
+})
                 .then(response => response.json())
                 .then(data => console.log("Nova AI Sync:", data.message))
                 .catch(err => console.error("Score sync failed:", err));
