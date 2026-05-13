@@ -244,7 +244,7 @@ app.post('/trex-score', async (req, res) => {
     let user;
     try {
       const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
-      user = { id: payload.sub };
+     user = { id: payload.sub, name: payload.user_metadata?.name || payload.email || 'Unknown' };
       console.log('User ID from token:', user.id);
     } catch (e) {
       console.error('Token decode error:', e);
@@ -269,7 +269,7 @@ app.post('/trex-score', async (req, res) => {
     if (score > currentHighScore) {
       const { error: upsertError } = await supabase
         .from('trex_scores')
-        .upsert({ id: user.id, trex_high_score: score });
+        .upsert({ id: user.id, trex_high_score: score, name: user.name });
 
       if (upsertError) throw upsertError;
       return res.status(200).json({ message: 'New high score saved!', highScore: score });
