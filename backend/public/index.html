@@ -423,7 +423,9 @@ async function saveCurrentChat() {
     
     // Grab the name from local storage
     const currentUserName = localStorage.getItem("nova_name") || "Unknown User";
-
+  
+    console.log("WAIT, WHAT IS MY TOKEN?", userToken);
+  
     await fetch(`${BACKEND_URL}/chats`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${userToken}` },
