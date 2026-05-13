@@ -155,12 +155,10 @@
 <div class="modal-overlay" id="profile-modal">
   <div class="modal-box">
     <h2 style="font-size:1.2rem;font-weight:600">👤 Profile Settings</h2>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem">
-      <img id="avatar-preview" src="" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--border);display:none" />
-      <label style="cursor:pointer;color:var(--accent);font-size:0.9rem">
-        📷 Change profile picture
-        <input type="file" id="avatar-input" accept="image/*" style="display:none" />
-      </label>
+    <div id="profile-upload-section" style="margin-bottom:20px;display:flex;flex-direction:column;align-items:center;">
+      <img id="profile-preview" src="https://via.placeholder.com/100" alt="Profile" width="100" height="100" style="border-radius:50%;object-fit:cover;margin-bottom:10px;" />
+      <br>
+      <input type="file" id="avatar-upload" accept="image/jpeg, image/png, image/webp" />
     </div>
     <input type="text" id="profile-name" class="modal-input" placeholder="New name" />
     <input type="email" id="profile-email" class="modal-input" placeholder="New email" />
@@ -292,18 +290,6 @@
       localStorage.setItem("nova_token", userToken);
       localStorage.setItem("nova_refresh_token", data.session.refresh_token);
       localStorage.setItem("nova_name", data.user?.user_metadata?.name || name || "");
-      
-      // --- NEW: Download their profile picture from the database! ---
-      const savedAvatar = data.user?.user_metadata?.avatar_url;
-      if (savedAvatar) {
-        localStorage.setItem("nova_avatar", savedAvatar);
-        updateProfileIcon(savedAvatar);
-      } else {
-        localStorage.removeItem("nova_avatar");
-        updateProfileIcon(null);
-      }
-      // --------------------------------------------------------------
-
       showApp();
     } catch { authError.textContent = "Something went wrong. Try again."; authSubmit.disabled = false; authSubmit.textContent = isSignUp ? "Sign Up" : "Sign In"; }
   });
@@ -415,25 +401,18 @@
   overlay.addEventListener("click", closeSidebarFn);
   function closeSidebarFn() { sidebar.classList.remove("open"); overlay.classList.remove("show"); }
 
-async function saveCurrentChat() {
+  async function saveCurrentChat() {
     if (history.length < 1 || !userToken) return;
     const firstUserMsg = history.find(m => m.role === "user");
     if (!firstUserMsg) return;
     const title = typeof firstUserMsg.content === "string" ? firstUserMsg.content.slice(0, 40) : "Image message";
-    
-    // Grab the name from local storage
-    const currentUserName = localStorage.getItem("nova_name") || "Unknown User";
-  
-    console.log("WAIT, WHAT IS MY TOKEN?", userToken);
-  
     await fetch(`${BACKEND_URL}/chats`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${userToken}` },
-      // Added 'author' right here!
-      body: JSON.stringify({ id: currentChatId, title, history, author: currentUserName }), 
+      body: JSON.stringify({ id: currentChatId, title, history }),
     });
   }
-  
+
   async function loadChats() {
     try {
       const res = await fetch(`${BACKEND_URL}/chats`, { headers: { "Authorization": `Bearer ${userToken}` } });
@@ -584,17 +563,14 @@ async function saveCurrentChat() {
     history.push({ role:"user", content: userContent.length===1 && userContent[0].type==="text" ? text : userContent });
     input.value = ""; clearImage(); btn.disabled = true;
 
-   // Save immediately
+    // Save immediately
     const firstUserMsg = history.find(m => m.role === "user");
     if (firstUserMsg && userToken) {
       const title = typeof firstUserMsg.content === "string" ? firstUserMsg.content.slice(0,40) : "Image message";
-      const currentUserName = localStorage.getItem("nova_name") || "Unknown User";
-      
       fetch(`${BACKEND_URL}/chats`, {
         method:"POST",
         headers:{"Content-Type":"application/json","Authorization":`Bearer ${userToken}`},
-        // Added 'author' right here!
-        body:JSON.stringify({ id:currentChatId, title, history, author: currentUserName }),
+        body:JSON.stringify({ id:currentChatId, title, history }),
       }).then(() => loadChats()).catch(console.error);
     }
 
@@ -643,7 +619,40 @@ async function saveCurrentChat() {
   btn.addEventListener("click", sendMessage);
   input.addEventListener("keydown", e => { if (e.key==="Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
 
-  // Easter egg — background
+  // --- PROFILE PICTURE UPLOAD LOGIC ---
+  const avatarUploadInput = document.getElementById('avatar-upload');
+  const profilePreview = document.getElementById('profile-preview');
+
+  async function loadExistingAvatar() {
+    const saved = localStorage.getItem("nova_avatar");
+    if (saved) profilePreview.src = saved;
+  }
+  loadExistingAvatar();
+
+  avatarUploadInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024;
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) { alert("Only JPG, PNG, and WEBP images are allowed!"); e.target.value = ''; return; }
+    if (file.size > MAX_FILE_SIZE_BYTES) { alert("File too big! Max 2MB."); e.target.value = ''; return; }
+    showToast("Uploading profile picture...");
+    try {
+      const compressed = await compressImage(file);
+      localStorage.setItem("nova_avatar", compressed);
+      profilePreview.src = compressed;
+      updateProfileIcon(compressed);
+      const res = await fetch(`${BACKEND_URL}/auth/update`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${userToken}` },
+        body: JSON.stringify({ avatar_url: compressed }),
+      });
+      const data = await res.json();
+      if (data.error) { showToast("Failed to save avatar."); }
+      else { showToast("Profile picture updated! ✅"); }
+    } catch { showToast("Upload failed. Try again."); }
+  });
+
   let easterActive = localStorage.getItem("nova_easter") === "true";
   const easterBtn = document.createElement("button");
   easterBtn.className = "icon-btn"; easterBtn.title = "Toggle background"; easterBtn.textContent = "🖼️"; easterBtn.style.display = easterActive ? "block" : "none";
