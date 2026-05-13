@@ -231,18 +231,21 @@ app.post('/trex-score', async (req, res) => {
   try {
     const { score } = req.body;
     const authHeader = req.headers.authorization;
-    console.log('Token received:', token ? token.substring(0, 20) + '...' : 'none');
-const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-console.log('Auth error:', authError);
-console.log('User:', user?.id);
 
     // 1. Check if token exists
     const token = req.body.token || (authHeader && authHeader.split(' ')[1]);
     if (!token) {
       return res.status(401).json({ error: 'Missing or invalid token' });
     }
+
+    console.log('Token received:', token.substring(0, 20) + '...');
+
     // 2. Authenticate the user securely via Supabase
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const { data: userData2, error: authError } = await supabase.auth.getUser(token);
+    const user = userData2.user;
+    console.log('Auth error:', authError);
+    console.log('User:', user?.id);
+
     if (authError || !user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
@@ -253,23 +256,19 @@ console.log('User:', user?.id);
     }
 
     // 4. Fetch the current user's profile
-    // THE FIX: Used .maybeSingle() so it doesn't crash on new users!
-    const { data: profile, error: fetchError } = await supabase
-      .from('profiles') 
+    const { data: profile } = await supabase
+      .from('profiles')
       .select('trex_high_score')
       .eq('id', user.id)
-      .maybeSingle(); 
+      .maybeSingle();
 
     const currentHighScore = profile?.trex_high_score || 0;
 
-    // 5. Upsert (Insert or Update) the database if the new score is higher
+    // 5. Upsert if new score is higher
     if (score > currentHighScore) {
       const { error: upsertError } = await supabase
         .from('profiles')
-        .upsert({ 
-          id: user.id, // Links directly to their hidden Auth ID
-          trex_high_score: score 
-        });
+        .upsert({ id: user.id, trex_high_score: score });
 
       if (upsertError) throw upsertError;
       return res.status(200).json({ message: 'New high score saved!', highScore: score });
@@ -283,8 +282,3 @@ console.log('User:', user?.id);
   }
 });
 // ----------------------------------
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
