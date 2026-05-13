@@ -266,7 +266,7 @@ app.post('/trex-score', async (req, res) => {
     const { data: profile } = await supabase
       .from('trex_scores')
       .select('trex_high_score')
-      .eq('id', user.id)
+      .eq('user_id', user.id)
       .maybeSingle();
 
     const currentHighScore = profile?.trex_high_score || 0;
@@ -275,7 +275,7 @@ app.post('/trex-score', async (req, res) => {
     if (score > currentHighScore) {
       const { error: upsertError } = await supabase
         .from('trex_scores')
-        .upsert({ id: user.id, trex_high_score: score, name: user.name });
+        .upsert({ user_id: user.id, trex_high_score: score, name: user.name }, { onConflict: 'user_id' });
 
       if (upsertError) throw upsertError;
       return res.status(200).json({ message: 'New high score saved!', highScore: score });
