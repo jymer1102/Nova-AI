@@ -168,7 +168,8 @@ app.post("/auth/login", async (req, res) => {
 
 // Save chat
 app.post("/chats", async (req, res) => {
-  const { id, title, history } = req.body;
+  // 1. Added 'author' right here to catch it from the frontend
+  const { id, title, history, author } = req.body; 
   const token = req.headers.authorization?.split(" ")[1] || req.body.token;
   try {
     const { data: userData, error: authErr } = await supabase.auth.getUser(token);
@@ -177,7 +178,12 @@ app.post("/chats", async (req, res) => {
       return res.status(401).json({ error: "Unauthorized" });
     }
     const { error } = await supabase.from("chats").upsert({
-      id, user_id: userData.user.id, title, history, created_at: new Date().toISOString()
+      id, 
+      user_id: userData.user.id, 
+      title, 
+      history, 
+      author, // 2. Added 'author' right here to drop it into the database
+      created_at: new Date().toISOString()
     });
     if (error) {
       console.error("Chat save DB error:", error);
