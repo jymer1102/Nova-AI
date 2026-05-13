@@ -258,7 +258,7 @@ app.post('/trex-score', async (req, res) => {
 
     // 4. Fetch the current user's profile
     const { data: profile } = await supabase
-      .from('profiles')
+      .from('trex_scores')
       .select('trex_high_score')
       .eq('id', user.id)
       .maybeSingle();
@@ -268,7 +268,7 @@ app.post('/trex-score', async (req, res) => {
     // 5. Upsert if new score is higher
     if (score > currentHighScore) {
       const { error: upsertError } = await supabase
-        .from('profiles')
+        .from('trex_scores')
         .upsert({ id: user.id, trex_high_score: score });
 
       if (upsertError) throw upsertError;
