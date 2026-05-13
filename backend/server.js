@@ -240,14 +240,15 @@ app.post('/trex-score', async (req, res) => {
 
     console.log('Token received:', token.substring(0, 20) + '...');
 
-    // 2. Authenticate the user securely via Supabase
-    const { data: userData2, error: authError } = await supabase.auth.getUser(token);
-    const user = userData2.user;
-    console.log('Auth error:', authError);
-    console.log('User:', user?.id);
-
-    if (authError || !user) {
-      return res.status(401).json({ error: 'Unauthorized' });
+   // 2. Decode JWT to get user ID without network call
+    let user;
+    try {
+      const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+      user = { id: payload.sub };
+      console.log('User ID from token:', user.id);
+    } catch (e) {
+      console.error('Token decode error:', e);
+      return res.status(401).json({ error: 'Invalid token' });
     }
 
     // 3. Basic Validation
