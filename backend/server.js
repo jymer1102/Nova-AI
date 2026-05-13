@@ -43,7 +43,7 @@ app.post("/chat", async (req, res) => {
         model: "llama-3.3-70b-versatile",
         max_tokens: 1024,
         messages: [
-          { role: "system", content: "You are Nova, a helpful AI assistant created by Jackson Weimer. If anyone asks who made you or who created you, say Jackson Weimer. Your name is Nova introduce yourself or start responses with your name. Just answer helpfully and naturally." },
+          { role: "system", content: "You are Nova, a helpful AI assistant created by Jackson Weimer. If anyone asks who made you or who created you, say Jackson Weimer. Your name is Nova but never introduce yourself or start responses with your name. Just answer naturally and helpfully." },
           ...messages,
         ],
       }),
@@ -101,7 +101,7 @@ app.post("/auth/update", async (req, res) => {
   const updates = {};
   if (email) updates.email = email;
   if (password) updates.password = password;
-if (name || avatar_url) updates.user_metadata = { ...user.user_metadata, ...(name && { name }), ...(avatar_url && { avatar_url }) };
+  if (name || avatar_url) updates.data = { ...user.user_metadata, ...(name && { name }), ...(avatar_url && { avatar_url }) };
   const { data, error } = await supabaseAdmin.auth.admin.updateUserById(user.id, updates);
   if (error) { console.error("Update error:", error); return res.status(500).json({ error: error.message }); }
   res.json({ success: true, user: data.user });
@@ -168,39 +168,28 @@ app.post("/auth/login", async (req, res) => {
 
 // Save chat
 app.post("/chats", async (req, res) => {
-  const { id, title, history, author } = req.body; 
-  const authHeader = req.headers.authorization;
-  const token = req.body.token || (authHeader && authHeader.split(" ")[1]);
-
-  if (!token) return res.status(401).json({ error: "Unauthorized" });
-
+  const { id, title, history } = req.body;
+  const token = req.headers.authorization?.split(" ")[1] || req.body.token;
   try {
-    // Decode JWT locally exactly like you did in the T-Rex route!
-    const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
-    const userId = payload.sub;
-
-    if (!userId) return res.status(401).json({ error: "Invalid token" });
-
+    const { data: userData, error: authErr } = await supabase.auth.getUser(token);
+    if (authErr || !userData.user) {
+      console.error("Chat save auth error:", authErr);
+      return res.status(401).json({ error: "Unauthorized" });
+    }
     const { error } = await supabase.from("chats").upsert({
-      id, 
-      user_id: userId, 
-      title, 
-      history, 
-      author,
-      created_at: new Date().toISOString()
+      id, user_id: userData.user.id, title, history, created_at: new Date().toISOString()
     });
-
     if (error) {
       console.error("Chat save DB error:", error);
       return res.status(500).json({ error: error.message });
     }
-    
     res.json({ success: true });
   } catch (err) {
     console.error("Chat save unexpected error:", err);
     res.status(500).json({ error: "Something went wrong" });
   }
 });
+
 // Get chats
 app.get("/chats", async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
@@ -237,64 +226,5 @@ app.delete("/chats", async (req, res) => {
   res.json({ success: true });
 });
 
-// --- NEW T-REX EASTER EGG ROUTE ---
-app.post('/trex-score', async (req, res) => {
-  try {
-    const { score } = req.body;
-    const authHeader = req.headers.authorization;
-
-    // 1. Check if token exists
-    const token = req.body.token || (authHeader && authHeader.split(' ')[1]);
-    if (!token) {
-      return res.status(401).json({ error: 'Missing or invalid token' });
-    }
-
-    console.log('Token received:', token.substring(0, 20) + '...');
-
-   // 2. Decode JWT to get user ID without network call
-    let user;
-    try {
-      const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
-     user = { id: payload.sub, name: payload.user_metadata?.name || payload.email || 'Unknown' };
-      console.log('User ID from token:', user.id);
-    } catch (e) {
-      console.error('Token decode error:', e);
-      return res.status(401).json({ error: 'Invalid token' });
-    }
-
-    // 3. Basic Validation
-    if (!Number.isInteger(score) || score < 0) {
-      return res.status(400).json({ error: 'Invalid score format.' });
-    }
-
-    // 4. Fetch the current user's profile
-    const { data: profile } = await supabase
-      .from('trex_scores')
-      .select('trex_high_score')
-      .eq('user_id', user.id)
-      .maybeSingle();
-
-    const currentHighScore = profile?.trex_high_score || 0;
-
-    // 5. Upsert if new score is higher
-    if (score > currentHighScore) {
-      const { error: upsertError } = await supabase
-        .from('trex_scores')
-        .upsert({ user_id: user.id, trex_high_score: score, name: user.name }, { onConflict: 'user_id' });
-
-      if (upsertError) throw upsertError;
-      return res.status(200).json({ message: 'New high score saved!', highScore: score });
-    }
-
-    return res.status(200).json({ message: 'Score recorded, but not a new high score.', highScore: currentHighScore });
-
-  } catch (error) {
-    console.error('Error saving T-Rex score:', error);
-    res.status(500).json({ error: 'Internal server error.' });
-  }
-});
-// ----------------------------------
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
