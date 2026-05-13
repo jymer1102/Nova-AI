@@ -187,7 +187,7 @@ app.post("/chats", async (req, res) => {
     }
 
     // 2. Save the chat using the locally decoded userId
-    const { error } = await supabase.from("chats").upsert({
+    const { error } = await supabaseAdmin.from("chats").upsert({
       id, 
       user_id: userId, 
       title, 
