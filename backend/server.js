@@ -171,6 +171,8 @@ app.post("/chats", async (req, res) => {
   // 1. Added 'author' right here to catch it from the frontend
   const { id, title, history, author } = req.body; 
   const token = req.headers.authorization?.split(" ")[1] || req.body.token;
+  console.log("SERVER RECEIVED TOKEN:", token); 
+
   try {
     const { data: userData, error: authErr } = await supabase.auth.getUser(token);
     if (authErr || !userData.user) {
