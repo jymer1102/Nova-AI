@@ -625,33 +625,35 @@
 
   async function loadExistingAvatar() {
     const saved = localStorage.getItem("nova_avatar");
-    if (saved) profilePreview.src = saved;
+    if (saved && profilePreview) profilePreview.src = saved;
   }
   loadExistingAvatar();
 
-  avatarUploadInput.addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024;
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) { alert("Only JPG, PNG, and WEBP images are allowed!"); e.target.value = ''; return; }
-    if (file.size > MAX_FILE_SIZE_BYTES) { alert("File too big! Max 2MB."); e.target.value = ''; return; }
-    showToast("Uploading profile picture...");
-    try {
-      const compressed = await compressImage(file);
-      localStorage.setItem("nova_avatar", compressed);
-      profilePreview.src = compressed;
-      updateProfileIcon(compressed);
-      const res = await fetch(`${BACKEND_URL}/auth/update`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${userToken}` },
-        body: JSON.stringify({ avatar_url: compressed }),
-      });
-      const data = await res.json();
-      if (data.error) { showToast("Failed to save avatar."); }
-      else { showToast("Profile picture updated! ✅"); }
-    } catch { showToast("Upload failed. Try again."); }
-  });
+  if (avatarUploadInput) {
+    avatarUploadInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024;
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) { alert("Only JPG, PNG, and WEBP images are allowed!"); e.target.value = ''; return; }
+      if (file.size > MAX_FILE_SIZE_BYTES) { alert("File too big! Max 2MB."); e.target.value = ''; return; }
+      showToast("Uploading profile picture...");
+      try {
+        const compressed = await compressImage(file);
+        localStorage.setItem("nova_avatar", compressed);
+        if (profilePreview) profilePreview.src = compressed;
+        updateProfileIcon(compressed);
+        const res = await fetch(`${BACKEND_URL}/auth/update`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${userToken}` },
+          body: JSON.stringify({ avatar_url: compressed }),
+        });
+        const data = await res.json();
+        if (data.error) { showToast("Failed to save avatar."); }
+        else { showToast("Profile picture updated! ✅"); }
+      } catch { showToast("Upload failed. Try again."); }
+    });
+  }
 
   let easterActive = localStorage.getItem("nova_easter") === "true";
   const easterBtn = document.createElement("button");
