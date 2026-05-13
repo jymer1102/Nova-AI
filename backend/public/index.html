@@ -415,18 +415,23 @@
   overlay.addEventListener("click", closeSidebarFn);
   function closeSidebarFn() { sidebar.classList.remove("open"); overlay.classList.remove("show"); }
 
-  async function saveCurrentChat() {
+async function saveCurrentChat() {
     if (history.length < 1 || !userToken) return;
     const firstUserMsg = history.find(m => m.role === "user");
     if (!firstUserMsg) return;
     const title = typeof firstUserMsg.content === "string" ? firstUserMsg.content.slice(0, 40) : "Image message";
+    
+    // Grab the name from local storage
+    const currentUserName = localStorage.getItem("nova_name") || "Unknown User";
+
     await fetch(`${BACKEND_URL}/chats`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${userToken}` },
-      body: JSON.stringify({ id: currentChatId, title, history }),
+      // Added 'author' right here!
+      body: JSON.stringify({ id: currentChatId, title, history, author: currentUserName }), 
     });
   }
-
+  
   async function loadChats() {
     try {
       const res = await fetch(`${BACKEND_URL}/chats`, { headers: { "Authorization": `Bearer ${userToken}` } });
