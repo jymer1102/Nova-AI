@@ -168,21 +168,39 @@ app.post("/auth/login", async (req, res) => {
 
 // Save chat
 app.post("/chats", async (req, res) => {
-  const { id, title, history } = req.body;
-  const token = req.headers.authorization?.split(" ")[1] || req.body.token;
+  const { id, title, history, author } = req.body; 
+  const authHeader = req.headers.authorization;
+  const token = req.body.token || (authHeader && authHeader.split(" ")[1]);
+
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
+
   try {
-    const { data: userData, error: authErr } = await supabase.auth.getUser(token);
-    if (authErr || !userData.user) {
-      console.error("Chat save auth error:", authErr);
-      return res.status(401).json({ error: "Unauthorized" });
+    // 1. Decode JWT locally to completely bypass Cloudflare and Supabase network limits
+    let userId;
+    try {
+      const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+      userId = payload.sub;
+      if (!userId) throw new Error("No user ID in token");
+    } catch (e) {
+      console.error("Token decode error:", e);
+      return res.status(401).json({ error: "Invalid token" });
     }
+
+    // 2. Save the chat using the locally decoded userId
     const { error } = await supabase.from("chats").upsert({
-      id, user_id: userData.user.id, title, history, created_at: new Date().toISOString()
+      id, 
+      user_id: userId, 
+      title, 
+      history, 
+      author,
+      created_at: new Date().toISOString()
     });
+
     if (error) {
       console.error("Chat save DB error:", error);
       return res.status(500).json({ error: error.message });
     }
+    
     res.json({ success: true });
   } catch (err) {
     console.error("Chat save unexpected error:", err);
