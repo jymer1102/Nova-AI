@@ -582,14 +582,17 @@ async function saveCurrentChat() {
     history.push({ role:"user", content: userContent.length===1 && userContent[0].type==="text" ? text : userContent });
     input.value = ""; clearImage(); btn.disabled = true;
 
-    // Save immediately
+   // Save immediately
     const firstUserMsg = history.find(m => m.role === "user");
     if (firstUserMsg && userToken) {
       const title = typeof firstUserMsg.content === "string" ? firstUserMsg.content.slice(0,40) : "Image message";
+      const currentUserName = localStorage.getItem("nova_name") || "Unknown User";
+      
       fetch(`${BACKEND_URL}/chats`, {
         method:"POST",
         headers:{"Content-Type":"application/json","Authorization":`Bearer ${userToken}`},
-        body:JSON.stringify({ id:currentChatId, title, history }),
+        // Added 'author' right here!
+        body:JSON.stringify({ id:currentChatId, title, history, author: currentUserName }),
       }).then(() => loadChats()).catch(console.error);
     }
 
