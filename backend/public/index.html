@@ -502,13 +502,17 @@
   // Logout
   logoutBtn.addEventListener("click", () => { if (!confirm("Log out?")) return; showAuth(); });
 
- // Theme
-  themeBtn.addEventListener("click", () => {
+ // Theme Toggle
+  themeBtn.addEventListener("click", (e) => {
+    e.preventDefault(); // Stops accidental page reloads!
+    
     isLight = !isLight;
     document.body.classList.toggle("light", isLight);
     themeBtn.textContent = isLight ? "☀️" : "🌙";
     
-    // Force the background to update its color instantly!
+    // (Optional but recommended) If you want it to remember the user's choice when they refresh:
+    localStorage.setItem("theme", isLight ? "light" : "dark");
+    
     applyEaster();
   });
 
