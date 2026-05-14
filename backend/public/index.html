@@ -935,7 +935,12 @@ document.addEventListener('keydown', e => {
   if (e.key.length !== 1) return;
   buf += e.key.toLowerCase();
   if (buf.length > SECRET.length) buf = buf.slice(-SECRET.length);
-  if (buf === SECRET) { buf = ''; triggerEasterEgg(); }
+  if (buf === SECRET) {
+  buf = '';
+  const msgInput = document.getElementById('input');
+  if (msgInput) msgInput.value = '';
+  triggerEasterEgg();
+}
 });
 
 function triggerEasterEgg() {
