@@ -485,11 +485,14 @@
   // Logout
   logoutBtn.addEventListener("click", () => { if (!confirm("Log out?")) return; showAuth(); });
 
-  // Theme
+ // Theme
   themeBtn.addEventListener("click", () => {
     isLight = !isLight;
     document.body.classList.toggle("light", isLight);
     themeBtn.textContent = isLight ? "☀️" : "🌙";
+    
+    // Force the background to update its color instantly!
+    applyEaster();
   });
 
   // New / Clear chat
