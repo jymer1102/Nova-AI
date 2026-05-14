@@ -791,8 +791,8 @@ function applyEaster() {
       // Turns ON your Easter Egg image
       document.body.style.setProperty('background', "url('https://images.pexels.com/photos/31265958/pexels-photo-31265958.jpeg') center/cover fixed", "important");
     } else {
-      // Turns OFF the image and goes back to black (or white in light mode)
-      document.body.style.setProperty('background', "var(--bg)", "important");
+      // Deletes the JS background entirely so your CSS can naturally handle Light/Dark mode!
+      document.body.style.removeProperty('background');
     }
   }
   function toggleEaster() { easterActive = !easterActive; localStorage.setItem("nova_easter", easterActive); applyEaster(); easterBtn.style.display = "block"; }
