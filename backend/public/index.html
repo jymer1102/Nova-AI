@@ -83,7 +83,7 @@
     .modal-input { padding:0.75rem; border-radius:10px; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-size:1rem; font-family:Inter,sans-serif; width:100%; }
     .modal-btn { padding:0.75rem; border-radius:10px; border:none; font-size:1rem; cursor:pointer; font-family:Inter,sans-serif; }
     
-    /* --- LIQUID GLASS PROFILE WIDGET STYLES --- */
+    /* --- UPGRADED LIQUID GLASS STYLES --- */
     .nova-glass-panel {
       display: flex; 
       flex-direction: column; 
@@ -93,39 +93,76 @@
       border-radius: 20px;
       margin-bottom: 20px;
       transition: all 0.3s ease;
-      /* Dark mode glass */
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+      
+      /* The Liquid Base */
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      
+      /* The 3D Rim Highlight */
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      border-left: 1px solid rgba(255, 255, 255, 0.15);
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+      
+      /* Outer shadow to lift it off the page */
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
     }
-    .light .nova-glass-panel {
-      /* Light mode glass */
-      background: rgba(0, 0, 0, 0.03);
-      border: 1px solid rgba(0, 0, 0, 0.05);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
-    }
+
     .glass-btn {
       display: inline-block;
-      padding: 8px 16px;
+      padding: 10px 20px;
       cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       font-weight: 500;
       color: var(--text);
       border-radius: 12px;
-      transition: all 0.2s ease;
-      /* Dark mode button */
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+      
+      /* Gel/Liquid Button Fill */
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
+      
+      /* Sharp top highlight, soft bottom shadow */
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      
+      /* Inner glow to make it look like thick glass */
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2), 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .glass-btn:hover { 
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.08) 100%);
+      transform: translateY(-2px);
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.3), 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .glass-btn:active {
+      transform: translateY(1px);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Light Mode Overrides */
+    .light .nova-glass-panel {
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.01));
+      border-top: 1px solid rgba(255, 255, 255, 0.6);
+      border-left: 1px solid rgba(255, 255, 255, 0.4);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      border-right: 1px solid rgba(0, 0, 0, 0.05);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
     }
     .light .glass-btn {
-      /* Light mode button */
-      background: rgba(0, 0, 0, 0.05);
-      border: 1px solid rgba(0, 0, 0, 0.1);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%);
+      border-top: 1px solid #ffffff;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      border-left: 1px solid rgba(255, 255, 255, 0.6);
+      border-right: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: inset 0 1px 1px #fff, 0 4px 10px rgba(0, 0, 0, 0.05);
     }
-    .glass-btn:hover { background: rgba(255, 255, 255, 0.15); }
-    .light .glass-btn:hover { background: rgba(0, 0, 0, 0.08); }
+    .light .glass-btn:hover { 
+      background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.6) 100%);
+    }
     /* ------------------------------------------ */
   </style>
 </head>
