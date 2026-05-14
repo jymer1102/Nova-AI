@@ -913,12 +913,12 @@ function applyEaster() {
 </div>
 
 <script>
-  const overlay = document.getElementById('egg-overlay');
-  const wrap = document.getElementById('backpack-wrap');
-  const label = document.getElementById('egg-label');
-  const canvas = document.getElementById('egg-canvas');
-  const ctx = canvas.getContext('2d');
-
+const eggOverlay = document.getElementById('egg-overlay');
+const eggWrap = document.getElementById('backpack-wrap');
+const eggLabel = document.getElementById('egg-label');
+const eggCanvas = document.getElementById('egg-canvas');
+const eggCtx = eggCanvas.getContext('2d');
+  
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   window.addEventListener('resize', () => {
