@@ -83,13 +83,12 @@
     .modal-input { padding:0.75rem; border-radius:10px; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-size:1rem; font-family:Inter,sans-serif; width:100%; }
     .modal-btn { padding:0.75rem; border-radius:10px; border:none; font-size:1rem; cursor:pointer; font-family:Inter,sans-serif; }
  
-  /* 1. Default Colorful Background (Glass NEEDS color to bend) */
+ /* 1. Default Theme Background */
   body {
-    /* We add a default colorful abstract background so the glass always works */
-    background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop') center/cover fixed !important;
-    padding: 15px; /* Pulls the app inward so we can bend the outer edges! */
+    /* This uses your original dark/light mode colors instead of an image */
+    background: var(--bg) !important; 
+    padding: 15px; 
   }
-
   /* 2. The Main Screen Border (Bends the whole app) */
   #app, #auth-screen {
     height: calc(100vh - 30px) !important;
