@@ -197,7 +197,24 @@
 
   /* Wipe out the old flat colors */
   :root { --surface: transparent !important; --surface2: transparent !important; --border: transparent !important; }
-</style>
+/* 7. Light Mode Glass Text Override */
+  .light .msg, 
+  .light button, 
+  .light .icon-btn, 
+  .light .tool-btn, 
+  .light .msg-action-btn, 
+  .light textarea, 
+  .light input, 
+  .light .history-item-title, 
+  .light .nova-glass-panel {
+    color: #111111 !important; /* Turns the text black */
+    text-shadow: 0 1px 3px rgba(255,255,255,0.9) !important; /* Changes shadow to white for readability */
+  }
+
+  .light ::placeholder { 
+    color: rgba(0, 0, 0, 0.5) !important; 
+  }
+  </style>
 </head>
 <body>
 
