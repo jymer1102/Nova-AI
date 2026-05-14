@@ -919,12 +919,12 @@ const eggLabel = document.getElementById('egg-label');
 const eggCanvas = document.getElementById('egg-canvas');
 const eggCtx = eggCanvas.getContext('2d');
   
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  window.addEventListener('resize', () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  });
+ eggCanvas.width = window.innerWidth;
+eggCanvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
+    eggCanvas.width = window.innerWidth;
+    eggCanvas.height = window.innerHeight;
+});
 
   const SECRET = 'allahu akbar';
   let buf = '';
