@@ -825,11 +825,17 @@
   headerBtns.prepend(easterBtn);
 function applyEaster() {
     if (easterActive) {
-      // Turns ON your Easter Egg image
+      // 1. Easter Egg is ON: Show the image
       document.body.style.setProperty('background', "url('https://images.pexels.com/photos/31265958/pexels-photo-31265958.jpeg') center/cover fixed", "important");
     } else {
-      // Deletes the JS background entirely so your CSS can naturally handle Light/Dark mode!
-      document.body.style.removeProperty('background');
+      // 2. Easter Egg is OFF: Check if Light Mode is on
+      if (document.body.classList.contains('light')) {
+        // Force pure white background
+        document.body.style.setProperty('background', "#ffffff", "important");
+      } else {
+        // Force dark background (fallback to your CSS variable)
+        document.body.style.setProperty('background', "var(--bg)", "important");
+      }
     }
   }
   function toggleEaster() { easterActive = !easterActive; localStorage.setItem("nova_easter", easterActive); applyEaster(); easterBtn.style.display = "block"; }
