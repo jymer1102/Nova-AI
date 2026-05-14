@@ -82,118 +82,123 @@
     .modal-box { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:2rem; width:100%; max-width:380px; display:flex; flex-direction:column; gap:1rem; }
     .modal-input { padding:0.75rem; border-radius:10px; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-size:1rem; font-family:Inter,sans-serif; width:100%; }
     .modal-btn { padding:0.75rem; border-radius:10px; border:none; font-size:1rem; cursor:pointer; font-family:Inter,sans-serif; }
+ 
+  /* 1. Default Colorful Background (Glass NEEDS color to bend) */
+  body {
+    /* We add a default colorful abstract background so the glass always works */
+    background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop') center/cover fixed !important;
+    padding: 15px; /* Pulls the app inward so we can bend the outer edges! */
+  }
+
+  /* 2. The Main Screen Border (Bends the whole app) */
+  #app, #auth-screen {
+    height: calc(100vh - 30px) !important;
+    border-radius: 40px; /* Massive curved corners */
     
-/* --- PEARLESCENT LENS GLASS STYLES --- */
-    .nova-glass-panel {
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      justify-content: center;
-      padding: 24px;
-      margin-bottom: 20px;
-      transition: all 0.3s ease;
-      
-      /* 1. The Domed Lens Edge (Thick top/left, thin dark bottom/right) */
-      border-radius: 28px;
-      border-top: 3px solid rgba(255, 255, 255, 0.7);
-      border-left: 3px solid rgba(255, 255, 255, 0.3);
-      border-bottom: 3px solid rgba(0, 0, 0, 0.4);
-      border-right: 3px solid rgba(0, 0, 0, 0.1);
-      
-      /* 2. The Iridescent Shimmer + Gel Base */
-      background: 
-        /* Subtle Soap-Bubble Rainbow */
-        linear-gradient(125deg, rgba(255, 100, 200, 0.06) 0%, rgba(100, 220, 255, 0.06) 50%, rgba(255, 250, 100, 0.06) 100%),
-        /* White Glass Frost */
-        linear-gradient(to bottom right, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.02));
-      
-      /* 3. The Screen Bend (Heavy blur + saturation warping) */
-      backdrop-filter: blur(30px) saturate(180%) contrast(120%);
-      -webkit-backdrop-filter: blur(30px) saturate(180%) contrast(120%);
-      
-      /* Deep drop shadow + Inner curved edge highlight */
-      box-shadow: 
-        inset 0 10px 20px rgba(255, 255, 255, 0.15), /* Inner domed highlight */
-        inset 0 -10px 20px rgba(0, 0, 0, 0.2),       /* Inner domed shadow */
-        0 20px 40px rgba(0, 0, 0, 0.5);              /* Outer 3D float shadow */
-    }
-
-    .glass-btn {
-      display: inline-block;
-      padding: 12px 24px;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: 600;
-      color: #ffffff;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.6); 
-      border-radius: 16px;
-      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      
-      /* Thick Button Lens Edge */
-      border-top: 2px solid rgba(255, 255, 255, 0.8);
-      border-left: 2px solid rgba(255, 255, 255, 0.4);
-      border-bottom: 2px solid rgba(0, 0, 0, 0.5);
-      border-right: 2px solid rgba(0, 0, 0, 0.2);
-
-      /* Iridescent Button Fill */
-      background: 
-        linear-gradient(125deg, rgba(255, 100, 200, 0.08) 0%, rgba(100, 220, 255, 0.08) 50%, rgba(255, 250, 100, 0.08) 100%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 100%);
-      
-      box-shadow: 
-        inset 0 4px 8px rgba(255, 255, 255, 0.5), 
-        inset 0 -4px 8px rgba(0, 0, 0, 0.3), 
-        0 8px 20px rgba(0, 0, 0, 0.4);
-    }
-
-    .glass-btn:hover { 
-      background: 
-        linear-gradient(125deg, rgba(255, 100, 200, 0.12) 0%, rgba(100, 220, 255, 0.12) 50%, rgba(255, 250, 100, 0.12) 100%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.1) 100%);
-      transform: translateY(-3px);
-      box-shadow: 
-        inset 0 6px 10px rgba(255, 255, 255, 0.7), 
-        inset 0 -4px 8px rgba(0, 0, 0, 0.3), 
-        0 12px 25px rgba(0, 0, 0, 0.5);
-    }
+    /* Thick outer dome reflection */
+    border-top: 4px solid rgba(255, 255, 255, 0.7) !important;
+    border-left: 4px solid rgba(255, 255, 255, 0.3) !important;
+    border-bottom: 4px solid rgba(0, 0, 0, 0.6) !important;
+    border-right: 4px solid rgba(0, 0, 0, 0.2) !important;
     
-    .glass-btn:active {
-      transform: translateY(2px);
-      box-shadow: 
-        inset 0 2px 4px rgba(0, 0, 0, 0.4), 
-        inset 0 0 10px rgba(0,0,0,0.3);
-      border-top: 2px solid rgba(255, 255, 255, 0.3);
-    }
+    /* Main App Glass Base */
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.1)) !important;
+    backdrop-filter: blur(15px) saturate(120%) !important;
+    -webkit-backdrop-filter: blur(15px) saturate(120%) !important;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 10px 20px rgba(255,255,255,0.15) !important;
+    overflow: hidden;
+  }
 
-    /* Light Mode Overrides */
-    .light .nova-glass-panel {
-      background: 
-        linear-gradient(125deg, rgba(255, 150, 200, 0.1) 0%, rgba(150, 220, 255, 0.1) 50%, rgba(255, 250, 150, 0.1) 100%),
-        linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.2));
-      border-top: 3px solid rgba(255, 255, 255, 1);
-      border-left: 3px solid rgba(255, 255, 255, 0.8);
-      border-bottom: 3px solid rgba(0, 0, 0, 0.15);
-      border-right: 3px solid rgba(0, 0, 0, 0.05);
-      box-shadow: inset 0 10px 20px rgba(255,255,255,0.4), 0 15px 35px rgba(0, 0, 0, 0.1);
-    }
-    .light .glass-btn {
-      color: #222; text-shadow: 0 1px 2px rgba(255,255,255,0.9);
-      background: 
-        linear-gradient(125deg, rgba(255, 150, 200, 0.15) 0%, rgba(150, 220, 255, 0.15) 50%, rgba(255, 250, 150, 0.15) 100%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.4) 100%);
-      border-top: 2px solid #ffffff;
-      border-bottom: 2px solid rgba(0, 0, 0, 0.2);
-      border-left: 2px solid rgba(255, 255, 255, 0.9);
-      border-right: 2px solid rgba(0, 0, 0, 0.1);
-      box-shadow: inset 0 3px 6px #fff, inset 0 -3px 6px rgba(0,0,0,0.05), 0 8px 15px rgba(0, 0, 0, 0.15);
-    }
-    .light .glass-btn:hover { 
-      background: 
-        linear-gradient(125deg, rgba(255, 150, 200, 0.2) 0%, rgba(150, 220, 255, 0.2) 50%, rgba(255, 250, 150, 0.2) 100%),
-        linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.7) 100%);
-    }
-    /* ------------------------------------------ */
-  </style>
+  /* 3. Containers (Header, Input Area, Sidebar, Modals) */
+  header, #input-area, #sidebar, .auth-box, .modal-box {
+    background: 
+      linear-gradient(125deg, rgba(255, 100, 200, 0.05) 0%, rgba(100, 220, 255, 0.05) 50%, rgba(255, 250, 100, 0.05) 100%),
+      linear-gradient(to bottom right, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01)) !important;
+    backdrop-filter: blur(30px) saturate(180%) contrast(120%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) contrast(120%) !important;
+    border: none !important;
+    border-top: 2px solid rgba(255, 255, 255, 0.4) !important;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.4) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+  }
+  
+  /* Fix layout overlapping for the new curves */
+  header { border-radius: 40px 40px 0 0 !important; border-bottom: 2px solid rgba(0,0,0,0.5) !important; }
+  #input-area { border-radius: 0 0 40px 40px !important; border-top: 2px solid rgba(255,255,255,0.4) !important; }
+  #sidebar { border-radius: 40px 0 0 40px !important; border-right: 2px solid rgba(0,0,0,0.5) !important; }
+
+  /* 4. Chat Bubbles */
+  .msg {
+    background: 
+      linear-gradient(125deg, rgba(255, 100, 200, 0.08) 0%, rgba(100, 220, 255, 0.08) 50%, rgba(255, 250, 100, 0.08) 100%),
+      linear-gradient(to bottom right, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.02)) !important;
+    backdrop-filter: blur(25px) saturate(180%) contrast(120%) !important;
+    -webkit-backdrop-filter: blur(25px) saturate(180%) contrast(120%) !important;
+    
+    border-top: 2px solid rgba(255, 255, 255, 0.7) !important;
+    border-left: 2px solid rgba(255, 255, 255, 0.3) !important;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.4) !important;
+    border-right: 2px solid rgba(0, 0, 0, 0.1) !important;
+    
+    box-shadow: inset 0 5px 10px rgba(255,255,255,0.2), 0 10px 20px rgba(0,0,0,0.3) !important;
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.6) !important;
+  }
+  
+  /* Give User Messages a faint blue iridescent tint */
+  .user .msg {
+    background: 
+      linear-gradient(125deg, rgba(47, 111, 235, 0.4) 0%, rgba(100, 220, 255, 0.1) 100%),
+      linear-gradient(to bottom right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05)) !important;
+  }
+
+  /* 5. ALL Buttons, Textareas, Inputs, and the Profile Widget Panel */
+  button, .icon-btn, .tool-btn, .msg-action-btn, textarea, input, .history-item-title, .nova-glass-panel {
+    background: 
+      linear-gradient(125deg, rgba(255, 100, 200, 0.08) 0%, rgba(100, 220, 255, 0.08) 50%, rgba(255, 250, 100, 0.08) 100%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
+    
+    backdrop-filter: blur(15px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(15px) saturate(150%) !important;
+    
+    border-top: 2px solid rgba(255, 255, 255, 0.8) !important;
+    border-left: 2px solid rgba(255, 255, 255, 0.4) !important;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.5) !important;
+    border-right: 2px solid rgba(0, 0, 0, 0.2) !important;
+    
+    box-shadow: inset 0 4px 8px rgba(255, 255, 255, 0.4), inset 0 -4px 8px rgba(0, 0, 0, 0.3), 0 8px 15px rgba(0, 0, 0, 0.4) !important;
+    
+    color: #ffffff !important;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8) !important;
+    border-radius: 16px !important;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  }
+
+  /* 6. Button Hover Physics */
+  button:hover, .icon-btn:hover, .tool-btn:hover, .msg-action-btn:hover, .history-item-title:hover {
+    background: 
+      linear-gradient(125deg, rgba(255, 100, 200, 0.12) 0%, rgba(100, 220, 255, 0.12) 50%, rgba(255, 250, 100, 0.12) 100%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.15) 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: inset 0 6px 12px rgba(255, 255, 255, 0.6), inset 0 -4px 8px rgba(0, 0, 0, 0.3), 0 12px 20px rgba(0, 0, 0, 0.5) !important;
+  }
+  button:active, .icon-btn:active, .tool-btn:active, .msg-action-btn:active {
+    transform: translateY(1px) !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0,0,0,0.4) !important;
+    border-top: 2px solid rgba(255, 255, 255, 0.3) !important;
+  }
+
+  /* Fixes for text inputs so they look hollow inside */
+  textarea, input {
+    box-shadow: inset 0 4px 10px rgba(0,0,0,0.5), 0 2px 5px rgba(255,255,255,0.1) !important;
+    border-top: 2px solid rgba(0,0,0,0.4) !important;
+    border-bottom: 2px solid rgba(255,255,255,0.4) !important;
+  }
+  ::placeholder { color: rgba(255, 255, 255, 0.5) !important; text-shadow: none !important; }
+
+  /* Wipe out the old flat colors */
+  :root { --surface: transparent !important; --surface2: transparent !important; --border: transparent !important; }
+</style>
 </head>
 <body>
 
