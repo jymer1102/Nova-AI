@@ -918,84 +918,82 @@ const eggWrap = document.getElementById('backpack-wrap');
 const eggLabel = document.getElementById('egg-label');
 const eggCanvas = document.getElementById('egg-canvas');
 const eggCtx = eggCanvas.getContext('2d');
-  
- eggCanvas.width = window.innerWidth;
+
+eggCanvas.width = window.innerWidth;
 eggCanvas.height = window.innerHeight;
 window.addEventListener('resize', () => {
-    eggCanvas.width = window.innerWidth;
-    eggCanvas.height = window.innerHeight;
+  eggCanvas.width = window.innerWidth;
+  eggCanvas.height = window.innerHeight;
 });
 
-  const SECRET = 'allahu akbar';
-  let buf = '';
-  let particles = [];
-  let animId = null;
+const SECRET = 'allahu akbar';
+let buf = '';
+let particles = [];
+let animId = null;
 
-  document.addEventListener('keydown', e => {
-    if (e.key.length !== 1) return;
-    buf += e.key.toLowerCase();
-    if (buf.length > SECRET.length) buf = buf.slice(-SECRET.length);
-    if (buf === SECRET) { buf = ''; triggerEasterEgg(); }
-  });
+document.addEventListener('keydown', e => {
+  if (e.key.length !== 1) return;
+  buf += e.key.toLowerCase();
+  if (buf.length > SECRET.length) buf = buf.slice(-SECRET.length);
+  if (buf === SECRET) { buf = ''; triggerEasterEgg(); }
+});
 
-  function triggerEasterEgg() {
-    overlay.classList.add('active');
-    wrap.classList.remove('spinning');
-    void wrap.offsetWidth;
-    wrap.classList.add('spinning');
-    setTimeout(() => label.classList.add('visible'), 600);
-    setTimeout(() => {
-      overlay.classList.remove('active');
-      wrap.classList.remove('spinning');
-      label.classList.remove('visible');
-      explodeParticles();
-    }, 1900);
+function triggerEasterEgg() {
+  eggOverlay.classList.add('active');
+  eggWrap.classList.remove('spinning');
+  void eggWrap.offsetWidth;
+  eggWrap.classList.add('spinning');
+  setTimeout(() => eggLabel.classList.add('visible'), 600);
+  setTimeout(() => {
+    eggOverlay.classList.remove('active');
+    eggWrap.classList.remove('spinning');
+    eggLabel.classList.remove('visible');
+    explodeParticles();
+  }, 1900);
+}
+
+function explodeParticles() {
+  particles = [];
+  cancelAnimationFrame(animId);
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  for (let i = 0; i < 80; i++) {
+    const angle = (Math.PI * 2 / 80) * i + (Math.random() - 0.5) * 0.4;
+    const speed = 4 + Math.random() * 14;
+    particles.push({
+      x: cx, y: cy,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - Math.random() * 6,
+      size: 14 + Math.random() * 28,
+      alpha: 1,
+      gravity: 0.25 + Math.random() * 0.2,
+      rot: Math.random() * Math.PI * 2,
+      rotV: (Math.random() - 0.5) * 0.3,
+    });
   }
+  animateEgg();
+}
 
-  function explodeParticles() {
-    particles = [];
-    cancelAnimationFrame(animId);
-    const cx = window.innerWidth / 2;
-    const cy = window.innerHeight / 2;
-    const emojis = ['💥'];
-    for (let i = 0; i < 80; i++) {
-      const angle = (Math.PI * 2 / 80) * i + (Math.random() - 0.5) * 0.4;
-      const speed = 4 + Math.random() * 14;
-      particles.push({
-        x: cx, y: cy,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed - Math.random() * 6,
-        size: 14 + Math.random() * 28,
-        alpha: 1,
-        emoji: emojis[Math.floor(Math.random() * emojis.length)],
-        gravity: 0.25 + Math.random() * 0.2,
-        rot: Math.random() * Math.PI * 2,
-        rotV: (Math.random() - 0.5) * 0.3,
-      });
-    }
-    animate();
+function animateEgg() {
+  eggCtx.clearRect(0, 0, eggCanvas.width, eggCanvas.height);
+  particles = particles.filter(p => p.alpha > 0.02);
+  for (const p of particles) {
+    p.x += p.vx; p.y += p.vy;
+    p.vy += p.gravity; p.vx *= 0.98;
+    p.alpha -= 0.018; p.rot += p.rotV;
+    eggCtx.save();
+    eggCtx.globalAlpha = Math.max(0, p.alpha);
+    eggCtx.translate(p.x, p.y);
+    eggCtx.rotate(p.rot);
+    eggCtx.font = `${p.size}px serif`;
+    eggCtx.textAlign = 'center';
+    eggCtx.textBaseline = 'middle';
+    eggCtx.fillText('💥', 0, 0);
+    eggCtx.restore();
   }
-
-  function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    particles = particles.filter(p => p.alpha > 0.02);
-    for (const p of particles) {
-      p.x += p.vx; p.y += p.vy;
-      p.vy += p.gravity; p.vx *= 0.98;
-      p.alpha -= 0.018; p.rot += p.rotV;
-      ctx.save();
-      ctx.globalAlpha = Math.max(0, p.alpha);
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot);
-      ctx.font = `${p.size}px serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(p.emoji, 0, 0);
-      ctx.restore();
-    }
-    if (particles.length > 0) animId = requestAnimationFrame(animate);
-    else ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }
+  if (particles.length > 0) animId = requestAnimationFrame(animateEgg);
+  else eggCtx.clearRect(0, 0, eggCanvas.width, eggCanvas.height);
+}
 </script>
 </body>
 </html>
