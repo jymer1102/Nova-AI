@@ -332,14 +332,6 @@
   profileClose.addEventListener("click", () => { profileModal.classList.remove("open"); });
   profileModal.addEventListener("click", (e) => { if (e.target === profileModal) profileModal.classList.remove("open"); });
 
-  avatarInput.addEventListener("change", async () => {
-    const file = avatarInput.files[0]; if (!file) return;
-    const compressed = await compressImage(file);
-    pendingAvatarBase64 = compressed;
-    avatarPreview.src = compressed;
-    avatarPreview.style.display = "block";
-  });
-
   profileSave.addEventListener("click", async () => {
     const name = document.getElementById("profile-name").value.trim();
     const email = document.getElementById("profile-email").value.trim();
