@@ -825,17 +825,11 @@
   headerBtns.prepend(easterBtn);
 function applyEaster() {
     if (easterActive) {
-      // 1. Easter Egg is ON: Show the image
+      // Easter Egg is ON: Show the image
       document.body.style.setProperty('background', "url('https://images.pexels.com/photos/31265958/pexels-photo-31265958.jpeg') center/cover fixed", "important");
     } else {
-      // 2. Easter Egg is OFF: Check if Light Mode is on
-      if (document.body.classList.contains('light')) {
-        // Force pure white background
-        document.body.style.setProperty('background', "#ffffff", "important");
-      } else {
-        // Force dark background (fallback to your CSS variable)
-        document.body.style.setProperty('background', "var(--bg)", "important");
-      }
+      // Easter Egg is OFF: Remove JS interference completely
+      document.body.style.removeProperty('background');
     }
   }
   function toggleEaster() { easterActive = !easterActive; localStorage.setItem("nova_easter", easterActive); applyEaster(); easterBtn.style.display = "block"; }
