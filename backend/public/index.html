@@ -247,6 +247,16 @@
     background-color: #ffffff !important;
     background-image: none !important;
   }
+ /* 9. THE ABSOLUTE LIGHT MODE CANVAS FIX */
+  html, body {
+    transition: background 0.3s ease; /* Makes the switch smooth instead of a harsh flash */
+  }
+
+  /* When Light Mode is active, force the deepest layers to be pure white */
+  html.light, body.light, .light {
+    background-color: #ffffff !important;
+    background-image: none !important;
+  }
   </style>
 </head>
 <body>
