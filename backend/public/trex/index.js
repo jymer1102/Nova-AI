@@ -2098,30 +2098,35 @@
                 // Make sure to use your actual live URL if testing on the live site
                 const BACKEND_URL = "https://nova-ai-mk9x.onrender.com"; 
 
-               fetch(`${BACKEND_URL}/trex-score`, {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ score: distance, token: token })
-})
-                .then(response => response.json())
-                .then(data => console.log("Nova AI Sync:", data.message))
-                .catch(err => console.error("Score sync failed:", err));
-            } else {
-                console.log("User not logged into Nova AI, score not saved.");
-            }
+           fetch(`${BACKEND_URL}/trex-score`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ score: distance, token: token })
+    })
+                    .then(response => {
+                        // THIS IS THE NEW PART: Check if the server actually said "OK"
+                        if (!response.ok) {
+                            throw new Error(`Server returned a ${response.status} error.`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => console.log("Nova AI Sync:", data.message))
+                    .catch(err => console.error("Score sync failed:", err));
+                } else {
+                    console.log("User not logged into Nova AI, score not saved.");
+                }
+            },
 
-        /**
-         * Reset the distance meter back to '00000'.
-         */
-        reset: function () {
-            this.update(0);
-            this.acheivement = false;
-        }
-    };
-
+            /**
+             * Reset the distance meter back to '00000'.
+             */
+            reset: function () {
+                this.update(0);
+                this.acheivement = false;
+            }
+        };
 
     //******************************************************************************
 
