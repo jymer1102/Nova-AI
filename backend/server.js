@@ -175,7 +175,6 @@ app.post("/chats", async (req, res) => {
   if (!token) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    // 1. Decode JWT locally to completely bypass Cloudflare and Supabase network limits
     let userId;
     try {
       const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
@@ -186,7 +185,6 @@ app.post("/chats", async (req, res) => {
       return res.status(401).json({ error: "Invalid token" });
     }
 
-    // 2. Save the chat using the locally decoded userId
     const { error } = await supabaseAdmin.from("chats").upsert({
       id, 
       user_id: userId, 
@@ -242,6 +240,41 @@ app.delete("/chats", async (req, res) => {
   const { error } = await supabase.from("chats").delete().eq("user_id", user.id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true });
+});
+
+// T-REX SCORE ROUTE
+app.post("/trex-score", async (req, res) => {
+  const { score, token } = req.body;
+  
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    // Decode JWT locally to bypass network limits
+    let userId;
+    try {
+      const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+      userId = payload.sub;
+      if (!userId) throw new Error("No user ID in token");
+    } catch (e) {
+      console.error("Token decode error:", e);
+      return res.status(401).json({ error: "Invalid token" });
+    }
+
+    // Insert into Supabase (Assuming your table is 'scores' and column is 'user_id')
+    const { error } = await supabaseAdmin.from("scores").insert([
+      { user_id: userId, score: score }
+    ]);
+
+    if (error) {
+      console.error("Score save DB error:", error);
+      return res.status(500).json({ error: error.message });
+    }
+    
+    res.json({ message: "Score successfully saved!" });
+  } catch (err) {
+    console.error("Score save unexpected error:", err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
 });
 
 const PORT = process.env.PORT || 3000;
