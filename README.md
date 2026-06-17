@@ -1,2 +1,2 @@
 # Nova AI
-AI site by Jackson Weimer
+AI site by Jackson Weimer.
