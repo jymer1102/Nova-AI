@@ -1017,22 +1017,8 @@ window.addEventListener('resize', () => {
   eggCanvas.height = window.innerHeight;
 });
 
-const SECRET = 'allahu akbar';
-let buf = '';
 let particles = [];
 let animId = null;
-
-document.addEventListener('keydown', e => {
-  if (e.key.length !== 1) return;
-  buf += e.key.toLowerCase();
-  if (buf.length > SECRET.length) buf = buf.slice(-SECRET.length);
-  if (buf === SECRET) {
-  buf = '';
-  const msgInput = document.getElementById('input');
-  if (msgInput) msgInput.value = '';
-  triggerEasterEgg();
-}
-});
 
 function triggerEasterEgg() {
   eggOverlay.classList.add('active');
