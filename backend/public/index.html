@@ -1000,7 +1000,7 @@
 <canvas id="egg-canvas"></canvas>
 <div id="egg-overlay">
   <div id="backpack-wrap">🎒</div>
-  <div id="egg-label">💣EASTER EGG💣</div>
+  <div id="egg-label">💣ALLAHU AKBAR💣</div>
 </div>
 
 <script>
@@ -1017,7 +1017,7 @@ window.addEventListener('resize', () => {
   eggCanvas.height = window.innerHeight;
 });
 
-const SECRET = 'jymer';
+const SECRET = 'allahu akbar';
 let buf = '';
 let particles = [];
 let animId = null;
@@ -1027,11 +1027,11 @@ document.addEventListener('keydown', e => {
   buf += e.key.toLowerCase();
   if (buf.length > SECRET.length) buf = buf.slice(-SECRET.length);
   if (buf === SECRET) {
-    buf = '';
-    const msgInput = document.getElementById('input');
-    if (msgInput) msgInput.value = '';
-    triggerEasterEgg();
-  }
+  buf = '';
+  const msgInput = document.getElementById('input');
+  if (msgInput) msgInput.value = '';
+  triggerEasterEgg();
+}
 });
 
 function triggerEasterEgg() {
