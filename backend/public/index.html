@@ -55,7 +55,7 @@
     #preview-area img { height:60px; border-radius:8px; border:1px solid var(--border); }
     #remove-img { background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:50%; width:24px; height:24px; cursor:pointer; font-size:0.8rem; }
     #bottom-row { display:flex; gap:0.5rem; }
-    textarea { flex:1; padding:0.75rem; border-radius:12px; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-size:1rem; resize:none; height:52px; font-family:'Inter',system-ui,sans-serif; }
+    textarea { flex:1; padding:0.75rem; border-radius:12px; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-size:1rem; resize:none; height:52px; font-family:'Inter',sans-serif; }
     button { padding:0 1.25rem; border-radius:12px; border:none; background:var(--accent); color:white; font-size:1rem; cursor:pointer; }
     button:disabled { opacity:0.5; cursor:default; }
     .tool-btn { background:var(--surface2); border:1px solid var(--border); color:var(--text); font-size:1.2rem; padding:0 0.9rem; border-radius:12px; cursor:pointer; }
@@ -83,180 +83,180 @@
     .modal-input { padding:0.75rem; border-radius:10px; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-size:1rem; font-family:Inter,sans-serif; width:100%; }
     .modal-btn { padding:0.75rem; border-radius:10px; border:none; font-size:1rem; cursor:pointer; font-family:Inter,sans-serif; }
  
- /* 1. Default Theme Background */
-  body {
-    /* This uses your original dark/light mode colors instead of an image */
-    background: var(--bg) !important; 
-    padding: 15px; 
-  }
-  /* 2. The Main Screen Border (Bends the whole app) */
-  #app, #auth-screen {
-    height: calc(100vh - 30px) !important;
-    border-radius: 40px; /* Massive curved corners */
-    
-    /* Thick outer dome reflection */
-    border-top: 4px solid rgba(255, 255, 255, 0.7) !important;
-    border-left: 4px solid rgba(255, 255, 255, 0.3) !important;
-    border-bottom: 4px solid rgba(0, 0, 0, 0.6) !important;
-    border-right: 4px solid rgba(0, 0, 0, 0.2) !important;
-    
-    /* Main App Glass Base */
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.1)) !important;
-    backdrop-filter: blur(15px) saturate(120%) !important;
-    -webkit-backdrop-filter: blur(15px) saturate(120%) !important;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 10px 20px rgba(255,255,255,0.15) !important;
-    overflow: hidden;
-  }
+  /* 1. Default Theme Background */
+   body {
+     /* This uses your original dark/light mode colors instead of an image */
+     background: var(--bg) !important; 
+     padding: 15px; 
+   }
+   /* 2. The Main Screen Border (Bends the whole app) */
+   #app, #auth-screen {
+     height: calc(100vh - 30px) !important;
+     border-radius: 40px; /* Massive curved corners */
+     
+     /* Thick outer dome reflection */
+     border-top: 4px solid rgba(255, 255, 255, 0.7) !important;
+     border-left: 4px solid rgba(255, 255, 255, 0.3) !important;
+     border-bottom: 4px solid rgba(0, 0, 0, 0.6) !important;
+     border-right: 4px solid rgba(0, 0, 0, 0.2) !important;
+     
+     /* Main App Glass Base */
+     background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.1)) !important;
+     backdrop-filter: blur(15px) saturate(120%) !important;
+     -webkit-backdrop-filter: blur(15px) saturate(120%) !important;
+     box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 10px 20px rgba(255,255,255,0.15) !important;
+     overflow: hidden;
+   }
 
-  /* 3. Containers (Header, Input Area, Sidebar, Modals) */
-  header, #input-area, #sidebar, .auth-box, .modal-box {
-    background: 
-      linear-gradient(125deg, rgba(255, 100, 200, 0.05) 0%, rgba(100, 220, 255, 0.05) 50%, rgba(255, 250, 100, 0.05) 100%),
-      linear-gradient(to bottom right, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01)) !important;
-    backdrop-filter: blur(30px) saturate(180%) contrast(120%) !important;
-    -webkit-backdrop-filter: blur(30px) saturate(180%) contrast(120%) !important;
-    border: none !important;
-    border-top: 2px solid rgba(255, 255, 255, 0.4) !important;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.4) !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
-  }
-  
-  /* Fix layout overlapping for the new curves */
-  header { border-radius: 40px 40px 0 0 !important; border-bottom: 2px solid rgba(0,0,0,0.5) !important; }
-  #input-area { border-radius: 0 0 40px 40px !important; border-top: 2px solid rgba(255,255,255,0.4) !important; }
-  #sidebar { border-radius: 40px 0 0 40px !important; border-right: 2px solid rgba(0,0,0,0.5) !important; }
+   /* 3. Containers (Header, Input Area, Sidebar, Modals) */
+   header, #input-area, #sidebar, .auth-box, .modal-box {
+     background: 
+       linear-gradient(125deg, rgba(255, 100, 200, 0.05) 0%, rgba(100, 220, 255, 0.05) 50%, rgba(255, 250, 100, 0.05) 100%),
+       linear-gradient(to bottom right, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01)) !important;
+     backdrop-filter: blur(30px) saturate(180%) contrast(120%) !important;
+     -webkit-backdrop-filter: blur(30px) saturate(180%) contrast(120%) !important;
+     border: none !important;
+     border-top: 2px solid rgba(255, 255, 255, 0.4) !important;
+     border-bottom: 2px solid rgba(0, 0, 0, 0.4) !important;
+     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+   }
+   
+   /* Fix layout overlapping for the new curves */
+   header { border-radius: 40px 40px 0 0 !important; border-bottom: 2px solid rgba(0,0,0,0.5) !important; }
+   #input-area { border-radius: 0 0 40px 40px !important; border-top: 2px solid rgba(255,255,255,0.4) !important; }
+   #sidebar { border-radius: 40px 0 0 40px !important; border-right: 2px solid rgba(0,0,0,0.5) !important; }
 
-  /* 4. Chat Bubbles */
-  .msg {
-    background: 
-      linear-gradient(125deg, rgba(255, 100, 200, 0.08) 0%, rgba(100, 220, 255, 0.08) 50%, rgba(255, 250, 100, 0.08) 100%),
-      linear-gradient(to bottom right, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.02)) !important;
-    backdrop-filter: blur(25px) saturate(180%) contrast(120%) !important;
-    -webkit-backdrop-filter: blur(25px) saturate(180%) contrast(120%) !important;
-    
-    border-top: 2px solid rgba(255, 255, 255, 0.7) !important;
-    border-left: 2px solid rgba(255, 255, 255, 0.3) !important;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.4) !important;
-    border-right: 2px solid rgba(0, 0, 0, 0.1) !important;
-    
-    box-shadow: inset 0 5px 10px rgba(255,255,255,0.2), 0 10px 20px rgba(0,0,0,0.3) !important;
-    color: #ffffff !important;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.6) !important;
-  }
-  
-  /* Give User Messages a faint blue iridescent tint */
-  .user .msg {
-    background: 
-      linear-gradient(125deg, rgba(47, 111, 235, 0.4) 0%, rgba(100, 220, 255, 0.1) 100%),
-      linear-gradient(to bottom right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05)) !important;
-  }
+   /* 4. Chat Bubbles */
+   .msg {
+     background: 
+       linear-gradient(125deg, rgba(255, 100, 200, 0.08) 0%, rgba(100, 220, 255, 0.08) 50%, rgba(255, 250, 100, 0.08) 100%),
+       linear-gradient(to bottom right, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.02)) !important;
+     backdrop-filter: blur(25px) saturate(180%) contrast(120%) !important;
+     -webkit-backdrop-filter: blur(25px) saturate(180%) contrast(120%) !important;
+     
+     border-top: 2px solid rgba(255, 255, 255, 0.7) !important;
+     border-left: 2px solid rgba(255, 255, 255, 0.3) !important;
+     border-bottom: 2px solid rgba(0, 0, 0, 0.4) !important;
+     border-right: 2px solid rgba(0, 0, 0, 0.1) !important;
+     
+     box-shadow: inset 0 5px 10px rgba(255,255,255,0.2), 0 10px 20px rgba(0,0,0,0.3) !important;
+     color: #ffffff !important;
+     text-shadow: 0 2px 4px rgba(0,0,0,0.6) !important;
+   }
+   
+   /* Give User Messages a faint blue iridescent tint */
+   .user .msg {
+     background: 
+       linear-gradient(125deg, rgba(47, 111, 235, 0.4) 0%, rgba(100, 220, 255, 0.1) 100%),
+       linear-gradient(to bottom right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05)) !important;
+   }
 
-  /* 5. ALL Buttons, Textareas, Inputs, and the Profile Widget Panel */
-  button, .icon-btn, .tool-btn, .msg-action-btn, textarea, input, .history-item-title, .nova-glass-panel {
-    background: 
-      linear-gradient(125deg, rgba(255, 100, 200, 0.08) 0%, rgba(100, 220, 255, 0.08) 50%, rgba(255, 250, 100, 0.08) 100%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
-    
-    backdrop-filter: blur(15px) saturate(150%) !important;
-    -webkit-backdrop-filter: blur(15px) saturate(150%) !important;
-    
-    border-top: 2px solid rgba(255, 255, 255, 0.8) !important;
-    border-left: 2px solid rgba(255, 255, 255, 0.4) !important;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.5) !important;
-    border-right: 2px solid rgba(0, 0, 0, 0.2) !important;
-    
-    box-shadow: inset 0 4px 8px rgba(255, 255, 255, 0.4), inset 0 -4px 8px rgba(0, 0, 0, 0.3), 0 8px 15px rgba(0, 0, 0, 0.4) !important;
-    
-    color: #ffffff !important;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.8) !important;
-    border-radius: 16px !important;
-    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
-  }
+   /* 5. ALL Buttons, Textareas, Inputs, and the Profile Widget Panel */
+   button, .icon-btn, .tool-btn, .msg-action-btn, textarea, input, .history-item-title, .nova-glass-panel {
+     background: 
+       linear-gradient(125deg, rgba(255, 100, 200, 0.08) 0%, rgba(100, 220, 255, 0.08) 50%, rgba(255, 250, 100, 0.08) 100%),
+       linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
+     
+     backdrop-filter: blur(15px) saturate(150%) !important;
+     -webkit-backdrop-filter: blur(15px) saturate(150%) !important;
+     
+     border-top: 2px solid rgba(255, 255, 255, 0.8) !important;
+     border-left: 2px solid rgba(255, 255, 255, 0.4) !important;
+     border-bottom: 2px solid rgba(0, 0, 0, 0.5) !important;
+     border-right: 2px solid rgba(0, 0, 0, 0.2) !important;
+     
+     box-shadow: inset 0 4px 8px rgba(255, 255, 255, 0.4), inset 0 -4px 8px rgba(0, 0, 0, 0.3), 0 8px 15px rgba(0, 0, 0, 0.4) !important;
+     
+     color: #ffffff !important;
+     text-shadow: 0 1px 3px rgba(0,0,0,0.8) !important;
+     border-radius: 16px !important;
+     transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+   }
 
-  /* 6. Button Hover Physics */
-  button:hover, .icon-btn:hover, .tool-btn:hover, .msg-action-btn:hover, .history-item-title:hover {
-    background: 
-      linear-gradient(125deg, rgba(255, 100, 200, 0.12) 0%, rgba(100, 220, 255, 0.12) 50%, rgba(255, 250, 100, 0.12) 100%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.15) 100%) !important;
-    transform: translateY(-2px);
-    box-shadow: inset 0 6px 12px rgba(255, 255, 255, 0.6), inset 0 -4px 8px rgba(0, 0, 0, 0.3), 0 12px 20px rgba(0, 0, 0, 0.5) !important;
-  }
-  button:active, .icon-btn:active, .tool-btn:active, .msg-action-btn:active {
-    transform: translateY(1px) !important;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0,0,0,0.4) !important;
-    border-top: 2px solid rgba(255, 255, 255, 0.3) !important;
-  }
+   /* 6. Button Hover Physics */
+   button:hover, .icon-btn:hover, .tool-btn:hover, .msg-action-btn:hover, .history-item-title:hover {
+     background: 
+       linear-gradient(125deg, rgba(255, 100, 200, 0.12) 0%, rgba(100, 220, 255, 0.12) 50%, rgba(255, 250, 100, 0.12) 100%),
+       linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.15) 100%) !important;
+     transform: translateY(-2px);
+     box-shadow: inset 0 6px 12px rgba(255, 255, 255, 0.6), inset 0 -4px 8px rgba(0, 0, 0, 0.3), 0 12px 20px rgba(0, 0, 0, 0.5) !important;
+   }
+   button:active, .icon-btn:active, .tool-btn:active, .msg-action-btn:active {
+     transform: translateY(1px) !important;
+     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0,0,0,0.4) !important;
+     border-top: 2px solid rgba(255, 255, 255, 0.3) !important;
+   }
 
-  /* Fixes for text inputs so they look hollow inside */
-  textarea, input {
-    box-shadow: inset 0 4px 10px rgba(0,0,0,0.5), 0 2px 5px rgba(255,255,255,0.1) !important;
-    border-top: 2px solid rgba(0,0,0,0.4) !important;
-    border-bottom: 2px solid rgba(255,255,255,0.4) !important;
-  }
-  ::placeholder { color: rgba(255, 255, 255, 0.5) !important; text-shadow: none !important; }
+   /* Fixes for text inputs so they look hollow inside */
+   textarea, input {
+     box-shadow: inset 0 4px 10px rgba(0,0,0,0.5), 0 2px 5px rgba(255,255,255,0.1) !important;
+     border-top: 2px solid rgba(0,0,0,0.4) !important;
+     border-bottom: 2px solid rgba(255,255,255,0.4) !important;
+   }
+   ::placeholder { color: rgba(255, 255, 255, 0.5) !important; text-shadow: none !important; }
 
-  /* Wipe out the old flat colors */
-  :root { --surface: transparent !important; --surface2: transparent !important; --border: transparent !important; }
-/* 7. Light Mode Glass Text Override */
-  .light .msg, 
-  .light button, 
-  .light .icon-btn, 
-  .light .tool-btn, 
-  .light .msg-action-btn, 
-  .light textarea, 
-  .light input, 
-  .light .history-item-title, 
-  .light .nova-glass-panel {
-    color: #111111 !important; /* Turns the text black */
-    text-shadow: 0 1px 3px rgba(255,255,255,0.9) !important; /* Changes shadow to white for readability */
-  }
+   /* Wipe out the old flat colors */
+   :root { --surface: transparent !important; --surface2: transparent !important; --border: transparent !important; }
+  /* 7. Light Mode Glass Text Override */
+   .light .msg, 
+   .light button, 
+   .light .icon-btn, 
+   .light .tool-btn, 
+   .light .msg-action-btn, 
+   .light textarea, 
+   .light input, 
+   .light .history-item-title, 
+   .light .nova-glass-panel {
+     color: #111111 !important; /* Turns the text black */
+     text-shadow: 0 1px 3px rgba(255,255,255,0.9) !important; /* Changes shadow to white for readability */
+   }
 
-  .light ::placeholder { 
-    color: rgba(0, 0, 0, 0.5) !important; 
-  }
- /* 8. Light Mode Glass Structure Overrides */
-  .light #app, .light #auth-screen {
-    /* Turns the main app background into bright frosted glass */
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.2)) !important;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.1), inset 0 10px 20px rgba(255,255,255,0.8) !important;
-    border-bottom: 4px solid rgba(0, 0, 0, 0.2) !important;
-  }
+   .light ::placeholder { 
+     color: rgba(0, 0, 0, 0.5) !important; 
+   }
+  /* 8. Light Mode Glass Structure Overrides */
+   .light #app, .light #auth-screen {
+     /* Turns the main app background into bright frosted glass */
+     background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.2)) !important;
+     box-shadow: 0 30px 60px rgba(0,0,0,0.1), inset 0 10px 20px rgba(255,255,255,0.8) !important;
+     border-bottom: 4px solid rgba(0, 0, 0, 0.2) !important;
+   }
 
-  .light header, .light #input-area, .light #sidebar, .light .auth-box, .light .modal-box {
-    /* Brightens all the structural boxes */
-    background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.3)) !important;
-    border-top: 2px solid rgba(255, 255, 255, 1) !important;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.1) !important;
-  }
-  
-  .light .msg {
-    /* Brightens the chat bubbles */
-    background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4)) !important;
-    border-top: 2px solid rgba(255,255,255,1) !important;
-    border-bottom: 2px solid rgba(0,0,0,0.1) !important;
-    box-shadow: inset 0 5px 10px #fff, 0 10px 20px rgba(0,0,0,0.05) !important;
-  }
-  
-  .light .user .msg {
-    /* Gives user messages a slight blue tint in light mode */
-    background: linear-gradient(125deg, rgba(47, 111, 235, 0.15) 0%, rgba(100, 220, 255, 0.1) 100%),
-                linear-gradient(to bottom right, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.4)) !important;
-  }
-  /* 9. THE NUCLEAR LIGHT MODE BACKGROUND FIX */
-  body.light {
-    background-color: #ffffff !important;
-    background-image: none !important;
-  }
- /* 9. THE ABSOLUTE LIGHT MODE CANVAS FIX */
-  html, body {
-    transition: background 0.3s ease; /* Makes the switch smooth instead of a harsh flash */
-  }
+   .light header, .light #input-area, .light #sidebar, .light .auth-box, .light .modal-box {
+     /* Brightens all the structural boxes */
+     background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.3)) !important;
+     border-top: 2px solid rgba(255, 255, 255, 1) !important;
+     border-bottom: 2px solid rgba(0, 0, 0, 0.1) !important;
+   }
+   
+   .light .msg {
+     /* Brightens the chat bubbles */
+     background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4)) !important;
+     border-top: 2px solid rgba(255,255,255,1) !important;
+     border-bottom: 2px solid rgba(0,0,0,0.1) !important;
+     box-shadow: inset 0 5px 10px #fff, 0 10px 20px rgba(0,0,0,0.05) !important;
+   }
+   
+   .light .user .msg {
+     /* Gives user messages a slight blue tint in light mode */
+     background: linear-gradient(125deg, rgba(47, 111, 235, 0.15) 0%, rgba(100, 220, 255, 0.1) 100%),
+                 linear-gradient(to bottom right, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.4)) !important;
+   }
+   /* 9. THE NUCLEAR LIGHT MODE BACKGROUND FIX */
+   body.light {
+     background-color: #ffffff !important;
+     background-image: none !important;
+   }
+  /* 9. THE ABSOLUTE LIGHT MODE CANVAS FIX */
+   html, body {
+     transition: background 0.3s ease; /* Makes the switch smooth instead of a harsh flash */
+   }
 
-  /* When Light Mode is active, force the deepest layers to be pure white */
-  html.light, body.light, .light {
-    background-color: #ffffff !important;
-    background-image: none !important;
-  }
+   /* When Light Mode is active, force the deepest layers to be pure white */
+   html.light, body.light, .light {
+     background-color: #ffffff !important;
+     background-image: none !important;
+   }
   </style>
 </head>
 <body>
@@ -389,8 +389,8 @@
   const profileSave = document.getElementById("profile-save");
   const profileDelete = document.getElementById("profile-delete");
   const profileMsg = document.getElementById("profile-msg");
-  const avatarInput = document.getElementById("avatar-input");
-  const avatarPreview = document.getElementById("avatar-preview");
+  const avatarInput = document.getElementById("avatar-upload");
+  const avatarPreview = document.getElementById("profile-preview");
 
   let history = [];
   let pendingImageBase64 = null;
@@ -409,7 +409,7 @@
   // Toast
   function showToast(msg) {
     const toast = document.createElement("div");
-    toast.style.cssText = "position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#2f6feb;color:white;padding:0.6rem 1.2rem;border-radius:12px;font-size:0.9rem;z-index:9999;animation:fadeout 3s forwards;white-space:nowrap";
+    toast.style.cssText = "position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#2f6feb;color:white;padding:0.6rem 1.2rem;border-radius:12px;font-size:0.9rem;z-index:9999;animation:fadeout 0.3s ease 2.7s forwards";
     toast.textContent = msg;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
@@ -547,13 +547,13 @@
 
  // Theme Toggle
   themeBtn.addEventListener("click", (e) => {
-    e.preventDefault(); // Stops accidental page reloads!
+    e.preventDefault();
     
     isLight = !isLight;
     document.body.classList.toggle("light", isLight);
+    document.documentElement.classList.toggle("light", isLight);
     themeBtn.textContent = isLight ? "☀️" : "🌙";
     
-    // (Optional but recommended) If you want it to remember the user's choice when they refresh:
     localStorage.setItem("theme", isLight ? "light" : "dark");
     
     applyEaster();
@@ -641,37 +641,112 @@
           canvas.getContext("2d").drawImage(img, 0, 0, w, h);
           resolve(canvas.toDataURL("image/jpeg", 0.7));
         };
+        img.onerror = () => {
+          showToast("Failed to load image");
+          resolve(null);
+        };
         img.src = e.target.result;
+      };
+      reader.onerror = () => {
+        showToast("Failed to read file");
+        resolve(null);
       };
       reader.readAsDataURL(file);
     });
   }
 
-  // Image upload
+  // Image upload - FIXED
   uploadBtn.addEventListener("click", () => fileInput.click());
-  fileInput.addEventListener("change", async () => {
-    const file = fileInput.files[0]; if (!file) return;
+  fileInput.addEventListener("change", async (e) => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+      showToast("Please upload a valid image file (JPG, PNG, WebP, or GIF)");
+      fileInput.value = "";
+      return;
+    }
+    
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      showToast("File is too large. Max size is 10MB");
+      fileInput.value = "";
+      return;
+    }
+    
+    showToast("Processing image...");
     const compressed = await compressImage(file);
+    
+    if (!compressed) {
+      fileInput.value = "";
+      return;
+    }
+    
     pendingImageBase64 = compressed.split(",")[1];
     pendingImageType = "image/jpeg";
     previewImg.src = compressed;
     previewArea.style.display = "flex";
+    fileInput.value = ""; // Reset input
+    showToast("Image ready!");
   });
+  
   removeImgBtn.addEventListener("click", clearImage);
   function clearImage() { pendingImageBase64 = null; pendingImageType = null; previewArea.style.display = "none"; previewImg.src = ""; fileInput.value = ""; }
 
-  // Voice input
+  // Voice input - FIXED
   if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SR();
-    recognition.continuous = false; recognition.interimResults = false;
-    recognition.onresult = e => { input.value = e.results[0][0].transcript; micBtn.classList.remove("recording"); isRecording = false; };
-    recognition.onend = () => { micBtn.classList.remove("recording"); isRecording = false; };
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = "en-US";
+    
+    recognition.onstart = () => {
+      micBtn.classList.add("recording");
+      isRecording = true;
+      showToast("🎤 Listening...");
+    };
+    
+    recognition.onresult = (e) => {
+      if (e.results && e.results.length > 0) {
+        const transcript = e.results[e.results.length - 1][0].transcript;
+        input.value = transcript;
+        showToast("✓ Got it!");
+      }
+      micBtn.classList.remove("recording");
+      isRecording = false;
+    };
+    
+    recognition.onerror = (e) => {
+      console.error("Speech recognition error:", e.error);
+      showToast(`Error: ${e.error}`);
+      micBtn.classList.remove("recording");
+      isRecording = false;
+    };
+    
+    recognition.onend = () => {
+      micBtn.classList.remove("recording");
+      isRecording = false;
+    };
   }
+  
   micBtn.addEventListener("click", () => {
-    if (!recognition) return alert("Voice input not supported in this browser.");
-    if (isRecording) { recognition.stop(); return; }
-    recognition.start(); isRecording = true; micBtn.classList.add("recording");
+    if (!recognition) {
+      showToast("⚠️ Voice input not supported in your browser");
+      return;
+    }
+    if (isRecording) {
+      recognition.stop();
+      return;
+    }
+    try {
+      recognition.start();
+    } catch (e) {
+      console.error("Error starting recognition:", e);
+      showToast("Could not start voice input");
+    }
   });
 
   // TTS
@@ -763,7 +838,7 @@
           thinking.innerHTML = "";
           const img = document.createElement("img"); img.src = data.imageUrl; img.style.cssText = "max-width:100%;border-radius:12px;display:block;"; img.alt = prompt;
           thinking.appendChild(img);
-          const caption = document.createElement("span"); caption.textContent = `🎨 "${prompt}"`; caption.style.cssText = "display:block;margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted)";
+          const caption = document.createElement("span"); caption.textContent = `🎨 "${prompt}"`; caption.style.cssText = "display:block;margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted);";
           thinking.appendChild(caption);
           history.push({ role:"assistant", content:`Here's an image of ${prompt}!` });
           saveCurrentChat();
@@ -808,11 +883,15 @@
         if (!file) return;
         const MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024;
         const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-        if (!allowedTypes.includes(file.type)) { alert("Only JPG, PNG, and WEBP images are allowed!"); e.target.value = ''; return; }
-        if (file.size > MAX_FILE_SIZE_BYTES) { alert("File too big! Max 2MB."); e.target.value = ''; return; }
+        if (!allowedTypes.includes(file.type)) { showToast("Only JPG, PNG, and WEBP images are allowed!"); e.target.value = ''; return; }
+        if (file.size > MAX_FILE_SIZE_BYTES) { showToast("File too big! Max 2MB."); e.target.value = ''; return; }
         showToast("Uploading profile picture...");
         try {
           const compressed = await compressImage(file);
+          if (!compressed) {
+            e.target.value = '';
+            return;
+          }
           localStorage.setItem("nova_avatar", compressed);
           if (profilePreview) profilePreview.src = compressed;
           updateProfileIcon(compressed);
@@ -825,6 +904,7 @@
           if (data.error) { showToast("Failed to save avatar."); }
           else { showToast("Profile picture updated! ✅"); }
         } catch { showToast("Upload failed. Try again."); }
+        e.target.value = '';
       });
     }
   });
@@ -833,15 +913,15 @@
   const easterBtn = document.createElement("button");
   easterBtn.className = "icon-btn"; easterBtn.title = "Toggle background"; easterBtn.textContent = "🖼️"; easterBtn.style.display = easterActive ? "block" : "none";
   headerBtns.prepend(easterBtn);
-function applyEaster() {
+  
+  function applyEaster() {
     if (easterActive) {
-      // Easter Egg is ON: Show the image
       document.body.style.setProperty('background', "url('https://images.pexels.com/photos/31265958/pexels-photo-31265958.jpeg') center/cover fixed", "important");
     } else {
-      // Easter Egg is OFF: Remove JS interference completely
       document.body.style.removeProperty('background');
     }
   }
+  
   function toggleEaster() { easterActive = !easterActive; localStorage.setItem("nova_easter", easterActive); applyEaster(); easterBtn.style.display = "block"; }
   applyEaster();
   easterBtn.addEventListener("click", toggleEaster);
@@ -854,10 +934,12 @@ function applyEaster() {
   const starBtn = document.createElement("button");
   starBtn.className = "icon-btn"; starBtn.title = "Toggle star cursor"; starBtn.textContent = "⭐"; starBtn.style.display = starCursorActive ? "block" : "none";
   headerBtns.prepend(starBtn);
+  
   function applyStarCursor() { document.body.style.cursor = starCursorActive ? starCursorURL : ""; }
-  function toggleStarCursor() { starCursorActive = !starCursorActive; localStorage.setItem("nova_star", starCursorActive); applyStarCursor(); starBtn.style.display = "block"; showToast(starCursorActive ? "⭐ Star cursor on!" : "⭐ Star cursor off!"); }
+  function toggleStarCursor() { starCursorActive = !starCursorActive; localStorage.setItem("nova_star", starCursorActive); applyStarCursor(); starBtn.style.display = "block"; showToast(starCursorActive ? "⭐ Star cursor enabled!" : "⭐ Star cursor disabled!"); }
   applyStarCursor();
   starBtn.addEventListener("click", toggleStarCursor);
+  
   headerTitle.addEventListener("click", () => { starClicks++; if (starClicks >= 8) { starClicks = 0; toggleStarCursor(); } else showToast(`${8-starClicks} more click${8-starClicks!==1?"s":""}...`); });
 
   // Easter egg — dino game
@@ -868,11 +950,20 @@ function applyEaster() {
   function toggleDino() { window.open("/trex/index.html", "_blank"); }
   dinoBtn.addEventListener("click", toggleDino);
 
+  // Easter egg — PAC-MAN GAME (NEW)
+  let pacmanUnlocked = localStorage.getItem("nova_pacman") === "true";
+  const pacmanBtn = document.createElement("button");
+  pacmanBtn.className = "icon-btn"; pacmanBtn.title = "Play Pac-Man Game"; pacmanBtn.textContent = "👻"; pacmanBtn.style.display = pacmanUnlocked ? "block" : "none";
+  headerBtns.prepend(pacmanBtn);
+  function togglePacman() { window.open("/pacman/index.html", "_blank"); }
+  pacmanBtn.addEventListener("click", togglePacman);
+
   // Input easter egg detection
   input.addEventListener("input", () => {
     const val = input.value.trim().toLowerCase();
     if (val === "jymer1102") { input.value = ""; toggleEaster(); showToast(easterActive ? "Easter egg unlocked! 🔓🎉" : "Background off!"); }
-    if (val === "dinosaur") { input.value = ""; if (!dinoUnlocked) { dinoUnlocked = true; localStorage.setItem("nova_dino","true"); dinoBtn.style.display = "block"; showToast("🦖 Dino game unlocked!"); } toggleDino(); }
+    if (val === "dinosaur") { input.value = ""; if (!dinoUnlocked) { dinoUnlocked = true; localStorage.setItem("nova_dino","true"); dinoBtn.style.display = "block"; showToast("🦖 Dino game unlocked! Type 'dinosaur' anytime to play!"); } }
+    if (val === "pac-man" || val === "pacman") { input.value = ""; if (!pacmanUnlocked) { pacmanUnlocked = true; localStorage.setItem("nova_pacman","true"); pacmanBtn.style.display = "block"; showToast("👻 Pac-Man game unlocked! Type 'pac-man' to play!"); } }
   });
 </script>
 <!-- BACKPACK EASTER EGG -->
@@ -909,7 +1000,7 @@ function applyEaster() {
 <canvas id="egg-canvas"></canvas>
 <div id="egg-overlay">
   <div id="backpack-wrap">🎒</div>
-  <div id="egg-label">💣ALLAHU AKBAR💣</div>
+  <div id="egg-label">💣EASTER EGG💣</div>
 </div>
 
 <script>
@@ -926,7 +1017,7 @@ window.addEventListener('resize', () => {
   eggCanvas.height = window.innerHeight;
 });
 
-const SECRET = 'allahu akbar';
+const SECRET = 'jymer';
 let buf = '';
 let particles = [];
 let animId = null;
@@ -936,11 +1027,11 @@ document.addEventListener('keydown', e => {
   buf += e.key.toLowerCase();
   if (buf.length > SECRET.length) buf = buf.slice(-SECRET.length);
   if (buf === SECRET) {
-  buf = '';
-  const msgInput = document.getElementById('input');
-  if (msgInput) msgInput.value = '';
-  triggerEasterEgg();
-}
+    buf = '';
+    const msgInput = document.getElementById('input');
+    if (msgInput) msgInput.value = '';
+    triggerEasterEgg();
+  }
 });
 
 function triggerEasterEgg() {
