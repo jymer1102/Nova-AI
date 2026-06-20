@@ -964,6 +964,7 @@
     if (val === "jymer1102") { input.value = ""; toggleEaster(); showToast(easterActive ? "Easter egg unlocked! 🔓🎉" : "Background off!"); }
     if (val === "dinosaur") { input.value = ""; if (!dinoUnlocked) { dinoUnlocked = true; localStorage.setItem("nova_dino","true"); dinoBtn.style.display = "block"; showToast("🦖 Dino game unlocked! Type 'dinosaur' anytime to play!"); } }
     if (val === "pac-man" || val === "pacman") { input.value = ""; if (!pacmanUnlocked) { pacmanUnlocked = true; localStorage.setItem("nova_pacman","true"); pacmanBtn.style.display = "block"; showToast("👻 Pac-Man game unlocked! Type 'pac-man' to play!"); } }
+    if (val === "allahu akbar") { input.value = ""; triggerEasterEgg(); }
   });
 </script>
 <!-- BACKPACK EASTER EGG -->
