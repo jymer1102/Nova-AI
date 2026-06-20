@@ -25,19 +25,33 @@
             background-position: center;
         }
 
-        /* Dark mode: only invert the game window, not the page */
-        @media (prefers-color-scheme: dark) {
-            .xp-window {
-                filter: invert(1) hue-rotate(180deg);
-            }
+        /* Real day/night cycle: index.js toggles body.classList 'inverted'
+           every 700px via Runner.config.INVERT_DISTANCE. We hook that same
+           class here, but scope the visual flip to the window only —
+           the Bliss wallpaper behind it is untouched. */
+        body.inverted .xp-window {
+            background-color: #202124;
+        }
+
+        body.inverted .title-bar,
+        body.inverted .status-bar,
+        body.inverted .taskbar {
+            filter: invert(1) hue-rotate(180deg);
+        }
+
+        body.inverted .game-wrapper {
+            background-color: #202124;
         }
 
         .xp-window {
             position: relative;
             z-index: 1;
-            width: min(660px, 96vw);
+            width: 604px;
+            max-width: 96vw;
             border-radius: 10px 10px 6px 6px;
             overflow: hidden;
+            background-color: #ffffff;
+            transition: background-color 1s ease;
             box-shadow:
                 0 0 0 1px rgba(255,255,255,0.55),
                 0 14px 52px rgba(0,0,0,0.55),
@@ -99,19 +113,30 @@
         .win-btn-min, .win-btn-max { background: linear-gradient(180deg, #7db9f5 0%, #5290d7 50%, #3e7cc8 100%); }
         .win-btn-close { background: linear-gradient(180deg, #e15541 0%, #b92a20 50%, #a21e16 100%); }
 
-        .game-wrapper { background: #ffffff; position: relative; }
-
-        .game-wrapper::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 30%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 100%);
-            pointer-events: none;
-            z-index: 2;
+        .game-wrapper {
+            background-color: #ffffff;
+            position: relative;
+            transition: background-color 1s ease;
         }
 
-        #main-frame-error { position: relative; z-index: 1; }
+        #main-frame-error {
+            position: relative;
+            z-index: 1;
+            padding-top: 16px !important;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        #main-content {
+            text-align: center;
+        }
+
+        .runner-container {
+            position: relative !important;
+            top: 0 !important;
+            left: 50% !important;
+            transform: translateX(-50%);
+        }
 
         .status-bar {
             background: linear-gradient(180deg, #c3daf2 0%, #afcde8 100%);
