@@ -276,7 +276,7 @@
     </div>
 
     <div class="taskbar">
-        <div class="start-btn">
+        <div class="start-btn" onclick="startGameFromButton()">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <rect x="0"   y="0"   width="6.5" height="6.5" fill="#FF3333" rx="0.5"/>
                 <rect x="7.5" y="0"   width="6.5" height="6.5" fill="#33CC33" rx="0.5"/>
@@ -304,6 +304,21 @@
         }
         updateClock();
         setInterval(updateClock, 15000);
+
+        function startGameFromButton() {
+            // Dispatch a real keydown/keyup for spacebar (keyCode 32),
+            // which Runner.prototype.onKeyDown already listens for to
+            // start the game and make the T-Rex jump — same path a
+            // real spacebar press takes, untouched in index.js.
+            var down = new KeyboardEvent('keydown', { keyCode: 32, which: 32, bubbles: true });
+            var up = new KeyboardEvent('keyup', { keyCode: 32, which: 32, bubbles: true });
+            Object.defineProperty(down, 'keyCode', { get: function () { return 32; } });
+            Object.defineProperty(up, 'keyCode', { get: function () { return 32; } });
+            document.dispatchEvent(down);
+            setTimeout(function () {
+                document.dispatchEvent(up);
+            }, 50);
+        }
 
         function toggleFullscreen() {
             const el = document.documentElement;
