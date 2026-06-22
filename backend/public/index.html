@@ -403,8 +403,19 @@
   let userToken = localStorage.getItem("nova_token") || null;
   let isSignUp = false;
 
-  // Keep Render awake
-  setInterval(() => fetch(`${BACKEND_URL}/`), 10 * 60 * 1000);
+  // Paste this near the top of your JavaScript code to keep your Render backend awake
+function pingRenderServer() {
+  console.log("Pinging Render backend to prevent spin-down...");
+  fetch(`${BACKEND_URL}/`)
+    .then(res => {
+      if (res.ok) console.log("Render backend is awake! status:", res.status);
+    })
+    .catch(err => console.warn("Ping failed, server might be sleeping:", err));
+}
+
+// Ping immediately on load, then repeat every 5 minutes (300,000 ms)
+pingRenderServer();
+setInterval(pingRenderServer, 5 * 60 * 1000);
 
   // Toast
   function showToast(msg) {
