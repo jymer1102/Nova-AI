@@ -17,6 +17,9 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
+
+// Serves index.html, dino.png, pacman.png, and the /trex and /pacman game
+// folders as long as they all live inside the "public" directory.
 app.use(express.static(path.join(__dirname, "public")));
 
 const supabase = createClient(
@@ -30,6 +33,8 @@ const supabaseAdmin = createClient(
 );
 
 // --- KEEP ALIVE ROUTE FOR RENDER ---
+// The frontend pings this every 5 minutes so the free Render instance
+// doesn't spin down from inactivity.
 app.get("/ping", (req, res) => {
   res.status(200).send("pong");
 });
@@ -173,7 +178,7 @@ app.post("/auth/login", async (req, res) => {
 
 // Save chat
 app.post("/chats", async (req, res) => {
-  const { id, title, history, author } = req.body; 
+  const { id, title, history, author } = req.body;
   const authHeader = req.headers.authorization;
   const token = req.body.token || (authHeader && authHeader.split(" ")[1]);
 
@@ -193,10 +198,10 @@ app.post("/chats", async (req, res) => {
 
     // 2. Save the chat using the locally decoded userId
     const { error } = await supabaseAdmin.from("chats").upsert({
-      id, 
-      user_id: userId, 
-      title, 
-      history, 
+      id,
+      user_id: userId,
+      title,
+      history,
       author,
       created_at: new Date().toISOString()
     });
@@ -205,7 +210,7 @@ app.post("/chats", async (req, res) => {
       console.error("Chat save DB error:", error);
       return res.status(500).json({ error: error.message });
     }
-    
+
     res.json({ success: true });
   } catch (err) {
     console.error("Chat save unexpected error:", err);
