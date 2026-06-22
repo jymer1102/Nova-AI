@@ -21,7 +21,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root { --bg:#0f0f0f; --surface:#1a1a1a; --surface2:#2a2a2a; --border:#333; --text:#f0f0f0; --text-muted:#888; --accent:#2f6feb; --ai-bg:#1e1e1e; }
-    .light { --bg:#ffffff; --surface:#ffffff; --surface2:#ececec; --border:#ddd; --text:#111; --text-muted:#666; --accent:#2f6feb; --ai-bg:#e8e8e8; }
+   .light { --bg:#ffffff; --surface:#ffffff; --surface2:#ececec; --border:#ddd; --text:#111; --text-muted:#666; --accent:#2f6feb; --ai-bg:#e8e8e8; }
     * { box-sizing:border-box; margin:0; padding:0; }
     body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--text); display:flex; flex-direction:column; height:100vh; transition:background 0.2s,color 0.2s; }
     #auth-screen { flex:1; display:flex; align-items:center; justify-content:center; padding:1rem; }
@@ -83,191 +83,180 @@
     .modal-input { padding:0.75rem; border-radius:10px; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-size:1rem; font-family:Inter,sans-serif; width:100%; }
     .modal-btn { padding:0.75rem; border-radius:10px; border:none; font-size:1rem; cursor:pointer; font-family:Inter,sans-serif; }
  
-    /* 1. Default Theme Background */
-    body {
-      background: var(--bg) !important; 
-      padding: 15px; 
-    }
-    /* 2. The Main Screen Border (Bends the whole app) */
-    #app, #auth-screen {
-      height: calc(100vh - 30px) !important;
-      border-radius: 40px; /* Massive curved corners */
-      
-      /* Thick outer dome reflection */
-      border-top: 4px solid rgba(255, 255, 255, 0.7) !important;
-      border-left: 4px solid rgba(255, 255, 255, 0.3) !important;
-      border-bottom: 4px solid rgba(0, 0, 0, 0.6) !important;
-      border-right: 4px solid rgba(0, 0, 0, 0.2) !important;
-      
-      /* Main App Glass Base */
-      background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.1)) !important;
-      backdrop-filter: blur(15px) saturate(120%) !important;
-      -webkit-backdrop-filter: blur(15px) saturate(120%) !important;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 10px 20px rgba(255,255,255,0.15) !important;
-      overflow: hidden;
-    }
+  /* 1. Default Theme Background */
+   body {
+     /* This uses your original dark/light mode colors instead of an image */
+     background: var(--bg) !important; 
+     padding: 15px; 
+   }
+   /* 2. The Main Screen Border (Bends the whole app) */
+   #app, #auth-screen {
+     height: calc(100vh - 30px) !important;
+     border-radius: 40px; /* Massive curved corners */
+     
+     /* Thick outer dome reflection */
+     border-top: 4px solid rgba(255, 255, 255, 0.7) !important;
+     border-left: 4px solid rgba(255, 255, 255, 0.3) !important;
+     border-bottom: 4px solid rgba(0, 0, 0, 0.6) !important;
+     border-right: 4px solid rgba(0, 0, 0, 0.2) !important;
+     
+     /* Main App Glass Base */
+     background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.1)) !important;
+     backdrop-filter: blur(15px) saturate(120%) !important;
+     -webkit-backdrop-filter: blur(15px) saturate(120%) !important;
+     box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 10px 20px rgba(255,255,255,0.15) !important;
+     overflow: hidden;
+   }
 
-    /* 3. Containers (Header, Input Area, Sidebar, Modals) */
-    header, #input-area, #sidebar, .auth-box, .modal-box {
-      background: 
-        linear-gradient(125deg, rgba(255, 100, 200, 0.05) 0%, rgba(100, 220, 255, 0.05) 50%, rgba(255, 250, 100, 0.05) 100%),
-        linear-gradient(to bottom right, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01)) !important;
-      backdrop-filter: blur(30px) saturate(180%) contrast(120%) !important;
-      -webkit-backdrop-filter: blur(30px) saturate(180%) contrast(120%) !important;
-      border: none !important;
-      border-top: 2px solid rgba(255, 255, 255, 0.4) !important;
-      border-bottom: 2px solid rgba(0, 0, 0, 0.4) !important;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
-    }
-    
-    /* Fix layout overlapping for the new curves */
-    header { border-radius: 40px 40px 0 0 !important; border-bottom: 2px solid rgba(0,0,0,0.5) !important; }
-    #input-area { border-radius: 0 0 40px 40px !important; border-top: 2px solid rgba(255,255,255,0.4) !important; }
-    #sidebar { border-radius: 40px 0 0 40px !important; border-right: 2px solid rgba(0,0,0,0.5) !important; }
+   /* 3. Containers (Header, Input Area, Sidebar, Modals) */
+   header, #input-area, #sidebar, .auth-box, .modal-box {
+     background: 
+       linear-gradient(125deg, rgba(255, 100, 200, 0.05) 0%, rgba(100, 220, 255, 0.05) 50%, rgba(255, 250, 100, 0.05) 100%),
+       linear-gradient(to bottom right, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01)) !important;
+     backdrop-filter: blur(30px) saturate(180%) contrast(120%) !important;
+     -webkit-backdrop-filter: blur(30px) saturate(180%) contrast(120%) !important;
+     border: none !important;
+     border-top: 2px solid rgba(255, 255, 255, 0.4) !important;
+     border-bottom: 2px solid rgba(0, 0, 0, 0.4) !important;
+     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+   }
+   
+   /* Fix layout overlapping for the new curves */
+   header { border-radius: 40px 40px 0 0 !important; border-bottom: 2px solid rgba(0,0,0,0.5) !important; }
+   #input-area { border-radius: 0 0 40px 40px !important; border-top: 2px solid rgba(255,255,255,0.4) !important; }
+   #sidebar { border-radius: 40px 0 0 40px !important; border-right: 2px solid rgba(0,0,0,0.5) !important; }
 
-    /* 4. Chat Bubbles */
-    .msg {
-      background: 
-        linear-gradient(125deg, rgba(255, 100, 200, 0.08) 0%, rgba(100, 220, 255, 0.08) 50%, rgba(255, 250, 100, 0.08) 100%),
-        linear-gradient(to bottom right, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.02)) !important;
-      backdrop-filter: blur(25px) saturate(180%) contrast(120%) !important;
-      -webkit-backdrop-filter: blur(25px) saturate(180%) contrast(120%) !important;
-      
-      border-top: 2px solid rgba(255, 255, 255, 0.7) !important;
-      border-left: 2px solid rgba(255, 255, 255, 0.3) !important;
-      border-bottom: 2px solid rgba(0, 0, 0, 0.4) !important;
-      border-right: 2px solid rgba(0, 0, 0, 0.1) !important;
-      
-      box-shadow: inset 0 5px 10px rgba(255,255,255,0.2), 0 10px 20px rgba(0,0,0,0.3) !important;
-      color: #ffffff !important;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.6) !important;
-    }
-    
-    /* Give User Messages a faint blue iridescent tint */
-    .user .msg {
-      background: 
-        linear-gradient(125deg, rgba(47, 111, 235, 0.4) 0%, rgba(100, 220, 255, 0.1) 100%),
-        linear-gradient(to bottom right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05)) !important;
-    }
+   /* 4. Chat Bubbles */
+   .msg {
+     background: 
+       linear-gradient(125deg, rgba(255, 100, 200, 0.08) 0%, rgba(100, 220, 255, 0.08) 50%, rgba(255, 250, 100, 0.08) 100%),
+       linear-gradient(to bottom right, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.02)) !important;
+     backdrop-filter: blur(25px) saturate(180%) contrast(120%) !important;
+     -webkit-backdrop-filter: blur(25px) saturate(180%) contrast(120%) !important;
+     
+     border-top: 2px solid rgba(255, 255, 255, 0.7) !important;
+     border-left: 2px solid rgba(255, 255, 255, 0.3) !important;
+     border-bottom: 2px solid rgba(0, 0, 0, 0.4) !important;
+     border-right: 2px solid rgba(0, 0, 0, 0.1) !important;
+     
+     box-shadow: inset 0 5px 10px rgba(255,255,255,0.2), 0 10px 20px rgba(0,0,0,0.3) !important;
+     color: #ffffff !important;
+     text-shadow: 0 2px 4px rgba(0,0,0,0.6) !important;
+   }
+   
+   /* Give User Messages a faint blue iridescent tint */
+   .user .msg {
+     background: 
+       linear-gradient(125deg, rgba(47, 111, 235, 0.4) 0%, rgba(100, 220, 255, 0.1) 100%),
+       linear-gradient(to bottom right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05)) !important;
+   }
 
-    /* 5. ALL Buttons, Textareas, Inputs, and the Profile Widget Panel */
-    button, .icon-btn, .tool-btn, .msg-action-btn, textarea, input, .history-item-title, .nova-glass-panel {
-      background: 
-        linear-gradient(125deg, rgba(255, 100, 200, 0.08) 0%, rgba(100, 220, 255, 0.08) 50%, rgba(255, 250, 100, 0.08) 100%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
-      
-      backdrop-filter: blur(15px) saturate(150%) !important;
-      -webkit-backdrop-filter: blur(15px) saturate(150%) !important;
-      
-      border-top: 2px solid rgba(255, 255, 255, 0.8) !important;
-      border-left: 2px solid rgba(255, 255, 255, 0.4) !important;
-      border-bottom: 2px solid rgba(0, 0, 0, 0.5) !important;
-      border-right: 2px solid rgba(0, 0, 0, 0.2) !important;
-      
-      box-shadow: inset 0 4px 8px rgba(255, 255, 255, 0.4), inset 0 -4px 8px rgba(0, 0, 0, 0.3), 0 8px 15px rgba(0, 0, 0, 0.4) !important;
-      
-      color: #ffffff !important;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.8) !important;
-      border-radius: 16px !important;
-      transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
-    }
+   /* 5. ALL Buttons, Textareas, Inputs, and the Profile Widget Panel */
+   button, .icon-btn, .tool-btn, .msg-action-btn, textarea, input, .history-item-title, .nova-glass-panel {
+     background: 
+       linear-gradient(125deg, rgba(255, 100, 200, 0.08) 0%, rgba(100, 220, 255, 0.08) 50%, rgba(255, 250, 100, 0.08) 100%),
+       linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
+     
+     backdrop-filter: blur(15px) saturate(150%) !important;
+     -webkit-backdrop-filter: blur(15px) saturate(150%) !important;
+     
+     border-top: 2px solid rgba(255, 255, 255, 0.8) !important;
+     border-left: 2px solid rgba(255, 255, 255, 0.4) !important;
+     border-bottom: 2px solid rgba(0, 0, 0, 0.5) !important;
+     border-right: 2px solid rgba(0, 0, 0, 0.2) !important;
+     
+     box-shadow: inset 0 4px 8px rgba(255, 255, 255, 0.4), inset 0 -4px 8px rgba(0, 0, 0, 0.3), 0 8px 15px rgba(0, 0, 0, 0.4) !important;
+     
+     color: #ffffff !important;
+     text-shadow: 0 1px 3px rgba(0,0,0,0.8) !important;
+     border-radius: 16px !important;
+     transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+   }
 
-    /* 6. Button Hover Physics */
-    button:hover, .icon-btn:hover, .tool-btn:hover, .msg-action-btn:hover, .history-item-title:hover {
-      background: 
-        linear-gradient(125deg, rgba(255, 100, 200, 0.12) 0%, rgba(100, 220, 255, 0.12) 50%, rgba(255, 250, 100, 0.12) 100%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.15) 100%) !important;
-      transform: translateY(-2px);
-      box-shadow: inset 0 6px 12px rgba(255, 255, 255, 0.6), inset 0 -4px 8px rgba(0, 0, 0, 0.3), 0 12px 20px rgba(0, 0, 0, 0.5) !important;
-    }
-    button:active, .icon-btn:active, .tool-btn:active, .msg-action-btn:active {
-      transform: translateY(1px) !important;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0,0,0,0.4) !important;
-      border-top: 2px solid rgba(255, 255, 255, 0.3) !important;
-    }
+   /* 6. Button Hover Physics */
+   button:hover, .icon-btn:hover, .tool-btn:hover, .msg-action-btn:hover, .history-item-title:hover {
+     background: 
+       linear-gradient(125deg, rgba(255, 100, 200, 0.12) 0%, rgba(100, 220, 255, 0.12) 50%, rgba(255, 250, 100, 0.12) 100%),
+       linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.15) 100%) !important;
+     transform: translateY(-2px);
+     box-shadow: inset 0 6px 12px rgba(255, 255, 255, 0.6), inset 0 -4px 8px rgba(0, 0, 0, 0.3), 0 12px 20px rgba(0, 0, 0, 0.5) !important;
+   }
+   button:active, .icon-btn:active, .tool-btn:active, .msg-action-btn:active {
+     transform: translateY(1px) !important;
+     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0,0,0,0.4) !important;
+     border-top: 2px solid rgba(255, 255, 255, 0.3) !important;
+   }
 
-    /* Fixes for text inputs so they look hollow inside */
-    textarea, input {
-      box-shadow: inset 0 4px 10px rgba(0,0,0,0.5), 0 2px 5px rgba(255,255,255,0.1) !important;
-      border-top: 2px solid rgba(0,0,0,0.4) !important;
-      border-bottom: 2px solid rgba(255,255,255,0.4) !important;
-    }
-    ::placeholder { color: rgba(255, 255, 255, 0.5) !important; text-shadow: none !important; }
+   /* Fixes for text inputs so they look hollow inside */
+   textarea, input {
+     box-shadow: inset 0 4px 10px rgba(0,0,0,0.5), 0 2px 5px rgba(255,255,255,0.1) !important;
+     border-top: 2px solid rgba(0,0,0,0.4) !important;
+     border-bottom: 2px solid rgba(255,255,255,0.4) !important;
+   }
+   ::placeholder { color: rgba(255, 255, 255, 0.5) !important; text-shadow: none !important; }
 
-    /* Wipe out the old flat colors */
-    :root { --surface: transparent !important; --surface2: transparent !important; --border: transparent !important; }
-    
-    /* 7. Light Mode Glass Text Override */
-    .light .msg, 
-    .light button, 
-    .light .icon-btn, 
-    .light .tool-btn, 
-    .light .msg-action-btn, 
-    .light textarea, 
-    .light input, 
-    .light .history-item-title, 
-    .light .nova-glass-panel {
-      color: #111111 !important; /* Turns the text black */
-      text-shadow: 0 1px 3px rgba(255,255,255,0.9) !important; /* Changes shadow to white for readability */
-    }
+   /* Wipe out the old flat colors */
+   :root { --surface: transparent !important; --surface2: transparent !important; --border: transparent !important; }
+  /* 7. Light Mode Glass Text Override */
+   .light .msg, 
+   .light button, 
+   .light .icon-btn, 
+   .light .tool-btn, 
+   .light .msg-action-btn, 
+   .light textarea, 
+   .light input, 
+   .light .history-item-title, 
+   .light .nova-glass-panel {
+     color: #111111 !important; /* Turns the text black */
+     text-shadow: 0 1px 3px rgba(255,255,255,0.9) !important; /* Changes shadow to white for readability */
+   }
 
-    .light ::placeholder { 
-      color: rgba(0, 0, 0, 0.5) !important; 
-    }
-    
-    /* 8. Light Mode Glass Structure Overrides */
-    .light #app, .light #auth-screen {
-      /* Turns the main app background into bright frosted glass */
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.2)) !important;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.1), inset 0 10px 20px rgba(255,255,255,0.8) !important;
-      border-bottom: 4px solid rgba(0, 0, 0, 0.2) !important;
-    }
+   .light ::placeholder { 
+     color: rgba(0, 0, 0, 0.5) !important; 
+   }
+  /* 8. Light Mode Glass Structure Overrides */
+   .light #app, .light #auth-screen {
+     /* Turns the main app background into bright frosted glass */
+     background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.2)) !important;
+     box-shadow: 0 30px 60px rgba(0,0,0,0.1), inset 0 10px 20px rgba(255,255,255,0.8) !important;
+     border-bottom: 4px solid rgba(0, 0, 0, 0.2) !important;
+   }
 
-    .light header, .light #input-area, .light #sidebar, .light .auth-box, .light .modal-box {
-      /* Brightens all the structural boxes */
-      background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.3)) !important;
-      border-top: 2px solid rgba(255, 255, 255, 1) !important;
-      border-bottom: 2px solid rgba(0, 0, 0, 0.1) !important;
-    }
-    
-    .light .msg {
-      /* Brightens the chat bubbles */
-      background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4)) !important;
-      border-top: 2px solid rgba(255,255,255,1) !important;
-      border-bottom: 2px solid rgba(0,0,0,0.1) !important;
-      box-shadow: inset 0 5px 10px #fff, 0 10px 20px rgba(0,0,0,0.05) !important;
-    }
-    
-    .light .user .msg {
-      /* Gives user messages a slight blue tint in light mode */
-      background: linear-gradient(125deg, rgba(47, 111, 235, 0.15) 0%, rgba(100, 220, 255, 0.1) 100%),
-                  linear-gradient(to bottom right, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.4)) !important;
-    }
-    
-    /* 9. THE NUCLEAR LIGHT MODE BACKGROUND FIX */
-    body.light {
-      background-color: #ffffff !important;
-      background-image: none !important;
-    }
-    
-    /* 10. THE ABSOLUTE LIGHT MODE CANVAS FIX */
-    html, body {
-      transition: background 0.3s ease; /* Makes the switch smooth instead of a harsh flash */
-    }
+   .light header, .light #input-area, .light #sidebar, .light .auth-box, .light .modal-box {
+     /* Brightens all the structural boxes */
+     background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.3)) !important;
+     border-top: 2px solid rgba(255, 255, 255, 1) !important;
+     border-bottom: 2px solid rgba(0, 0, 0, 0.1) !important;
+   }
+   
+   .light .msg {
+     /* Brightens the chat bubbles */
+     background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4)) !important;
+     border-top: 2px solid rgba(255,255,255,1) !important;
+     border-bottom: 2px solid rgba(0,0,0,0.1) !important;
+     box-shadow: inset 0 5px 10px #fff, 0 10px 20px rgba(0,0,0,0.05) !important;
+   }
+   
+   .light .user .msg {
+     /* Gives user messages a slight blue tint in light mode */
+     background: linear-gradient(125deg, rgba(47, 111, 235, 0.15) 0%, rgba(100, 220, 255, 0.1) 100%),
+                 linear-gradient(to bottom right, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.4)) !important;
+   }
+   /* 9. THE NUCLEAR LIGHT MODE BACKGROUND FIX */
+   body.light {
+     background-color: #ffffff !important;
+     background-image: none !important;
+   }
+  /* 9. THE ABSOLUTE LIGHT MODE CANVAS FIX */
+   html, body {
+     transition: background 0.3s ease; /* Makes the switch smooth instead of a harsh flash */
+   }
 
-    /* When Light Mode is active, force the deepest layers to be pure white */
-    html.light, body.light, .light {
-      background-color: #ffffff !important;
-      background-image: none !important;
-    }
-
-    /* 11. REMOVE WHITE BACKGROUND FROM PACMAN/DINO IN-BUTTON IMAGES */
-    button img, .icon-btn img, .tool-btn img {
-      mix-blend-mode: multiply;
-      display: block;
-      max-width: 100%;
-      height: auto;
-    }
+   /* When Light Mode is active, force the deepest layers to be pure white */
+   html.light, body.light, .light {
+     background-color: #ffffff !important;
+     background-image: none !important;
+   }
   </style>
 </head>
 <body>
@@ -316,7 +305,7 @@
       <button class="icon-btn" id="clear-btn" title="Clear chat">🗑️</button>
       <button class="icon-btn" id="logout-btn" title="Log out">🚪</button>
       <button class="icon-btn" id="profile-btn" title="Profile" style="padding:0;overflow:hidden;width:34px;height:34px;">
-        <img id="profile-icon" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:8px;" />
+        <img id="profile-icon" src="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:8px;" />
         <span id="profile-icon-fallback">👤</span>
       </button>
     </div>
@@ -324,7 +313,7 @@
   <div id="chat"></div>
   <div id="input-area">
     <div id="preview-area">
-      <img id="preview-img" alt="preview" />
+      <img id="preview-img" src="" alt="preview" />
       <button id="remove-img">✕</button>
     </div>
     <div id="bottom-row">
@@ -345,7 +334,7 @@
       <img id="profile-preview" src="https://via.placeholder.com/100" alt="Profile" width="100" height="100" style="display: block; margin: 0 auto 15px auto; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.4); background: var(--surface2);" />
       
       <label for="avatar-upload" class="glass-btn">✨ Update Photo</label>
-      <input type="file" id="avatar-upload" accept="image/jpeg, image/png, image/webp, image/jpg" style="display:none;" />
+      <input type="file" id="avatar-upload" accept="image/jpeg, image/png, image/webp" style="display:none;" />
     </div>
     <input type="text" id="profile-name" class="modal-input" placeholder="New name" />
     <input type="email" id="profile-email" class="modal-input" placeholder="New email" />
@@ -582,7 +571,512 @@
   });
 
   // Sidebar
-  historyBtn.addEventListener("click", async () => { await saveCurrentChat(); await loadChats(); });
+  historyBtn.addEventListener("click", async () => { await saveCurrentChat(); await loadChats(); sidebar.classList.add("open"); overlay.classList.add("show"); });
+  closeSidebarBtn.addEventListener("click", closeSidebarFn);
+  overlay.addEventListener("click", closeSidebarFn);
+  function closeSidebarFn() { sidebar.classList.remove("open"); overlay.classList.remove("show"); }
+
+  async function saveCurrentChat() {
+    if (history.length < 1 || !userToken) return;
+    const firstUserMsg = history.find(m => m.role === "user");
+    if (!firstUserMsg) return;
+    const title = typeof firstUserMsg.content === "string" ? firstUserMsg.content.slice(0, 40) : "Image message";
+    await fetch(`${BACKEND_URL}/chats`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${userToken}` },
+      body: JSON.stringify({ id: currentChatId, title, history }),
+    });
+  }
+
+  async function loadChats() {
+    try {
+      const res = await fetch(`${BACKEND_URL}/chats`, { headers: { "Authorization": `Bearer ${userToken}` } });
+      const data = await res.json();
+      renderSidebar(data.chats || []);
+    } catch { console.error("Failed to load chats"); }
+  }
+
+  function renderSidebar(chats) {
+    sidebarList.innerHTML = chats.length === 0
+      ? `<p style="padding:1rem;color:var(--text-muted);font-size:0.9rem">No saved chats yet</p>`
+      : chats.map(c => `<div class="history-item" data-id="${c.id}"><span class="history-item-title">${c.title}</span><button class="delete-chat-btn" data-id="${c.id}">✕</button></div>`).join("");
+    sidebarList.querySelectorAll(".history-item-title").forEach(el => {
+      el.addEventListener("click", () => {
+        const c = chats.find(x => x.id === el.closest(".history-item").dataset.id);
+        if (!c) return;
+        history = c.history; currentChatId = c.id; chatEl.innerHTML = "";
+        history.forEach(m => { if (m.role !== "system") addMsg(m.role, typeof m.content === "string" ? m.content : "[image message]"); });
+        closeSidebarFn();
+      });
+    });
+    sidebarList.querySelectorAll(".delete-chat-btn").forEach(el => {
+      el.addEventListener("click", async e => {
+        e.stopPropagation();
+        await fetch(`${BACKEND_URL}/chats/${el.dataset.id}`, { method: "DELETE", headers: { "Authorization": `Bearer ${userToken}` } });
+        await loadChats();
+      });
+    });
+  }
+
+  // Greeting
+  function addGreeting() {
+    const name = localStorage.getItem("nova_name");
+    const greeting = `Hi${name ? ` ${name}` : ""}! I'm Nova, your personal AI assistant by Jackson Weimer. How can I help you?`;
+    addMsg("ai", greeting);
+    history.push({ role: "assistant", content: greeting });
+  }
+
+  // Image compression
+  function compressImage(file) {
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const maxSize = 800;
+          let w = img.width, h = img.height;
+          if (w > maxSize || h > maxSize) { if (w > h) { h = (h/w)*maxSize; w = maxSize; } else { w = (w/h)*maxSize; h = maxSize; } }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL("image/jpeg", 0.7));
+        };
+        img.onerror = () => {
+          showToast("Failed to load image");
+          resolve(null);
+        };
+        img.src = e.target.result;
+      };
+      reader.onerror = () => {
+        showToast("Failed to read file");
+        resolve(null);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Image upload - FIXED
+  uploadBtn.addEventListener("click", () => fileInput.click());
+  fileInput.addEventListener("change", async (e) => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+      showToast("Please upload a valid image file (JPG, PNG, WebP, or GIF)");
+      fileInput.value = "";
+      return;
+    }
+    
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      showToast("File is too large. Max size is 10MB");
+      fileInput.value = "";
+      return;
+    }
+    
+    showToast("Processing image...");
+    const compressed = await compressImage(file);
+    
+    if (!compressed) {
+      fileInput.value = "";
+      return;
+    }
+    
+    pendingImageBase64 = compressed.split(",")[1];
+    pendingImageType = "image/jpeg";
+    previewImg.src = compressed;
+    previewArea.style.display = "flex";
+    fileInput.value = ""; // Reset input
+    showToast("Image ready!");
+  });
+  
+  removeImgBtn.addEventListener("click", clearImage);
+  function clearImage() { pendingImageBase64 = null; pendingImageType = null; previewArea.style.display = "none"; previewImg.src = ""; fileInput.value = ""; }
+
+  // Voice input - FIXED
+  if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SR();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = "en-US";
+    
+    recognition.onstart = () => {
+      micBtn.classList.add("recording");
+      isRecording = true;
+      showToast("🎤 Listening...");
+    };
+    
+    recognition.onresult = (e) => {
+      if (e.results && e.results.length > 0) {
+        const transcript = e.results[e.results.length - 1][0].transcript;
+        input.value = transcript;
+        showToast("✓ Got it!");
+      }
+      micBtn.classList.remove("recording");
+      isRecording = false;
+    };
+    
+    recognition.onerror = (e) => {
+      console.error("Speech recognition error:", e.error);
+      showToast(`Error: ${e.error}`);
+      micBtn.classList.remove("recording");
+      isRecording = false;
+    };
+    
+    recognition.onend = () => {
+      micBtn.classList.remove("recording");
+      isRecording = false;
+    };
+  }
+  
+  micBtn.addEventListener("click", () => {
+    if (!recognition) {
+      showToast("⚠️ Voice input not supported in your browser");
+      return;
+    }
+    if (isRecording) {
+      recognition.stop();
+      return;
+    }
+    try {
+      recognition.start();
+    } catch (e) {
+      console.error("Error starting recognition:", e);
+      showToast("Could not start voice input");
+    }
+  });
+
+  // TTS
+  function speak(text) {
+    if (!window.speechSynthesis) return;
+    speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance(text);
+    const voices = speechSynthesis.getVoices();
+    const preferred = voices.find(v => ["Samantha","Karen","Moira","Fiona","Victoria","Allison","Ava"].includes(v.name)) || voices.find(v => v.lang === "en-US" && !v.name.includes("Google")) || voices[0];
+    if (preferred) utt.voice = preferred;
+    utt.rate = 0.95; utt.pitch = 1.05; utt.volume = 1;
+    speechSynthesis.speak(utt);
+  }
+
+  // Add message
+  function addMsg(role, text, imgSrc = null) {
+    const wrap = document.createElement("div");
+    wrap.className = `msg-wrap ${role === "user" ? "user" : "ai"}`;
+    const div = document.createElement("div"); div.className = "msg";
+    if (imgSrc) { const img = document.createElement("img"); img.src = imgSrc; div.appendChild(img); }
+    const span = document.createElement("span"); span.textContent = text || ""; div.appendChild(span); wrap.appendChild(div);
+    const actions = document.createElement("div"); actions.className = "msg-actions";
+    const copyBtn = document.createElement("button"); copyBtn.className = "msg-action-btn"; copyBtn.textContent = "📋 Copy";
+    copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(text || ""); copyBtn.textContent = "✅ Copied"; setTimeout(() => copyBtn.textContent = "📋 Copy", 2000); });
+    actions.appendChild(copyBtn);
+    if (role === "ai") {
+      const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-btn"; ttsBtn.textContent = "🔊 Listen";
+      ttsBtn.addEventListener("click", () => speak(text)); actions.appendChild(ttsBtn);
+    }
+    wrap.appendChild(actions); chatEl.appendChild(wrap); chatEl.scrollTop = chatEl.scrollHeight;
+    return span;
+  }
+
+  // Typing animation
+  function typeText(span, text) {
+    return new Promise(resolve => {
+      const cursor = document.createElement("span"); cursor.className = "cursor"; span.appendChild(cursor);
+      let i = 0;
+      const interval = setInterval(() => {
+        span.insertBefore(document.createTextNode(text[i]), cursor); i++;
+        chatEl.scrollTop = chatEl.scrollHeight;
+        if (i >= text.length) { clearInterval(interval); cursor.remove(); resolve(); }
+      }, 15);
+    });
+  }
+
+  // Image generation detection
+  function isImageRequest(text) {
+    const t = text.toLowerCase();
+    const triggers = ["generate","create","make","draw","image of","picture of","photo of","show me"];
+    return triggers.some(w => t.includes(w)) && (t.includes("image")||t.includes("picture")||t.includes("photo")||t.includes("draw")||t.includes("generate"));
+  }
+  function extractImagePrompt(text) { return text.replace(/generate|create|make|draw|show me|an image of|a picture of|a photo of|image of|picture of|photo of/gi,"").trim(); }
+
+  // Send message
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text && !pendingImageBase64) return;
+    const imgSrc = pendingImageBase64 ? `data:${pendingImageType};base64,${pendingImageBase64}` : null;
+    addMsg("user", text, imgSrc);
+    const userContent = [];
+    if (pendingImageBase64) userContent.push({ type:"image_url", image_url:{ url:`data:${pendingImageType};base64,${pendingImageBase64}` } });
+    if (text) userContent.push({ type:"text", text });
+    history.push({ role:"user", content: userContent.length===1 && userContent[0].type==="text" ? text : userContent });
+    input.value = ""; clearImage(); btn.disabled = true;
+
+    // Save immediately
+    const firstUserMsg = history.find(m => m.role === "user");
+    if (firstUserMsg && userToken) {
+      const title = typeof firstUserMsg.content === "string" ? firstUserMsg.content.slice(0,40) : "Image message";
+      fetch(`${BACKEND_URL}/chats`, {
+        method:"POST",
+        headers:{"Content-Type":"application/json","Authorization":`Bearer ${userToken}`},
+        body:JSON.stringify({ id:currentChatId, title, history }),
+      }).then(() => loadChats()).catch(console.error);
+    }
+
+    const wrap = document.createElement("div"); wrap.className = "msg-wrap ai";
+    const thinking = document.createElement("div"); thinking.className = "msg"; thinking.textContent = "Thinking...";
+    wrap.appendChild(thinking); chatEl.appendChild(wrap); chatEl.scrollTop = chatEl.scrollHeight;
+
+    if (text && isImageRequest(text) && !pendingImageBase64) {
+      const prompt = extractImagePrompt(text);
+      thinking.textContent = "Generating image...";
+      try {
+        const res = await fetch(`${BACKEND_URL}/generate-image`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ prompt }) });
+        const data = await res.json();
+        if (data.imageUrl) {
+          thinking.innerHTML = "";
+          const img = document.createElement("img"); img.src = data.imageUrl; img.style.cssText = "max-width:100%;border-radius:12px;display:block;"; img.alt = prompt;
+          thinking.appendChild(img);
+          const caption = document.createElement("span"); caption.textContent = `🎨 "${prompt}"`; caption.style.cssText = "display:block;margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted);";
+          thinking.appendChild(caption);
+          history.push({ role:"assistant", content:`Here's an image of ${prompt}!` });
+          saveCurrentChat();
+        } else { thinking.textContent = "Couldn't generate image. Try a different prompt!"; }
+      } catch { thinking.textContent = "Image generation failed. Try again!"; }
+      btn.disabled = false; return;
+    }
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/chat`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ messages:history }) });
+      const data = await res.json();
+      const reply = data.reply || data.error || "Something went wrong.";
+      thinking.innerHTML = "";
+      const span = document.createElement("span"); thinking.appendChild(span);
+      const actions = document.createElement("div"); actions.className = "msg-actions";
+      const copyBtn = document.createElement("button"); copyBtn.className = "msg-action-btn"; copyBtn.textContent = "📋 Copy";
+      copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(reply); copyBtn.textContent = "✅ Copied"; setTimeout(() => copyBtn.textContent = "📋 Copy", 2000); });
+      const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-btn"; ttsBtn.textContent = "🔊 Listen";
+      ttsBtn.addEventListener("click", () => speak(reply));
+      actions.appendChild(copyBtn); actions.appendChild(ttsBtn); wrap.appendChild(actions);
+      await typeText(span, reply);
+      if (data.reply) history.push({ role:"assistant", content:reply });
+      saveCurrentChat();
+    } catch { thinking.textContent = "Error reaching the server. Is your backend running?"; }
+    btn.disabled = false;
+  }
+
+  btn.addEventListener("click", sendMessage);
+  input.addEventListener("keydown", e => { if (e.key==="Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
+
+  // --- PROFILE PICTURE UPLOAD LOGIC ---
+  document.addEventListener("DOMContentLoaded", () => {
+    const avatarUploadInput = document.getElementById('avatar-upload');
+    const profilePreview = document.getElementById('profile-preview');
+
+    const saved = localStorage.getItem("nova_avatar");
+    if (saved && profilePreview) profilePreview.src = saved;
+
+    if (avatarUploadInput) {
+      avatarUploadInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024;
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) { showToast("Only JPG, PNG, and WEBP images are allowed!"); e.target.value = ''; return; }
+        if (file.size > MAX_FILE_SIZE_BYTES) { showToast("File too big! Max 2MB."); e.target.value = ''; return; }
+        showToast("Uploading profile picture...");
+        try {
+          const compressed = await compressImage(file);
+          if (!compressed) {
+            e.target.value = '';
+            return;
+          }
+          localStorage.setItem("nova_avatar", compressed);
+          if (profilePreview) profilePreview.src = compressed;
+          updateProfileIcon(compressed);
+          const res = await fetch(`${BACKEND_URL}/auth/update`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${userToken}` },
+            body: JSON.stringify({ avatar_url: compressed }),
+          });
+          const data = await res.json();
+          if (data.error) { showToast("Failed to save avatar."); }
+          else { showToast("Profile picture updated! ✅"); }
+        } catch { showToast("Upload failed. Try again."); }
+        e.target.value = '';
+      });
+    }
+  });
+
+  let easterActive = localStorage.getItem("nova_easter") === "true";
+  const easterBtn = document.createElement("button");
+  easterBtn.className = "icon-btn"; easterBtn.title = "Toggle background"; easterBtn.textContent = "🖼️"; easterBtn.style.display = easterActive ? "block" : "none";
+  headerBtns.prepend(easterBtn);
+  
+  function applyEaster() {
+    if (easterActive) {
+      document.body.style.setProperty('background', "url('https://images.pexels.com/photos/31265958/pexels-photo-31265958.jpeg') center/cover fixed", "important");
+    } else {
+      document.body.style.removeProperty('background');
+    }
+  }
+  
+  function toggleEaster() { easterActive = !easterActive; localStorage.setItem("nova_easter", easterActive); applyEaster(); easterBtn.style.display = "block"; }
+  applyEaster();
+  easterBtn.addEventListener("click", toggleEaster);
+
+  // Easter egg — star cursor
+  let starCursorActive = localStorage.getItem("nova_star") === "true";
+  let starClicks = 0;
+  const starSVG = `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><text y='26' font-size='26'>⭐</text></svg>`;
+  const starCursorURL = `url("data:image/svg+xml,${encodeURIComponent(starSVG)}") 16 16, auto`;
+  const starBtn = document.createElement("button");
+  starBtn.className = "icon-btn"; starBtn.title = "Toggle star cursor"; starBtn.textContent = "⭐"; starBtn.style.display = starCursorActive ? "block" : "none";
+  headerBtns.prepend(starBtn);
+  
+  function applyStarCursor() { document.body.style.cursor = starCursorActive ? starCursorURL : ""; }
+  function toggleStarCursor() { starCursorActive = !starCursorActive; localStorage.setItem("nova_star", starCursorActive); applyStarCursor(); starBtn.style.display = "block"; showToast(starCursorActive ? "⭐ Star cursor enabled!" : "⭐ Star cursor disabled!"); }
+  applyStarCursor();
+  starBtn.addEventListener("click", toggleStarCursor);
+  
+  headerTitle.addEventListener("click", () => { starClicks++; if (starClicks >= 8) { starClicks = 0; toggleStarCursor(); } else showToast(`${8-starClicks} more click${8-starClicks!==1?"s":""}...`); });
+
+  // Easter egg — dino game
+  let dinoUnlocked = localStorage.getItem("nova_dino") === "true";
+  const dinoBtn = document.createElement("button");
+ dinoBtn.className = "icon-btn"; dinoBtn.title = "Play Dino Game"; dinoBtn.innerHTML = '<img src="dino.png" style="width:24px;height:24px;object-fit:contain;display:block;">'; dinoBtn.style.display = dinoUnlocked ? "block" : "none";
+  headerBtns.prepend(dinoBtn);
+  function toggleDino() { window.open("/trex/index.html", "_blank"); }
+  dinoBtn.addEventListener("click", toggleDino);
+
+  // Easter egg — PAC-MAN GAME (NEW)
+  let pacmanUnlocked = localStorage.getItem("nova_pacman") === "true";
+  const pacmanBtn = document.createElement("button");
+ pacmanBtn.className = "icon-btn"; pacmanBtn.title = "Play Pac-Man Game"; pacmanBtn.innerHTML = '<img src="pacman.png" style="width:24px;height:24px;object-fit:contain;display:block;">'; pacmanBtn.style.display = pacmanUnlocked ? "block" : "none";
+  headerBtns.prepend(pacmanBtn);
+  function togglePacman() { window.open("/pacman/index.html", "_blank"); }
+  pacmanBtn.addEventListener("click", togglePacman);
+
+  // Input easter egg detection
+  input.addEventListener("input", () => {
+    const val = input.value.trim().toLowerCase();
+    if (val === "jymer1102") { input.value = ""; toggleEaster(); showToast(easterActive ? "Easter egg unlocked! 🔓🎉" : "Background off!"); }
+    if (val === "dinosaur") { input.value = ""; if (!dinoUnlocked) { dinoUnlocked = true; localStorage.setItem("nova_dino","true"); dinoBtn.style.display = "block"; showToast("🦖 Dino game unlocked! Type 'dinosaur' anytime to play!"); } }
+    if (val === "pac-man" || val === "pacman") { input.value = ""; if (!pacmanUnlocked) { pacmanUnlocked = true; localStorage.setItem("nova_pacman","true"); pacmanBtn.style.display = "block"; showToast("👻 Pac-Man game unlocked! Type 'pac-man' to play!"); } }
+    if (val === "allahu akbar") { input.value = ""; triggerEasterEgg(); }
+  });
+</script>
+<!-- BACKPACK EASTER EGG -->
+<style>
+  #egg-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+    display: none; align-items: center; justify-content: center;
+    z-index: 9999; flex-direction: column;
+  }
+  #egg-overlay.active { display: flex; }
+  #backpack-wrap {
+    font-size: 120px; line-height: 1; transform-origin: center;
+    filter: drop-shadow(0 0 30px rgba(255,200,0,0.5));
+  }
+  #backpack-wrap.spinning {
+    animation: spinZoom 1.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+  @keyframes spinZoom {
+    0%   { transform: scale(0.4) rotate(0deg); opacity: 0; }
+    30%  { transform: scale(1) rotate(360deg); opacity: 1; }
+    80%  { transform: scale(1.6) rotate(900deg); }
+    100% { transform: scale(3) rotate(1080deg); opacity: 0; }
+  }
+  #egg-label {
+    color: #fff; font-family: monospace; font-size: 18px;
+    letter-spacing: 4px; text-transform: uppercase;
+    opacity: 0; transition: opacity 0.4s; margin-top: 16px;
+    text-shadow: 0 0 20px rgba(255,200,0,0.9);
+  }
+  #egg-label.visible { opacity: 1; }
+  #egg-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 9998; }
+</style>
+
+<canvas id="egg-canvas"></canvas>
+<div id="egg-overlay">
+  <div id="backpack-wrap">🎒</div>
+  <div id="egg-label">💣ALLAHU AKBAR💣</div>
+</div>
+
+<script>
+const eggOverlay = document.getElementById('egg-overlay');
+const eggWrap = document.getElementById('backpack-wrap');
+const eggLabel = document.getElementById('egg-label');
+const eggCanvas = document.getElementById('egg-canvas');
+const eggCtx = eggCanvas.getContext('2d');
+
+eggCanvas.width = window.innerWidth;
+eggCanvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
+  eggCanvas.width = window.innerWidth;
+  eggCanvas.height = window.innerHeight;
+});
+
+let particles = [];
+let animId = null;
+
+function triggerEasterEgg() {
+  eggOverlay.classList.add('active');
+  eggWrap.classList.remove('spinning');
+  void eggWrap.offsetWidth;
+  eggWrap.classList.add('spinning');
+  setTimeout(() => eggLabel.classList.add('visible'), 600);
+  setTimeout(() => {
+    eggOverlay.classList.remove('active');
+    eggWrap.classList.remove('spinning');
+    eggLabel.classList.remove('visible');
+    explodeParticles();
+  }, 1900);
+}
+
+function explodeParticles() {
+  particles = [];
+  cancelAnimationFrame(animId);
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  for (let i = 0; i < 80; i++) {
+    const angle = (Math.PI * 2 / 80) * i + (Math.random() - 0.5) * 0.4;
+    const speed = 4 + Math.random() * 14;
+    particles.push({
+      x: cx, y: cy,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - Math.random() * 6,
+      size: 14 + Math.random() * 28,
+      alpha: 1,
+      gravity: 0.25 + Math.random() * 0.2,
+      rot: Math.random() * Math.PI * 2,
+      rotV: (Math.random() - 0.5) * 0.3,
+    });
+  }
+  animateEgg();
+}
+
+function animateEgg() {
+  eggCtx.clearRect(0, 0, eggCanvas.width, eggCanvas.height);
+  particles = particles.filter(p => p.alpha > 0.02);
+  for (const p of particles) {
+    p.x += p.vx; p.y += p.vy;
+    p.vy += p.gravity; p.vx *= 0.98;
+    p.alpha -= 0.018; p.rot += p.rotV;
+    eggCtx.save();
+    eggCtx.globalAlpha = Math.max(0, p.alpha);
+    eggCtx.translate(p.x, p.y);
+    eggCtx.rotate(p.rot);
+    eggCtx.font = `${p.size}px serif`;
+    eggCtx.textAlign = 'center';
+    eggCtx.textBaseline = 'middle';
+    eggCtx.fillText('💥', 0, 0);
+    eggCtx.restore();
+  }
+  if (particles.length > 0) animId = requestAnimationFrame(animateEgg);
+  else eggCtx.clearRect(0, 0, eggCanvas.width, eggCanvas.height);
+}
 </script>
 </body>
 </html>
