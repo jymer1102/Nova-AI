@@ -256,3 +256,20 @@ app.delete("/chats", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// --- SELF KEEP-ALIVE (no browser required) ---
+// While this process is running, it pings its own /ping route every 5
+// minutes so Render's free-tier inactivity timer never gets a chance to
+// trigger a spin-down. This only works once the server is already up —
+// if Render has fully spun it down to zero, an outside request (e.g. a
+// free cron job hitting /ping) is still needed to wake it back up the
+// first time.
+const SELF_URL = process.env.SITE_URL || "https://nova-ai-mk9x.onrender.com";
+
+function selfPing() {
+  fetch(`${SELF_URL}/ping`)
+    .then((res) => console.log(`Self-ping OK (${res.status})`))
+    .catch((err) => console.warn("Self-ping failed:", err.message));
+}
+
+setInterval(selfPing, 5 * 60 * 1000);
