@@ -29,6 +29,11 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_KEY
 );
 
+// --- KEEP ALIVE ROUTE FOR RENDER ---
+app.get("/ping", (req, res) => {
+  res.status(200).send("pong");
+});
+
 // Chat route
 app.post("/chat", async (req, res) => {
   const { messages } = req.body;
