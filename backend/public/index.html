@@ -945,7 +945,7 @@
   // Easter egg — dino game
   let dinoUnlocked = localStorage.getItem("nova_dino") === "true";
   const dinoBtn = document.createElement("button");
- dinoBtn.className = "icon-btn"; dinoBtn.title = "Play Dino Game"; dinoBtn.innerHTML = '<img src="/backend/public/dino.png" style="width:24px;height:24px;object-fit:contain;display:block;">'; dinoBtn.style.display = dinoUnlocked ? "block" : "none";
+ dinoBtn.className = "icon-btn"; dinoBtn.title = "Play Dino Game"; dinoBtn.innerHTML = '<img src="dino.png" style="width:24px;height:24px;object-fit:contain;display:block;">'; dinoBtn.style.display = dinoUnlocked ? "block" : "none";
   headerBtns.prepend(dinoBtn);
   function toggleDino() { window.open("/trex/index.html", "_blank"); }
   dinoBtn.addEventListener("click", toggleDino);
@@ -953,7 +953,7 @@
   // Easter egg — PAC-MAN GAME (NEW)
   let pacmanUnlocked = localStorage.getItem("nova_pacman") === "true";
   const pacmanBtn = document.createElement("button");
- pacmanBtn.className = "icon-btn"; pacmanBtn.title = "Play Pac-Man Game"; pacmanBtn.innerHTML = '<img src="/backend/public/pacman.png" style="width:24px;height:24px;object-fit:contain;display:block;">'; pacmanBtn.style.display = pacmanUnlocked ? "block" : "none";
+ pacmanBtn.className = "icon-btn"; pacmanBtn.title = "Play Pac-Man Game"; pacmanBtn.innerHTML = '<img src="pacman.png" style="width:24px;height:24px;object-fit:contain;display:block;">'; pacmanBtn.style.display = pacmanUnlocked ? "block" : "none";
   headerBtns.prepend(pacmanBtn);
   function togglePacman() { window.open("/pacman/index.html", "_blank"); }
   pacmanBtn.addEventListener("click", togglePacman);
