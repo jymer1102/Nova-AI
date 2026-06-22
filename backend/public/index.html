@@ -374,13 +374,12 @@
   let userToken = localStorage.getItem("nova_token") || null;
   let isSignUp = false;
 
-  // Keep Render awake by pinging the backend route every 5 minutes safely
-  setInterval(() => {
-    fetch(`${BACKEND_URL}/ping`)
-      .then(res => console.log("Keep alive response status:", res.status))
-      .catch(err => console.error("Keep alive failed:", err));
-  }, 5 * 60 * 1000);
-
+// Keep Render awake by pinging the backend every 5 minutes
+setInterval(() => {
+  fetch(`${BACKEND_URL}/ping`)
+    .then(res => console.log("Ping successful:", res.status))
+    .catch(err => console.error("Ping failed:", err));
+}, 5 * 60 * 1000);
   // Toast
   function showToast(msg) {
     const toast = document.createElement("div");
@@ -569,7 +568,47 @@
     try {
       sidebar.classList.add("open");
       overlay.classList.add("show");
-    } catch (err) { console.error("Error launching context window:", err); }
+      const res = await fetch(`${BACKEND_URL}/chats`, { headers: { "Authorization": `Bearer ${userToken}` } });
+      const data = await res.json();
+      if (data.chats) renderSidebar(data.chats);
+    } catch (err) { console.error("Error loading history:", err); }
+  }
+
+  function renderSidebar(chats) {
+    sidebarList.innerHTML = "";
+    chats.forEach(c => {
+      const item = document.createElement("div");
+      item.className = "history-item";
+      const title = document.createElement("span");
+      title.className = "history-item-title";
+      title.textContent = c.title || "Saved Chat";
+      title.addEventListener("click", () => {
+        currentChatId = c.id;
+        history = c.history || [];
+        chatEl.innerHTML = "";
+        history.forEach(m => appendMessage(m.role, m.text));
+        sidebar.classList.remove("open");
+        overlay.classList.remove("show");
+      });
+      item.appendChild(title);
+      sidebarList.appendChild(item);
+    });
+  }
+
+  function addGreeting() {
+    const name = localStorage.getItem("nova_name") || "Friend";
+    appendMessage("ai", `Hello ${name}! How can I help you today?`);
+  }
+
+  function appendMessage(role, text) {
+    const wrap = document.createElement("div");
+    wrap.className = `msg-wrap ${role}`;
+    const msg = document.createElement("div");
+    msg.className = "msg";
+    msg.textContent = text;
+    wrap.appendChild(msg);
+    chatEl.appendChild(wrap);
+    chatEl.scrollTop = chatEl.scrollHeight;
   }
 </script>
 </body>
