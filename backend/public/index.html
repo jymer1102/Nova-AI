@@ -374,9 +374,12 @@
   let userToken = localStorage.getItem("nova_token") || null;
   let isSignUp = false;
 
-  // Keep Render awake
-  setInterval(() => fetch(`${BACKEND_URL}/`), 10 * 60 * 1000);
-
+// Keep Render awake by pinging the backend every 5 minutes
+setInterval(() => {
+  fetch(`${BACKEND_URL}/ping`)
+    .then(res => console.log("Ping successful:", res.status))
+    .catch(err => console.error("Ping failed:", err));
+}, 5 * 60 * 1000);
   // Toast
   function showToast(msg) {
     const toast = document.createElement("div");
