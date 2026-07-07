@@ -17,9 +17,6 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
-
-// Serves index.html, dino.png, pacman.png, and the /trex and /pacman game
-// folders as long as they all live inside the "public" directory.
 app.use(express.static(path.join(__dirname, "public")));
 
 const supabase = createClient(
@@ -32,14 +29,96 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_KEY
 );
 
-// --- KEEP ALIVE ROUTE FOR RENDER ---
-// The frontend pings this every 5 minutes so the free Render instance
-// doesn't spin down from inactivity.
+// --- KEEP ALIVE ---
 app.get("/ping", (req, res) => {
   res.status(200).send("pong");
 });
 
-// Chat route
+// --- SCORE ROUTES ---
+
+// helper: decode JWT locally (no network call needed)
+function getUserIdFromToken(token) {
+  try {
+    const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+    if (!payload.sub) throw new Error("no sub");
+    return payload.sub;
+  } catch {
+    return null;
+  }
+}
+
+// T-Rex high score
+app.post("/trex-score", async (req, res) => {
+  const { score, token } = req.body;
+  if (!token || score == null) return res.status(400).json({ error: "Missing score or token" });
+
+  const userId = getUserIdFromToken(token);
+  if (!userId) return res.status(401).json({ error: "Invalid token" });
+
+  // only update if it's actually a new high score
+  const { data: existing } = await supabaseAdmin
+    .from("profiles")
+    .select("trex_high_score")
+    .eq("id", userId)
+    .single();
+
+  if (existing && score <= existing.trex_high_score) {
+    return res.json({ message: "Not a new high score, no update needed" });
+  }
+
+  const { error } = await supabaseAdmin
+    .from("profiles")
+    .upsert({ id: userId, trex_high_score: score, updated_at: new Date().toISOString() });
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ message: "T-Rex high score saved!" });
+});
+
+// Pac-Man high score
+app.post("/pacman-score", async (req, res) => {
+  const { score, token } = req.body;
+  if (!token || score == null) return res.status(400).json({ error: "Missing score or token" });
+
+  const userId = getUserIdFromToken(token);
+  if (!userId) return res.status(401).json({ error: "Invalid token" });
+
+  const { data: existing } = await supabaseAdmin
+    .from("profiles")
+    .select("pacman_high_score")
+    .eq("id", userId)
+    .single();
+
+  if (existing && score <= existing.pacman_high_score) {
+    return res.json({ message: "Not a new high score, no update needed" });
+  }
+
+  const { error } = await supabaseAdmin
+    .from("profiles")
+    .upsert({ id: userId, pacman_high_score: score, updated_at: new Date().toISOString() });
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ message: "Pac-Man high score saved!" });
+});
+
+// Get profile (for displaying scores)
+app.get("/profile", async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+  const userId = getUserIdFromToken(token);
+  if (!userId) return res.status(401).json({ error: "Invalid token" });
+
+  const { data, error } = await supabaseAdmin
+    .from("profiles")
+    .select("name, email, phone, trex_high_score, pacman_high_score")
+    .eq("id", userId)
+    .single();
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ profile: data });
+});
+
+// --- CHAT ---
 app.post("/chat", async (req, res) => {
   const { messages } = req.body;
   try {
@@ -76,7 +155,7 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-// Image generation via Pollinations
+// --- IMAGE GENERATION ---
 app.post("/generate-image", async (req, res) => {
   const { prompt } = req.body;
   if (!prompt) return res.status(400).json({ error: "No prompt provided" });
@@ -90,7 +169,7 @@ app.post("/generate-image", async (req, res) => {
   }
 });
 
-// Refresh token
+// --- AUTH ---
 app.post("/auth/refresh", async (req, res) => {
   const { refresh_token } = req.body;
   const { data, error } = await supabase.auth.refreshSession({ refresh_token });
@@ -98,13 +177,11 @@ app.post("/auth/refresh", async (req, res) => {
   res.json({ session: data.session });
 });
 
-// Update profile
 app.post("/auth/update", async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
   const { name, email, password, avatar_url } = req.body;
   const { data: userData, error: authErr } = await supabase.auth.getUser(token);
   if (authErr || !userData.user) {
-    console.error("Auth error:", authErr);
     return res.status(401).json({ error: "Unauthorized — token may be expired. Try logging out and back in." });
   }
   const user = userData.user;
@@ -113,23 +190,33 @@ app.post("/auth/update", async (req, res) => {
   if (password) updates.password = password;
   if (name || avatar_url) updates.data = { ...user.user_metadata, ...(name && { name }), ...(avatar_url && { avatar_url }) };
   const { data, error } = await supabaseAdmin.auth.admin.updateUserById(user.id, updates);
-  if (error) { console.error("Update error:", error); return res.status(500).json({ error: error.message }); }
+  if (error) return res.status(500).json({ error: error.message });
+
+  // keep profiles table in sync
+  if (name || email) {
+    await supabaseAdmin.from("profiles").upsert({
+      id: user.id,
+      ...(name && { name }),
+      ...(email && { email }),
+      updated_at: new Date().toISOString()
+    });
+  }
+
   res.json({ success: true, user: data.user });
 });
 
-// Delete account
 app.delete("/auth/delete", async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
   const { data: userData, error: authErr } = await supabase.auth.getUser(token);
   if (authErr || !userData.user) return res.status(401).json({ error: "Unauthorized" });
   const userId = userData.user.id;
   await supabase.from("chats").delete().eq("user_id", userId);
+  await supabaseAdmin.from("profiles").delete().eq("id", userId);
   const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true });
 });
 
-// OAuth redirect
 app.get("/auth/oauth/:provider", async (req, res) => {
   const { provider } = req.params;
   const { data, error } = await supabase.auth.signInWithOAuth({
@@ -140,7 +227,6 @@ app.get("/auth/oauth/:provider", async (req, res) => {
   res.redirect(data.url);
 });
 
-// OAuth callback
 app.get("/auth/callback", (req, res) => {
   res.send(`
     <script>
@@ -157,7 +243,6 @@ app.get("/auth/callback", (req, res) => {
   `);
 });
 
-// Sign up
 app.post("/auth/signup", async (req, res) => {
   const { email, password, name, phone } = req.body;
   const { data, error } = await supabase.auth.signUp({
@@ -168,7 +253,6 @@ app.post("/auth/signup", async (req, res) => {
   res.json({ user: data.user, session: data.session });
 });
 
-// Log in
 app.post("/auth/login", async (req, res) => {
   const { email, password } = req.body;
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -176,75 +260,45 @@ app.post("/auth/login", async (req, res) => {
   res.json({ user: data.user, session: data.session });
 });
 
-// Save chat
+// --- CHATS ---
 app.post("/chats", async (req, res) => {
   const { id, title, history, author } = req.body;
   const authHeader = req.headers.authorization;
   const token = req.body.token || (authHeader && authHeader.split(" ")[1]);
-
   if (!token) return res.status(401).json({ error: "Unauthorized" });
-
   try {
-    // 1. Decode JWT locally to completely bypass Cloudflare and Supabase network limits
-    let userId;
-    try {
-      const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
-      userId = payload.sub;
-      if (!userId) throw new Error("No user ID in token");
-    } catch (e) {
-      console.error("Token decode error:", e);
-      return res.status(401).json({ error: "Invalid token" });
-    }
-
-    // 2. Save the chat using the locally decoded userId
+    const userId = getUserIdFromToken(token);
+    if (!userId) return res.status(401).json({ error: "Invalid token" });
     const { error } = await supabaseAdmin.from("chats").upsert({
-      id,
-      user_id: userId,
-      title,
-      history,
-      author,
+      id, user_id: userId, title, history, author,
       created_at: new Date().toISOString()
     });
-
-    if (error) {
-      console.error("Chat save DB error:", error);
-      return res.status(500).json({ error: error.message });
-    }
-
+    if (error) return res.status(500).json({ error: error.message });
     res.json({ success: true });
   } catch (err) {
-    console.error("Chat save unexpected error:", err);
     res.status(500).json({ error: "Something went wrong" });
   }
 });
 
-// Get chats
 app.get("/chats", async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
   const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
   if (authErr || !user) return res.status(401).json({ error: "Unauthorized" });
   const { data, error } = await supabase.from("chats")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+    .select("*").eq("user_id", user.id).order("created_at", { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
   res.json({ chats: data });
 });
 
-// Delete chat
 app.delete("/chats/:id", async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
   const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
   if (authErr || !user) return res.status(401).json({ error: "Unauthorized" });
-  const { error } = await supabase.from("chats")
-    .delete()
-    .eq("id", req.params.id)
-    .eq("user_id", user.id);
+  const { error } = await supabase.from("chats").delete().eq("id", req.params.id).eq("user_id", user.id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true });
 });
 
-// Delete all chats
 app.delete("/chats", async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
   const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
@@ -254,22 +308,14 @@ app.delete("/chats", async (req, res) => {
   res.json({ success: true });
 });
 
+// --- SELF KEEP-ALIVE ---
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-// --- SELF KEEP-ALIVE (no browser required) ---
-// While this process is running, it pings its own /ping route every 5
-// minutes so Render's free-tier inactivity timer never gets a chance to
-// trigger a spin-down. This only works once the server is already up —
-// if Render has fully spun it down to zero, an outside request (e.g. a
-// free cron job hitting /ping) is still needed to wake it back up the
-// first time.
 const SELF_URL = process.env.SITE_URL || "https://nova-ai-mk9x.onrender.com";
-
 function selfPing() {
   fetch(`${SELF_URL}/ping`)
     .then((res) => console.log(`Self-ping OK (${res.status})`))
     .catch((err) => console.warn("Self-ping failed:", err.message));
 }
-
 setInterval(selfPing, 5 * 60 * 1000);
