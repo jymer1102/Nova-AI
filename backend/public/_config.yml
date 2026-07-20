@@ -4,6 +4,4 @@ permalink: pretty
 baseurl: "/"
 url: "https://nova-ai-mk9x.onrender.com"
 theme: jekyll-theme-minimal
-
-# Tell Jekyll to output into a temporary folder instead of wiping public/
 destination: ../jekyll_build
