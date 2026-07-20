@@ -1,9 +1,0 @@
-title: "Nova AI"
-description: "Your personal AI assistant created by Jackson Weimer"
-permalink: pretty
-baseurl: "/"
-url: "https://nova-ai-mk9x.onrender.com"
-theme: jekyll-theme-minimal
-
-# Directs compiled output out of the public folder into jekyll_build
-destination: ../jekyll_build
