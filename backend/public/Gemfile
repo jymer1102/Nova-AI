@@ -1,0 +1,6 @@
+source "https://rubygems.org"
+
+gem "jekyll", "~> 4.3"
+
+# Add your theme gem here (it must match the name in your _config.yml)
+gem "jekyll-theme-minimal"
