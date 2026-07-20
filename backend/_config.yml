@@ -4,8 +4,5 @@ permalink: pretty
 baseurl: "/"
 url: "https://nova-ai-mk9x.onrender.com"
 
-# Add your theme name here (for example, if using a standard theme like minima)
-theme: minima
-
-# OR, if you are using a GitHub Pages remote theme, use this instead:
-# remote_theme: owner/repository-name
+# Put the name of your Jekyll theme here
+theme: jekyll-theme-minimal
