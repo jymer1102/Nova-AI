@@ -3,6 +3,7 @@ description: "Your personal AI assistant created by Jackson Weimer"
 permalink: pretty
 baseurl: "/"
 url: "https://nova-ai-mk9x.onrender.com"
-
-# Put the name of your Jekyll theme here
 theme: jekyll-theme-minimal
+
+# Tell Jekyll to output into a temporary folder instead of wiping public/
+destination: ../jekyll_build
