@@ -1027,6 +1027,7 @@ document.head.appendChild(starStyle);
 // Check if the device is a touchscreen / mobile device
 const isMobileDevice = window.matchMedia("(pointer: coarse)").matches;
 
+// Create Star Toggle Button
 const starBtn = document.createElement("button");
 starBtn.className = "icon-btn"; 
 starBtn.title = "Toggle star cursor"; 
@@ -1035,8 +1036,10 @@ starBtn.innerHTML = '<i class="fa-solid fa-star"></i>';
 // Only display on desktop AND if starCursorActive is true
 starBtn.style.display = (starCursorActive && !isMobileDevice) ? "block" : "none";
 
-
-headerBtns.prepend(starBtn);
+// SAFELY attach button to header container if present
+if (typeof headerBtns !== "undefined" && headerBtns) {
+  headerBtns.prepend(starBtn);
+}
 
 function applyStarCursor() { 
   if (starCursorActive) {
@@ -1062,10 +1065,6 @@ function applyStarCursor() {
   }
 }
 
-
-// Check if device is a touchscreen/mobile pointer
-const isMobileDevice = window.matchMedia("(pointer: coarse)").matches;
-
 function toggleStarCursor() { 
   starCursorActive = !starCursorActive; 
   localStorage.setItem("nova_star", starCursorActive); 
@@ -1084,15 +1083,19 @@ function toggleStarCursor() {
 applyStarCursor();
 starBtn.addEventListener("click", toggleStarCursor);
 
-headerTitle.addEventListener("click", () => { 
-  starClicks++; 
-  if (starClicks >= 8) { 
-    starClicks = 0; 
-    toggleStarCursor(); 
-  } else {
-    showToast(`${8 - starClicks} more click${8 - starClicks !== 1 ? "s" : ""}...`);
-  }
-});
+// SAFELY attach click listener to header title if present
+if (typeof headerTitle !== "undefined" && headerTitle) {
+  headerTitle.addEventListener("click", () => { 
+    starClicks++; 
+    if (starClicks >= 8) { 
+      starClicks = 0; 
+      toggleStarCursor(); 
+    } else {
+      showToast(`${8 - starClicks} more click${8 - starClicks !== 1 ? "s" : ""}...`);
+    }
+  });
+}
+
   // Easter egg — dino game
   let dinoUnlocked = localStorage.getItem("nova_dino") === "true";
   const dinoBtn = document.createElement("button");
