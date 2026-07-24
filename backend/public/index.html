@@ -306,8 +306,8 @@
       <span style="color:var(--text-muted);font-size:0.8rem">or</span>
       <div style="flex:1;height:1px;background:var(--border)"></div>
     </div>
-    <button class="primary" id="discord-btn" style="background:#5865F2">🎮 Continue with Discord</button>
-    <button class="primary" id="github-btn" style="background:#333">🐙 Continue with GitHub</button>
+    <button class="primary" id="discord-btn" style="background:#5865F2"><i class="fa-brands fa-discord"></i> Continue with Discord</button>
+    <button class="primary" id="github-btn" style="background:#333"><i class="fa-brands fa-github"></i> Continue with GitHub</button>
     <button class="auth-toggle" id="auth-toggle">Don't have an account? Sign up</button>
   </div>
 </div>
@@ -315,9 +315,9 @@
 <div id="app">
   <div id="sidebar">
     <div id="sidebar-header">
-      💬 Chat History
+      <i class="fa-solid fa-comment"></i> Chat History
       <div style="display:flex;gap:0.5rem;align-items:center">
-        <button id="clear-all-btn">🗑️ Clear All</button>
+        <button id="clear-all-btn"><i class="fa-solid fa-trash-can"></i> Clear All</button>
         <button class="icon-btn" id="close-sidebar">✕</button>
       </div>
     </div>
@@ -326,17 +326,17 @@
   <div id="overlay"></div>
   <header>
     <div style="display:flex;gap:0.5rem">
-      <button class="icon-btn" id="history-btn" title="Chat history">💬</button>
-      <button class="icon-btn" id="new-chat-btn" title="New chat">✏️</button>
+      <button class="icon-btn" id="history-btn" title="Chat history"><i class="fa-solid fa-comment"></i></button>
+      <button class="icon-btn" id="new-chat-btn" title="New chat"><i class="fa-solid fa-pencil"></i></button>
     </div>
     <span class="header-title" id="header-title">🌟 Nova AI by Jackson Weimer</span>
     <div class="header-btns" id="header-btns">
-      <button class="icon-btn" id="theme-btn" title="Toggle theme">🌙</button>
-      <button class="icon-btn" id="clear-btn" title="Clear chat">🗑️</button>
-      <button class="icon-btn" id="logout-btn" title="Log out">🚪</button>
+      <button class="icon-btn" id="theme-btn" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+      <button class="icon-btn" id="clear-btn" title="Clear chat"><i class="fa-solid fa-trash-can"></i></button>
+      <button class="icon-btn" id="logout-btn" title="Log out"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
       <button class="icon-btn" id="profile-btn" title="Profile">
         <img id="profile-icon" src="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:8px;" />
-        <span id="profile-icon-fallback">👤</span>
+        <span id="profile-icon-fallback"><i class="fa-solid fa-circle-user"></i></span>
       </button>
     </div>
   </header>
@@ -347,9 +347,9 @@
       <button id="remove-img">✕</button>
     </div>
     <div id="bottom-row">
-      <button class="tool-btn" id="upload-btn" title="Upload image">📎</button>
+      <button class="tool-btn" id="upload-btn" title="Upload image"><i class="fa-solid fa-paperclip"></i></button>
       <input type="file" id="file-input" accept="image/*" style="display:none" />
-      <button class="tool-btn" id="mic-btn" title="Voice input">🎤</button>
+      <button class="tool-btn" id="mic-btn" title="Voice input"><i class="fa-solid fa-microphone"></i></button>
       <textarea id="input" placeholder="Type a message..."></textarea>
       <button id="send">Send</button>
     </div>
@@ -358,7 +358,7 @@
 
 <div class="modal-overlay" id="profile-modal">
   <div class="modal-box">
-    <h2 style="font-size:1.2rem;font-weight:600">👤 Profile Settings</h2>
+    <h2 style="font-size:1.2rem;font-weight:600"><i class="fa-solid fa-circle-user"></i> Profile Settings</h2>
     
    <div id="profile-upload-section" class="nova-glass-panel" style="width: 100%; text-align: center; box-sizing: border-box;">
       <img id="profile-preview" src="https://via.placeholder.com/100" alt="Profile" width="100" height="100" style="display: block; margin: 0 auto 15px auto; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.4); background: var(--surface2);" />
@@ -374,7 +374,7 @@
       <button id="profile-save" class="modal-btn" style="flex:1;background:var(--accent);color:white">Save</button>
       <button id="profile-close" class="modal-btn" style="flex:1;background:var(--surface2);color:var(--text);border:1px solid var(--border)">Cancel</button>
     </div>
-    <button id="profile-delete" class="modal-btn" style="width:100%;background:#c0392b;color:white">🗑️ Delete Account</button>
+    <button id="profile-delete" class="modal-btn" style="width:100%;background:#c0392b;color:white"><i class="fa-solid fa-trash-can"></i> Delete Account</button>
   </div>
 </div>
 
@@ -411,7 +411,7 @@
 <canvas id="backpack-egg-canvas"></canvas>
 <div id="backpack-egg-overlay">
   <div id="backpack-egg-wrap">🎒</div>
-  <div id="backpack-egg-label">💣 ALLAHU AKBAR 💣</div>
+  <div id="backpack-egg-label"><i class="fa-solid fa-bomb"></i> ALLAHU AKBAR <i class="fa-solid fa-bomb"></i></div>
 </div>
 
 <script>
@@ -629,7 +629,7 @@
     isLight = !isLight;
     document.body.classList.toggle("light", isLight);
     document.documentElement.classList.toggle("light", isLight);
-    themeBtn.textContent = isLight ? "☀️" : "🌙";
+    themeBtn.textContent = isLight ? "<i class="fa-solid fa-sun"></i>" : "<i class="fa-solid fa-moon"></i>";
     
     localStorage.setItem("theme", isLight ? "light" : "dark");
     
@@ -783,7 +783,7 @@
     recognition.onstart = () => {
       micBtn.classList.add("recording");
       isRecording = true;
-      showToast("🎤 Listening...");
+      showToast("<i class="fa-solid fa-microphone"></i> Listening...");
     };
     
     recognition.onresult = (e) => {
@@ -811,7 +811,7 @@
   
   micBtn.addEventListener("click", () => {
     if (!recognition) {
-      showToast("⚠️ Voice input not supported in your browser");
+      showToast("<i class="fa-solid fa-triangle-exclamation"></i> Voice input not supported in your browser");
       return;
     }
     if (isRecording) {
@@ -846,11 +846,11 @@
     if (imgSrc) { const img = document.createElement("img"); img.src = imgSrc; div.appendChild(img); }
     const span = document.createElement("span"); span.textContent = text || ""; div.appendChild(span); wrap.appendChild(div);
     const actions = document.createElement("div"); actions.className = "msg-actions";
-    const copyBtn = document.createElement("button"); copyBtn.className = "msg-action-btn"; copyBtn.textContent = "📋 Copy";
-    copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(text || ""); copyBtn.textContent = "✅ Copied"; setTimeout(() => copyBtn.textContent = "📋 Copy", 2000); });
+    const copyBtn = document.createElement("button"); copyBtn.className = "msg-action-btn"; copyBtn.textContent = "<i class="fa-solid fa-copy"></i> Copy";
+    copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(text || ""); copyBtn.textContent = "<i class="fa-solid fa-check"></i> Copied"; setTimeout(() => copyBtn.textContent = "<i class="fa-solid fa-copy"></i> Copy", 2000); });
     actions.appendChild(copyBtn);
     if (role === "ai") {
-      const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-btn"; ttsBtn.textContent = "🔊 Listen";
+      const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-btn"; ttsBtn.textContent = "<i class="fa-solid fa-volume-high"></i> Listen";
       ttsBtn.addEventListener("click", () => speak(text)); actions.appendChild(ttsBtn);
     }
     wrap.appendChild(actions); chatEl.appendChild(wrap); chatEl.scrollTop = chatEl.scrollHeight;
@@ -915,7 +915,7 @@
           thinking.innerHTML = "";
           const img = document.createElement("img"); img.src = data.imageUrl; img.style.cssText = "max-width:100%;border-radius:12px;display:block;"; img.alt = prompt;
           thinking.appendChild(img);
-          const caption = document.createElement("span"); caption.textContent = `🎨 "${prompt}"`; caption.style.cssText = "display:block;margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted);";
+          const caption = document.createElement("span"); caption.textContent = `<i class="fa-solid fa-palette"></i> "${prompt}"`; caption.style.cssText = "display:block;margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted);";
           thinking.appendChild(caption);
           history.push({ role:"assistant", content:`Here's an image of ${prompt}!` });
           saveCurrentChat();
@@ -931,9 +931,9 @@
       thinking.innerHTML = "";
       const span = document.createElement("span"); thinking.appendChild(span);
       const actions = document.createElement("div"); actions.className = "msg-actions";
-      const copyBtn = document.createElement("button"); copyBtn.className = "msg-action-btn"; copyBtn.textContent = "📋 Copy";
-      copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(reply); copyBtn.textContent = "✅ Copied"; setTimeout(() => copyBtn.textContent = "📋 Copy", 2000); });
-      const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-btn"; ttsBtn.textContent = "🔊 Listen";
+      const copyBtn = document.createElement("button"); copyBtn.className = "msg-action-btn"; copyBtn.textContent = "<i class="fa-solid fa-copy"></i> Copy";
+      copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(reply); copyBtn.textContent = "<i class="fa-solid fa-check"></i> Copied"; setTimeout(() => copyBtn.textContent = "<i class="fa-solid fa-copy"></i> Copy", 2000); });
+      const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-btn"; ttsBtn.textContent = "<i class="fa-solid fa-volume-high"></i> Listen";
       ttsBtn.addEventListener("click", () => speak(reply));
       actions.appendChild(copyBtn); actions.appendChild(ttsBtn); wrap.appendChild(actions);
       await typeText(span, reply);
@@ -1006,14 +1006,14 @@
   // Easter egg — star cursor
   let starCursorActive = localStorage.getItem("nova_star") === "true";
   let starClicks = 0;
-  const starSVG = `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><text y='26' font-size='26'>⭐</text></svg>`;
+  const starSVG = `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><text y='26' font-size='26'><i class="fa-solid fa-star"></i></text></svg>`;
   const starCursorURL = `url("data:image/svg+xml,${encodeURIComponent(starSVG)}") 16 16, auto`;
   const starBtn = document.createElement("button");
-  starBtn.className = "icon-btn"; starBtn.title = "Toggle star cursor"; starBtn.textContent = "⭐"; starBtn.style.display = starCursorActive ? "block" : "none";
+  starBtn.className = "icon-btn"; starBtn.title = "Toggle star cursor"; starBtn.textContent = "<i class="fa-solid fa-star"></i>"; starBtn.style.display = starCursorActive ? "block" : "none";
   headerBtns.prepend(starBtn);
   
   function applyStarCursor() { document.body.style.cursor = starCursorActive ? starCursorURL : ""; }
-  function toggleStarCursor() { starCursorActive = !starCursorActive; localStorage.setItem("nova_star", starCursorActive); applyStarCursor(); starBtn.style.display = "block"; showToast(starCursorActive ? "⭐ Star cursor enabled!" : "⭐ Star cursor disabled!"); }
+  function toggleStarCursor() { starCursorActive = !starCursorActive; localStorage.setItem("nova_star", starCursorActive); applyStarCursor(); starBtn.style.display = "block"; showToast(starCursorActive ? "<i class="fa-solid fa-star"></i> Star cursor enabled!" : "<i class="fa-solid fa-star"></i> Star cursor disabled!"); }
   applyStarCursor();
   starBtn.addEventListener("click", toggleStarCursor);
   
@@ -1038,9 +1038,9 @@
   // Input easter egg detection
   input.addEventListener("input", () => {
     const val = input.value.trim().toLowerCase();
-    if (val === "jymer1102") { input.value = ""; toggleEaster(); showToast(easterActive ? "Easter egg unlocked! 🔓🎉" : "Background off!"); }
+    if (val === "jymer1102") { input.value = ""; toggleEaster(); showToast(easterActive ? "Easter egg unlocked! <i class="fa-solid fa-lock-open"></i>" : "Background off!"); }
     if (val === "dinosaur" || val === "trex" || val === "t-rex") { input.value = ""; if (!dinoUnlocked) { dinoUnlocked = true; localStorage.setItem("nova_dino","true"); dinoBtn.style.display = "block"; showToast("🦖 Dino game unlocked! Click the T-Rex button anytime to play!"); } }
-    if (val === "pac-man" || val === "pacman") { input.value = ""; if (!pacmanUnlocked) { pacmanUnlocked = true; localStorage.setItem("nova_pacman","true"); pacmanBtn.style.display = "block"; showToast("👻 Pac-Man game unlocked! Click the Pac-Man button anytime to play!"); } }
+    if (val === "pac-man" || val === "pacman") { input.value = ""; if (!pacmanUnlocked) { pacmanUnlocked = true; localStorage.setItem("nova_pacman","true"); pacmanBtn.style.display = "block"; showToast("<i class="fa-solid fa-ghost"></i> Pac-Man game unlocked! Click the Pac-Man button anytime to play!"); } }
     if (val === "allahu akbar") { input.value = ""; triggerBackpackEgg(); }
   });
 
@@ -1109,7 +1109,7 @@
       backpackCtx.font = `${p.size}px serif`;
       backpackCtx.textAlign = "center";
       backpackCtx.textBaseline = "middle";
-      backpackCtx.fillText("💥", 0, 0);
+      backpackCtx.fillText("<i class="fa-solid fa-burst"></i>", 0, 0);
       backpackCtx.restore();
     }
     if (backpackParticles.length > 0) backpackAnimId = requestAnimationFrame(animateBackpackStars);
