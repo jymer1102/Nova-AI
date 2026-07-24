@@ -1004,7 +1004,7 @@ const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-
   applyEaster();
   easterBtn.addEventListener("click", toggleEaster);
 
- // Easter egg — star cursor
+// Easter egg — star cursor
 let starCursorActive = localStorage.getItem("nova_star") === "true";
 let starClicks = 0;
 
@@ -1030,9 +1030,14 @@ function toggleStarCursor() {
   localStorage.setItem("nova_star", starCursorActive); 
   applyStarCursor(); 
   starBtn.style.display = "block"; 
-  showToast(starCursorActive ? '<i class="fa-solid fa-star"></i> Star cursor enabled!' : '<i class="fa-solid fa-star"></i> Star cursor disabled!'); 
-}
   
+  showToast(
+    starCursorActive 
+      ? '<i class="fa-solid fa-star"></i> Star cursor enabled!' 
+      : '<i class="fa-solid fa-star"></i> Star cursor disabled!'
+  ); 
+}
+
 applyStarCursor();
 starBtn.addEventListener("click", toggleStarCursor);
 
