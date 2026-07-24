@@ -288,6 +288,39 @@
      background-color: #ffffff !important;
      background-image: none !important;
    }
+
+    /* Trash-can buttons: red icon + text */
+#clear-all-btn, #clear-all-btn i, #clear-all-btn span,
+#clear-btn, #clear-btn i, #clear-btn span,
+#profile-delete, #profile-delete i, #profile-delete span {
+  color: #ff4d4f !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6) !important;
+}
+
+/* Cancel button: red icon + text */
+#profile-close, #profile-close i, #profile-close span {
+  color: #ff4d4f !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6) !important;
+}
+
+/* Star cursor toggle button: yellow icon */
+button.icon-btn[title="Toggle star cursor"],
+button.icon-btn[title="Toggle star cursor"] i {
+  color: #FFD700 !important;
+}
+
+/* Center profile settings modal content */
+#profile-modal .modal-box {
+  align-items: center;
+  text-align: center;
+}
+#profile-modal .modal-box h2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+}
   </style>
 </head>
 <body>
