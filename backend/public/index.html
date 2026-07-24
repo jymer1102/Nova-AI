@@ -1035,10 +1035,16 @@ headerBtns.prepend(starBtn);
 function applyStarCursor() { 
   if (starCursorActive) {
     starStyle.innerHTML = `
+      /* Base cursor for everything */
       body, body * { 
         cursor: ${starCursorURL} !important; 
       }
-      body a, body button, body input, body select, body textarea, body [role="button"], body .icon-btn { 
+      /* Hover cursor for clickable elements AND all their inner child tags */
+      body a, body a *,
+      body button, body button *,
+      body input, body select, body textarea,
+      body [role="button"], body [role="button"] *,
+      body .icon-btn, body .icon-btn * { 
         cursor: ${starCursorHoverURL} !important; 
       }
     `;
