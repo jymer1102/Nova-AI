@@ -980,7 +980,7 @@
           });
           const data = await res.json();
           if (data.error) { showToast("Failed to save avatar."); }
-          else { showToast("Profile picture updated! ✅"); }
+          else { showToast("Profile picture updated! <i class="fa-solid fa-check"></i>"); }
         } catch { showToast("Upload failed. Try again."); }
         e.target.value = '';
       });
@@ -989,7 +989,7 @@
 
   let easterActive = localStorage.getItem("nova_easter") === "true";
   const easterBtn = document.createElement("button");
-  easterBtn.className = "icon-btn"; easterBtn.title = "Toggle background"; easterBtn.textContent = "🖼️"; easterBtn.style.display = easterActive ? "block" : "none";
+  easterBtn.className = "icon-btn"; easterBtn.title = "Toggle background"; easterBtn.textContent = "<i class="fa-solid fa-image"></i>"; easterBtn.style.display = easterActive ? "block" : "none";
   headerBtns.prepend(easterBtn);
   
   function applyEaster() {
