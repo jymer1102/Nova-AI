@@ -1137,7 +1137,7 @@ const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-
       backpackCtx.font = `${p.size}px serif`;
       backpackCtx.textAlign = "center";
       backpackCtx.textBaseline = "middle";
-      backpackCtx.fillText("<i class="fa-solid fa-burst"></i>", 0, 0);
+      element.innerHTML = '<i class="fa-solid fa-burst"></i>';
       backpackCtx.restore();
     }
     if (backpackParticles.length > 0) backpackAnimId = requestAnimationFrame(animateBackpackStars);
