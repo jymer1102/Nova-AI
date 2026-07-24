@@ -1010,10 +1010,19 @@ const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-
 let starCursorActive = localStorage.getItem("nova_star") === "true";
 let starClicks = 0;
 
-// Uses raw #FFD700 so encodeURIComponent converts it cleanly to %23FFD700
+// Standard 32x32 Star SVG
 const starSVG = `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 576 512'><path fill='#FFD700' d='M316.9 18C311.6 7 300.4 0 288 0s-23.6 7-28.9 18L182.7 170 10.5 195.1c-12.4 1.8-22.3 10.7-25.2 22.8s1.4 24.7 11 33.1L121 371.1 91.7 502.3c-2.1 12.3 2.9 24.7 12.9 31.8s23 7.3 33.5 1.7L288 458.1l150 78.8c10.5 5.5 23.5 5.4 33.5-.7s15-19.5 12.9-31.8L455 371.1l124.7-120.2c9.6-8.4 13.9-21 11-33.1s-12.8-21-25.2-22.8L393.3 170 316.9 18z'/></svg>`;
 
+// Half-size 16x16 Star SVG (For interactive elements)
+const starHoverSVG = `<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 576 512'><path fill='#FFD700' d='M316.9 18C311.6 7 300.4 0 288 0s-23.6 7-28.9 18L182.7 170 10.5 195.1c-12.4 1.8-22.3 10.7-25.2 22.8s1.4 24.7 11 33.1L121 371.1 91.7 502.3c-2.1 12.3 2.9 24.7 12.9 31.8s23 7.3 33.5 1.7L288 458.1l150 78.8c10.5 5.5 23.5 5.4 33.5-.7s15-19.5 12.9-31.8L455 371.1l124.7-120.2c9.6-8.4 13.9-21 11-33.1s-12.8-21-25.2-22.8L393.3 170 316.9 18z'/></svg>`;
+
 const starCursorURL = `url("data:image/svg+xml,${encodeURIComponent(starSVG)}") 16 16, auto`;
+const starCursorHoverURL = `url("data:image/svg+xml,${encodeURIComponent(starHoverSVG)}") 8 8, pointer`;
+
+// Dynamic stylesheet to manage cursor state globally
+const starStyle = document.createElement("style");
+starStyle.id = "star-cursor-styles";
+document.head.appendChild(starStyle);
 
 const starBtn = document.createElement("button");
 starBtn.className = "icon-btn"; 
@@ -1024,7 +1033,18 @@ starBtn.style.display = starCursorActive ? "block" : "none";
 headerBtns.prepend(starBtn);
 
 function applyStarCursor() { 
-  document.body.style.cursor = starCursorActive ? starCursorURL : ""; 
+  if (starCursorActive) {
+    starStyle.innerHTML = `
+      body, body * { 
+        cursor: ${starCursorURL} !important; 
+      }
+      body a, body button, body input, body select, body textarea, body [role="button"], body .icon-btn { 
+        cursor: ${starCursorHoverURL} !important; 
+      }
+    `;
+  } else {
+    starStyle.innerHTML = "";
+  }
 }
 
 function toggleStarCursor() { 
