@@ -1037,13 +1037,40 @@ const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-
   pacmanBtn.addEventListener("click", togglePacman);
 
   // Input easter egg detection
-  input.addEventListener("input", () => {
-    const val = input.value.trim().toLowerCase();
-    if (val === "jymer1102") { input.value = ""; toggleEaster(); showToast(easterActive ? 'Easter egg unlocked! <i class="fa-solid fa-lock-open"></i>' : "Background off!"); }
-    if (val === "dinosaur" || val === "trex" || val === "t-rex") { input.value = ""; if (!dinoUnlocked) { dinoUnlocked = true; localStorage.setItem("nova_dino","true"); dinoBtn.style.display = "block"; showToast("🦖 Dino game unlocked! Click the T-Rex button anytime to play!"); } }
-    if (val if (val === "pac-man" || val === "pacman") { input.value = ""; if (!pacmanUnlocked) { pacmanUnlocked = true; localStorage.setItem("nova_pacman","true"); pacmanBtn.style.display = "block"; showToast('<i class="fa-solid fa-ghost"></i> Pac-Man game unlocked! Click the Pac-Man button anytime to play!'); } }
-    if (val === "allahu akbar") { input.value = ""; triggerBackpackEgg(); }
-  });
+ input.addEventListener("input", () => {
+  const val = input.value.trim().toLowerCase();
+
+  if (val === "jymer1102") { 
+    input.value = ""; 
+    toggleEaster(); 
+    showToast(easterActive ? 'Easter egg unlocked! <i class="fa-solid fa-lock-open"></i>' : "Background off!"); 
+  }
+
+  if (val === "dinosaur" || val === "trex" || val === "t-rex") { 
+    input.value = ""; 
+    if (!dinoUnlocked) { 
+      dinoUnlocked = true; 
+      localStorage.setItem("nova_dino","true"); 
+      dinoBtn.style.display = "block"; 
+      showToast("🦖 Dino game unlocked! Click the T-Rex button anytime to play!"); 
+    } 
+  }
+
+  if (val === "pac-man" || val === "pacman") { 
+    input.value = ""; 
+    if (!pacmanUnlocked) { 
+      pacmanUnlocked = true; 
+      localStorage.setItem("nova_pacman","true"); 
+      pacmanBtn.style.display = "block"; 
+      showToast('<i class="fa-solid fa-ghost"></i> Pac-Man game unlocked! Click the Pac-Man button anytime to play!'); 
+    } 
+  }
+
+  if (val === "allahu akbar") { 
+    input.value = ""; 
+    triggerBackpackEgg(); 
+  }
+});
 
   // Easter egg — spinning backpack that bursts into stars
   function triggerBackpackEgg() {
