@@ -1041,6 +1041,7 @@ const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-
 
 // Easter egg — star cursor
 let starCursorActive = localStorage.getItem("nova_star") === "true";
+let starDiscovered = localStorage.getItem("nova_star_discovered") === "true";
 let starClicks = 0;
 
 // Standard 32x32 Star SVG
@@ -1066,8 +1067,8 @@ starBtn.className = "icon-btn";
 starBtn.title = "Toggle star cursor"; 
 starBtn.innerHTML = '<i class="fa-solid fa-star"></i>'; 
 
-// Only display on desktop AND if starCursorActive is true
-starBtn.style.display = (starCursorActive && !isMobileDevice) ? "block" : "none";
+// Only display on desktop AND if the star cursor has ever been discovered
+starBtn.style.display = (starDiscovered && !isMobileDevice) ? "block" : "none";
 
 // SAFELY attach button to header container if present
 if (typeof headerBtns !== "undefined" && headerBtns) {
@@ -1102,9 +1103,15 @@ function toggleStarCursor() {
   starCursorActive = !starCursorActive; 
   localStorage.setItem("nova_star", starCursorActive); 
   applyStarCursor(); 
-  
-  // Displays button ONLY if enabled and NOT on a mobile device
-  starBtn.style.display = (starCursorActive && !isMobileDevice) ? "block" : "none"; 
+
+  // First time it's toggled, mark it as discovered so the button never hides again
+  if (!starDiscovered) {
+    starDiscovered = true;
+    localStorage.setItem("nova_star_discovered", "true");
+  }
+
+  // Once discovered, the button stays visible on desktop regardless of on/off state
+  starBtn.style.display = !isMobileDevice ? "block" : "none"; 
   
   showToast(
     starCursorActive 
@@ -1246,7 +1253,8 @@ if (typeof headerTitle !== "undefined" && headerTitle) {
       backpackCtx.font = `${p.size}px serif`;
       backpackCtx.textAlign = "center";
       backpackCtx.textBaseline = "middle";
-      element.innerHTML = '<i class="fa-solid fa-burst"></i>';
+      backpackCtx.fillStyle = `rgba(255, 215, 0, ${Math.max(0, p.alpha)})`;
+      backpackCtx.fillText("★", 0, 0);
       backpackCtx.restore();
     }
     if (backpackParticles.length > 0) backpackAnimId = requestAnimationFrame(animateBackpackStars);
