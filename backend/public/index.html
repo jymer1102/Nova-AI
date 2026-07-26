@@ -315,6 +315,12 @@ button.icon-btn[title="Toggle star cursor"] i {
   text-shadow: 0 1px 3px rgba(0,0,0,0.6) !important;
 }
 
+/* Brand stars flanking "Nova AI" on the sign-in screen: same gold accent */
+.auth-box h1 i {
+  color: #FFD700 !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6) !important;
+}
+
 /* Checkmarks + their accompanying phrase: green */
 .msg-action-btn.copied,
 .msg-action-btn.copied i {
@@ -323,6 +329,10 @@ button.icon-btn[title="Toggle star cursor"] i {
 .toast-success,
 .toast-success i {
   color: #2ecc71 !important;
+}
+.toast-star,
+.toast-star i {
+  color: #FFD700 !important;
 }
 
 /* Center profile settings modal content */
@@ -343,7 +353,7 @@ button.icon-btn[title="Toggle star cursor"] i {
 
 <div id="auth-screen">
   <div class="auth-box">
-    <h1>Nova AI</h1>
+    <h1><i class="fa-solid fa-star"></i> Nova AI <i class="fa-solid fa-star"></i></h1>
     <p id="auth-subtitle">Sign in to your account</p>
     <input type="text" id="auth-name" placeholder="Your name" style="display:none" />
     <input type="tel" id="auth-phone" placeholder="Phone number (optional)" style="display:none" />
@@ -1131,8 +1141,8 @@ function toggleStarCursor() {
   
   showToast(
     starCursorActive 
-      ? '<i class="fa-solid fa-star"></i> Star cursor enabled!' 
-      : '<i class="fa-solid fa-star"></i> Star cursor disabled!'
+      ? '<span class="toast-star"><i class="fa-solid fa-star"></i> Star cursor enabled!</span>' 
+      : '<span class="toast-star"><i class="fa-solid fa-star"></i> Star cursor disabled!</span>'
   ); 
 }
 
@@ -1250,6 +1260,7 @@ if (typeof headerTitle !== "undefined" && headerTitle) {
         gravity: 0.25 + Math.random() * 0.2,
         rot: Math.random() * Math.PI * 2,
         rotV: (Math.random() - 0.5) * 0.3,
+        color: Math.random() < 0.5 ? "#FFD700" : "#FFA500",
       });
     }
     animateBackpackStars();
@@ -1266,11 +1277,11 @@ if (typeof headerTitle !== "undefined" && headerTitle) {
       backpackCtx.globalAlpha = Math.max(0, p.alpha);
       backpackCtx.translate(p.x, p.y);
       backpackCtx.rotate(p.rot);
-      backpackCtx.font = `${p.size}px serif`;
+      backpackCtx.font = `900 ${p.size}px "Font Awesome 6 Free"`;
       backpackCtx.textAlign = "center";
       backpackCtx.textBaseline = "middle";
-      backpackCtx.fillStyle = `rgba(255, 215, 0, ${Math.max(0, p.alpha)})`;
-      backpackCtx.fillText("★", 0, 0);
+      backpackCtx.fillStyle = p.color;
+      backpackCtx.fillText("\ue4dc", 0, 0);
       backpackCtx.restore();
     }
     if (backpackParticles.length > 0) backpackAnimId = requestAnimationFrame(animateBackpackStars);
