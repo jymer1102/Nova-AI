@@ -860,7 +860,11 @@ button.icon-btn[title="Toggle star cursor"] i {
     
     recognition.onerror = (e) => {
       console.error("Speech recognition error:", e.error);
-      showToast(`Error: ${e.error}`);
+      if (e.error === "aborted") {
+        showToast('<i class="fa-solid fa-microphone-slash"></i> Listening cancelled');
+      } else {
+        showToast(`Error: ${e.error}`);
+      }
       micBtn.classList.remove("recording");
       isRecording = false;
     };
