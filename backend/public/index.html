@@ -852,7 +852,7 @@ button.icon-btn[title="Toggle star cursor"] i {
       if (e.results && e.results.length > 0) {
         const transcript = e.results[e.results.length - 1][0].transcript;
         input.value = transcript;
-        showToast('<span class="toast-success">✓ Got it!</span>');
+        showToast('<span class="toast-success"><i class="fa-solid fa-circle-check"></i> Got it!</span>');
       }
       micBtn.classList.remove("recording");
       isRecording = false;
@@ -909,7 +909,7 @@ button.icon-btn[title="Toggle star cursor"] i {
     const span = document.createElement("span"); span.textContent = text || ""; div.appendChild(span); wrap.appendChild(div);
     const actions = document.createElement("div"); actions.className = "msg-actions";
     const copyBtn = document.createElement("button"); copyBtn.className = "msg-action-btn"; copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy';
-copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(text || ""); copyBtn.innerHTML = '<i class="fa-solid fa-check"></i> Copied'; copyBtn.classList.add("copied"); setTimeout(() => { copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy'; copyBtn.classList.remove("copied"); }, 2000); });
+copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(text || ""); copyBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Copied'; copyBtn.classList.add("copied"); setTimeout(() => { copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy'; copyBtn.classList.remove("copied"); }, 2000); });
     actions.appendChild(copyBtn);
     if (role === "ai") {
       const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-btn"; ttsBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
@@ -994,7 +994,7 @@ copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(text || 
       const span = document.createElement("span"); thinking.appendChild(span);
       const actions = document.createElement("div"); actions.className = "msg-actions";
      const copyBtn = document.createElement("button"); copyBtn.className = "msg-action-btn"; copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy';
-copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(reply); copyBtn.innerHTML = '<i class="fa-solid fa-check"></i> Copied'; copyBtn.classList.add("copied"); setTimeout(() => { copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy'; copyBtn.classList.remove("copied"); }, 2000); });
+copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(reply); copyBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Copied'; copyBtn.classList.add("copied"); setTimeout(() => { copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy'; copyBtn.classList.remove("copied"); }, 2000); });
 const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-btn"; ttsBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
       ttsBtn.addEventListener("click", () => speak(reply));
       actions.appendChild(copyBtn); actions.appendChild(ttsBtn); wrap.appendChild(actions);
@@ -1041,7 +1041,7 @@ const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-
           });
           const data = await res.json();
           if (data.error) { showToast("Failed to save avatar."); }
-          else { showToast('<span class="toast-success">Profile picture updated! <i class="fa-solid fa-check"></i></span>'); }
+          else { showToast('<span class="toast-success">Profile picture updated! <i class="fa-solid fa-circle-check"></i></span>'); }
         } catch { showToast("Upload failed. Try again."); }
         e.target.value = '';
       });
