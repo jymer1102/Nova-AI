@@ -266,6 +266,45 @@
   }
 
   /* ============================================================
+     Real refraction — progressive enhancement only.
+     These rules only fire inside html.glass-distort-supported,
+     which JS only adds after confirming the browser can actually
+     render an SVG-filter backdrop-filter. Every browser that can't
+     just keeps the blur-only rules above untouched — no fallback
+     branch to maintain, no risk of a broken/blank panel.
+     ============================================================ */
+
+  html.glass-distort-supported #app,
+  html.glass-distort-supported #auth-screen {
+    backdrop-filter: url(#glass-distortion) blur(28px) saturate(150%) !important;
+  }
+
+  html.glass-distort-supported header,
+  html.glass-distort-supported #input-area,
+  html.glass-distort-supported #sidebar,
+  html.glass-distort-supported .auth-box,
+  html.glass-distort-supported .modal-box {
+    backdrop-filter: url(#glass-distortion) blur(22px) saturate(140%) !important;
+  }
+
+  html.glass-distort-supported .msg {
+    backdrop-filter: url(#glass-distortion-subtle) blur(16px) saturate(160%) !important;
+  }
+
+  /* Buttons/inputs stay on the subtle map — heavy displacement on small
+     surfaces reads as glitchy rather than glassy at this size. */
+  html.glass-distort-supported button,
+  html.glass-distort-supported .icon-btn,
+  html.glass-distort-supported .tool-btn,
+  html.glass-distort-supported .msg-action-btn,
+  html.glass-distort-supported textarea,
+  html.glass-distort-supported input,
+  html.glass-distort-supported .history-item-title,
+  html.glass-distort-supported .nova-glass-panel {
+    backdrop-filter: url(#glass-distortion-subtle) blur(14px) saturate(150%) !important;
+  }
+
+  /* ============================================================
      End Liquid Glass block
      ============================================================ */
 
@@ -328,8 +367,42 @@ button.icon-btn[title="Toggle star cursor"] i {
   width: 100%;
 }
   </style>
+  <script>
+    // Feature-detect real SVG-filter backdrop distortion support before paint.
+    // Browsers that don't support it (older Safari/Firefox) simply never get
+    // the .glass-distort-supported class, and fall back to the plain
+    // blur-only glass CSS below — nothing breaks either way.
+    (function () {
+      try {
+        if (window.CSS && CSS.supports && CSS.supports('backdrop-filter', 'url(#glass-distortion) blur(1px)')) {
+          document.documentElement.classList.add('glass-distort-supported');
+        }
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
+
+<!-- Real optical refraction for surfaces that support SVG-filter backdrop-filter.
+     feTurbulence generates a fixed noise field; feDisplacementMap uses it to
+     bend the pixels behind each glass panel, the way Apple's Liquid Glass
+     actually lenses content instead of just blurring it. Only ever applied
+     when .glass-distort-supported is present on <html> — see the early
+     feature-detection script in <head>. -->
+<svg style="position:absolute; width:0; height:0; overflow:hidden;" aria-hidden="true">
+  <defs>
+    <filter id="glass-distortion" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.009 0.011" numOctaves="2" seed="17" result="noise" />
+      <feGaussianBlur in="noise" stdDeviation="2.5" result="softNoise" />
+      <feDisplacementMap in="SourceGraphic" in2="softNoise" scale="26" xChannelSelector="R" yChannelSelector="G" result="panelDisplace" />
+    </filter>
+    <filter id="glass-distortion-subtle" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.014" numOctaves="2" seed="42" result="noise2" />
+      <feGaussianBlur in="noise2" stdDeviation="2" result="softNoise2" />
+      <feDisplacementMap in="SourceGraphic" in2="softNoise2" scale="12" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </defs>
+</svg>
 
 <div id="auth-screen">
   <div class="auth-box">
