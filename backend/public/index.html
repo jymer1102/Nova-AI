@@ -991,8 +991,8 @@ copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(text || 
       thinking.innerHTML = "";
       const span = document.createElement("span"); thinking.appendChild(span);
       const actions = document.createElement("div"); actions.className = "msg-actions";
-     const copyBtn = document.createElement("button"); copyBtn.className = "msg-action-btn"; copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy';
-copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(reply); copyBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Copied'; copyBtn.classList.add("copied"); setTimeout(() => { copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy'; copyBtn.classList.remove("copied"); }, 2000); });
+     const copyBtn = document.createElement("button"); copyBtn.className = "msg-action-btn"; copyBtn.innerHTML = '<i class="fa-solid fa-clipboard"></i> Copy';
+copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(reply); copyBtn.innerHTML = '<i class="fa-solid fa-clipboard-check"></i> Copied'; copyBtn.classList.add("copied"); setTimeout(() => { copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy'; copyBtn.classList.remove("copied"); }, 2000); });
 const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-btn"; ttsBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
       ttsBtn.addEventListener("click", () => speak(reply));
       actions.appendChild(copyBtn); actions.appendChild(ttsBtn); wrap.appendChild(actions);
