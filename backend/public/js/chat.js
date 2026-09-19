@@ -192,12 +192,12 @@ function addMsg(role, text, imgSrc = null) {
   wrap.className = `msg-wrap ${role === "user" ? "user" : "ai"}`;
   
   const div = document.createElement("div"); 
-  // User keeps standard message styling (gray bubble), AI content container is transparent/borderless
-  div.className = role === "user" ? "msg user-msg-bubble" : "ai-text-content-transparent";
   if (role === "user") {
+    div.className = "msg";
     div.style.backgroundColor = "#555555";
     div.style.color = "#ffffff";
   } else {
+    div.className = "ai-text-content-transparent";
     div.style.background = "transparent";
     div.style.border = "none";
     div.style.boxShadow = "none";
@@ -229,7 +229,7 @@ function addMsg(role, text, imgSrc = null) {
       structuredData = text;
     }
   } catch (e) {
-    // Not a structured JSON payload
+    // Not structured JSON
   }
 
   if (structuredData) {
@@ -308,12 +308,12 @@ function addMsg(role, text, imgSrc = null) {
       const codeCopyBtn = document.createElement("button");
       codeCopyBtn.className = "code-action-btn";
       codeCopyBtn.style.cssText = "background:transparent;border:none;color:#ccc;cursor:pointer;font-size:0.75rem;";
-      codeCopyBtn.innerHTML = '<i class="fa-solid fa-clipboard"></i> Copy';
+      codeCopyBtn.innerHTML = '<i class="fa-solid fa-clipboard"></i> Copy Code';
       codeCopyBtn.addEventListener("click", () => {
         navigator.clipboard.writeText(codeEl.textContent);
         codeCopyBtn.innerHTML = '<i class="fa-solid fa-clipboard-check"></i> Copied!';
         setTimeout(() => {
-          codeCopyBtn.innerHTML = '<i class="fa-solid fa-clipboard"></i> Copy';
+          codeCopyBtn.innerHTML = '<i class="fa-solid fa-clipboard"></i> Copy Code';
         }, 2000);
       });
 
@@ -321,7 +321,7 @@ function addMsg(role, text, imgSrc = null) {
       const codeDownloadBtn = document.createElement("button");
       codeDownloadBtn.className = "code-action-btn";
       codeDownloadBtn.style.cssText = "background:transparent;border:none;color:#ccc;cursor:pointer;font-size:0.75rem;";
-      codeDownloadBtn.innerHTML = '<i class="fa-solid fa-download"></i> Download';
+      codeDownloadBtn.innerHTML = '<i class="fa-solid fa-download"></i> Download Code';
       codeDownloadBtn.addEventListener("click", () => {
         downloadTextFile(codeEl.textContent, "snippet.txt");
       });
@@ -374,6 +374,20 @@ function addMsg(role, text, imgSrc = null) {
   chatEl.scrollTop = chatEl.scrollHeight;
   
   return contentSpan;
+}
+
+// Typing animation for standard text blocks
+function typeText(span, text) {
+  return new Promise(resolve => {
+    const chatEl = document.getElementById("chat");
+    const cursor = document.createElement("span"); cursor.className = "cursor"; span.appendChild(cursor);
+    let i = 0;
+    const interval = setInterval(() => {
+      span.insertBefore(document.createTextNode(text[i]), cursor); i++;
+      if (chatEl) chatEl.scrollTop = chatEl.scrollHeight;
+      if (i >= text.length) { clearInterval(interval); cursor.remove(); resolve(); }
+    }, 15);
+  });
 }
 
 // Image generation detection
