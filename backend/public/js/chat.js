@@ -5,57 +5,136 @@ document.addEventListener("DOMContentLoaded", () => {
   const fileInput = document.getElementById("file-input");
   const micBtn = document.getElementById("mic-btn");
   const chatEl = document.getElementById("chat");
+  const previewArea = document.getElementById("preview-area");
+  const previewImg = document.getElementById("preview-img");
+  const removeImgBtn = document.getElementById("remove-img");
 
+  let selectedImageBase64 = null;
+
+  // Handle Image Upload Selection
+  if (uploadBtn && fileInput) {
+    uploadBtn.addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (uploadEvent) => {
+        selectedImageBase64 = uploadEvent.target.result;
+        if (previewImg && previewArea) {
+          previewImg.src = selectedImageBase64;
+          previewArea.style.display = "flex";
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  if (removeImgBtn && previewArea) {
+    removeImgBtn.addEventListener("click", () => {
+      selectedImageBase64 = null;
+      previewImg.src = "";
+      previewArea.style.display = "none";
+      fileInput.value = "";
+    });
+  }
+
+  // Handle Send Button & Enter Key
   if (sendBtn && inputEl) {
-    sendBtn.addEventListener("click", async () => {
+    const handleSend = async () => {
       const text = inputEl.value.trim();
-      if (!text) return;
+      if (!text && !selectedImageBase64) return;
+
+      // Format user message correctly
+      let userDisplayContent = text;
+      if (selectedImageBase64) {
+        userDisplayContent = `<img src="${selectedImageBase64}" style="max-width:200px;border-radius:8px;display:block;margin-bottom:5px;" />${text}`;
+      }
+
+      appendMessageToChat("user", userDisplayContent);
       
-      // Append user message to chat UI
-      addMsg("user", text);
+      // Store in global history array if it exists in your app context
+      if (typeof history !== "undefined") {
+        history.push({ role: "user", content: text || "[Image]" });
+      }
+
+      // Reset input fields
       inputEl.value = "";
+      const currentImage = selectedImageBase64;
+      selectedImageBase64 = null;
+      if (previewArea) previewArea.style.display = "none";
+      if (fileInput) fileInput.value = "";
 
       try {
-        const res = await fetch(`${BACKEND_URL}/chat`, {
+        const token = localStorage.getItem("nova_token") || "";
+        const res = await fetch(`${window.BACKEND_URL || ""}/chat`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${userToken}`
+            "Authorization": `Bearer ${token}`
           },
-          body: JSON.stringify({ messages: [{ role: "user", content: text }] })
+          body: JSON.stringify({ 
+            messages: typeof history !== "undefined" ? history : [{ role: "user", content: text }] 
+          })
         });
+
         const data = await res.json();
         if (data.reply) {
-          addMsg("assistant", data.reply);
+          appendMessageToChat("assistant", data.reply);
+          if (typeof history !== "undefined") {
+            history.push({ role: "assistant", content: data.reply });
+          }
         } else if (data.error) {
-          addMsg("assistant", "Error: " + data.error);
+          appendMessageToChat("assistant", "Error: " + data.error);
         }
       } catch (err) {
         console.error(err);
-        addMsg("assistant", "Something went wrong.");
+        appendMessageToChat("assistant", "Something went wrong connecting to the server.");
+      }
+    };
+
+    sendBtn.addEventListener("click", handleSend);
+    inputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
       }
     });
   }
 
-  if (uploadBtn && fileInput) {
-    uploadBtn.addEventListener("click", () => {
-      fileInput.click();
-    });
-  }
-
+  // Mic placeholder behavior
   if (micBtn) {
     micBtn.addEventListener("click", () => {
-      alert("Voice input is initializing...");
+      alert("Voice input is ready to configure.");
     });
   }
 });
 
-function addMsg(role, content) {
+// Helper to render messages using standard UI classes
+function appendMessageToChat(role, content) {
   const chatEl = document.getElementById("chat");
   if (!chatEl) return;
-  const div = document.createElement("div");
-  div.className = `msg ${role}`;
-  div.textContent = content;
-  chatEl.appendChild(div);
+
+  const msgDiv = document.createElement("div");
+  // Assigns correct distinct classes for left/right alignment via CSS
+  msgDiv.className = role === "user" ? "message user-message" : "message assistant-message";
+
+  const contentDiv = document.createElement("div");
+  contentDiv.className = "message-body";
+
+  if (role === "assistant" && window.marked) {
+    contentDiv.innerHTML = marked.parse(content);
+  } else if (role === "user" && content.includes("<img")) {
+    contentDiv.innerHTML = content;
+  } else {
+    contentDiv.textContent = content;
+  }
+
+  msgDiv.appendChild(contentDiv);
+  chatEl.appendChild(msgDiv);
   chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+// Global helper fallback if other scripts call addMsg
+function addMsg(role, content) {
+  appendMessageToChat(role, content);
 }
