@@ -57,6 +57,7 @@
     authScreen.style.display = "none";
     appEl.style.display = "flex";
     await refreshToken();
+    loadProfile(); // fetches the saved profile picture; not awaited so the chat isn't held up
     if (history.length === 0) addGreeting();
     loadChats();
   }
@@ -67,6 +68,9 @@
     userToken = null;
     localStorage.removeItem("nova_token");
     localStorage.removeItem("nova_refresh_token");
+    clearAvatar();
   }
 
-  if (userToken) showApp();
+  // Wait for DOMContentLoaded so profile.js / chat.js (loaded after this file) are defined
+  // before showApp() calls into them.
+  if (userToken) window.addEventListener("DOMContentLoaded", showApp);
