@@ -35,7 +35,7 @@ function compressImage(file) {
   });
 }
 
-// Image upload setup (assumes uploadBtn and fileInput exist in main scope)
+// Image upload setup
 if (typeof uploadBtn !== 'undefined' && uploadBtn && typeof fileInput !== 'undefined' && fileInput) {
   uploadBtn.addEventListener("click", () => fileInput.click());
   fileInput.addEventListener("change", async (e) => {
@@ -183,7 +183,7 @@ function downloadTextFile(content, filename) {
   showToast("File downloaded successfully!");
 }
 
-// Add message supporting interactive charts (Bar, Line, Pie, Doughnut, Spider/Radar) and tables
+// Add message supporting interactive charts (Bar, Line, Pie, Doughnut, Radar/Spider) and tables
 function addMsg(role, text, imgSrc = null) {
   const chatEl = document.getElementById("chat");
   if (!chatEl) return;
@@ -272,8 +272,7 @@ function addMsg(role, text, imgSrc = null) {
       }, 50);
     }
   } else if (role === "ai" && window.marked) {
-    // Parse Markdown (which automatically parses tables if markdown tables are provided)
-    contentSpan.innerHTML = marked.parse(text || "");
+    contentSpan.innerHTML = marked.parse(typeof text === "string" ? text : JSON.stringify(text));
     
     contentSpan.querySelectorAll("pre").forEach(pre => {
       const codeEl = pre.querySelector("code");
@@ -324,7 +323,7 @@ function addMsg(role, text, imgSrc = null) {
   });
   actions.appendChild(copyBtn);
   
-  if (role === "ai" && !structuredData) {
+  if (role === "ai") {
     const ttsBtn = document.createElement("button"); 
     ttsBtn.className = "msg-action-btn"; 
     ttsBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
@@ -378,7 +377,7 @@ if (typeof btn !== 'undefined' && btn && typeof input !== 'undefined' && input) 
     if (pendingImageBase64) userContent.push({ type:"image_url", image_url:{ url:`data:${pendingImageType};base64,${pendingImageBase64}` } });
     if (text) userContent.push({ type:"text", text });
     history.push({ role:"user", content: userContent.length===1 && userContent[0].type==="text" ? text : userContent });
-    input.value=""; clearImage(); btn.disabled=true;
+    input.value = ""; clearImage(); btn.disabled = true;
 
     const chatEl = document.getElementById("chat");
     const firstUserMsg = history.find(m => m.role === "user");
