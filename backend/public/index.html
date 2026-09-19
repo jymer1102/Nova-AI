@@ -55,23 +55,23 @@
     <div id="sidebar-header">
       <i class="fa-solid fa-comment"></i> Chat History
       <div style="display:flex;gap:0.5rem;align-items:center">
-        <button id="clear-all-btn"><i class="fa-solid fa-trash-can"></i> Clear All</button>
-        <button class="icon-btn" id="close-sidebar">✕</button>
+        <button id="clearAllBtn"><i class="fa-solid fa-trash-can"></i> Clear All</button>
+        <button class="icon-btn" id="closeSidebarBtn">✕</button>
       </div>
     </div>
-    <div id="sidebar-list"></div>
+    <div id="sidebarList"></div>
   </div>
   <div id="overlay"></div>
   <header>
     <div style="display:flex;gap:0.5rem">
-      <button class="icon-btn" id="history-btn" title="Chat history"><i class="fa-solid fa-comment"></i></button>
-      <button class="icon-btn" id="new-chat-btn" title="New chat"><i class="fa-solid fa-pencil"></i></button>
+      <button class="icon-btn" id="historyBtn" title="Chat history"><i class="fa-solid fa-comment"></i></button>
+      <button class="icon-btn" id="newChatBtn" title="New chat"><i class="fa-solid fa-pencil"></i></button>
     </div>
     <span class="header-title" id="header-title"><i class="fa-solid fa-star"></i>Nova AI by jymer1102<i class="fa-solid fa-star"></i></span>
     <div class="header-btns" id="header-btns">
-      <button class="icon-btn" id="theme-btn" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
-      <button class="icon-btn" id="clear-btn" title="Clear chat"><i class="fa-solid fa-trash-can"></i></button>
-      <button class="icon-btn" id="logout-btn" title="Log out"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+      <button class="icon-btn" id="themeBtn" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+      <button class="icon-btn" id="clearBtn" title="Clear chat"><i class="fa-solid fa-trash-can"></i></button>
+      <button class="icon-btn" id="logoutBtn" title="Log out"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
       <button class="icon-btn" id="profile-btn" title="Profile">
         <img id="profile-icon" src="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:8px;" />
         <span id="profile-icon-fallback"><i class="fa-solid fa-circle-user"></i></span>
@@ -80,14 +80,14 @@
   </header>
   <div id="chat"></div>
   <div id="input-area">
-    <div id="preview-area">
-      <img id="preview-img" src="" alt="preview" />
-      <button id="remove-img">✕</button>
+    <div id="previewArea" style="display:none;">
+      <img id="previewImg" src="" alt="preview" />
+      <button id="removeImgBtn">✕</button>
     </div>
     <div id="bottom-row">
-      <button class="tool-btn" id="upload-btn" title="Upload image"><i class="fa-solid fa-paperclip"></i></button>
-      <input type="file" id="file-input" accept="image/*" style="display:none" />
-      <button class="tool-btn" id="mic-btn" title="Voice input"><i class="fa-solid fa-microphone"></i></button>
+      <button class="tool-btn" id="uploadBtn" title="Upload image"><i class="fa-solid fa-paperclip"></i></button>
+      <input type="file" id="fileInput" accept="image/*" style="display:none" />
+      <button class="tool-btn" id="micBtn" title="Voice input"><i class="fa-solid fa-microphone"></i></button>
       <textarea id="input" placeholder="Type a message..."></textarea>
       <button id="send">Send</button>
     </div>
@@ -116,13 +116,12 @@
   </div>
 </div>
 
-
 <canvas id="backpack-egg-canvas"></canvas>
 <div id="backpack-egg-overlay">
   <div id="backpack-egg-wrap">🎒</div>
   <div id="backpack-egg-label"><i class="fa-solid fa-bomb"></i> ALLAHU AKBAR <i class="fa-solid fa-bomb"></i></div>
 </div>
-
+  
 <script src="js/config.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/auth.js"></script>
