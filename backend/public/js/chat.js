@@ -1,4 +1,4 @@
-// Greeting
+  // Greeting
   function addGreeting() {
     const name = localStorage.getItem("nova_name");
     const greeting = `Hi${name ? ` ${name}` : ""}! I'm Nova, your personal AI assistant by jymer1102. How can I help you?`;
@@ -168,7 +168,7 @@
     const span = document.createElement("span"); span.textContent = text || ""; div.appendChild(span); wrap.appendChild(div);
     const actions = document.createElement("div"); actions.className = "msg-actions";
     const copyBtn = document.createElement("button"); copyBtn.className = "msg-action-btn"; copyBtn.innerHTML = '<i class="fa-solid fa-clipboard"></i> Copy';
-copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(text || ""); copyBtn.innerHTML = '<i class="fa-solid fa-clipboard-check"></i> Copied'; copyBtn.classList.add("copied"); setTimeout(() => { copyBtn.innerHTML = '<i class="fa-solid fa-clipboard"></i> Copy'; copyBtn.classList.remove("copied"); }, 2000); });
+    copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(text || ""); copyBtn.innerHTML = '<i class="fa-solid fa-clipboard-check"></i> Copied'; copyBtn.classList.add("copied"); setTimeout(() => { copyBtn.innerHTML = '<i class="fa-solid fa-clipboard"></i> Copy'; copyBtn.classList.remove("copied"); }, 2000); });
     actions.appendChild(copyBtn);
     if (role === "ai") {
       const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-btn"; ttsBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
@@ -176,19 +176,6 @@ copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(text || 
     }
     wrap.appendChild(actions); chatEl.appendChild(wrap); chatEl.scrollTop = chatEl.scrollHeight;
     return span;
-  }
-
-  // Typing animation
-  function typeText(span, text) {
-    return new Promise(resolve => {
-      const cursor = document.createElement("span"); cursor.className = "cursor"; span.appendChild(cursor);
-      let i = 0;
-      const interval = setInterval(() => {
-        span.insertBefore(document.createTextNode(text[i]), cursor); i++;
-        chatEl.scrollTop = chatEl.scrollHeight;
-        if (i >= text.length) { clearInterval(interval); cursor.remove(); resolve(); }
-      }, 15);
-    });
   }
 
   // Image generation detection
@@ -249,15 +236,20 @@ copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(text || 
       const res = await fetch(`${BACKEND_URL}/chat`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ messages:history }) });
       const data = await res.json();
       const reply = data.reply || data.error || "Something went wrong.";
+      
       thinking.innerHTML = "";
-      const span = document.createElement("span"); thinking.appendChild(span);
+      const span = document.createElement("span"); 
+      span.textContent = reply; // Displays instantly
+      thinking.appendChild(span);
+      
       const actions = document.createElement("div"); actions.className = "msg-actions";
-     const copyBtn = document.createElement("button"); copyBtn.className = "msg-action-btn"; copyBtn.innerHTML = '<i class="fa-solid fa-clipboard"></i> Copy';
-copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(reply); copyBtn.innerHTML = '<i class="fa-solid fa-clipboard-check"></i> Copied'; copyBtn.classList.add("copied"); setTimeout(() => { copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy'; copyBtn.classList.remove("copied"); }, 2000); });
-const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-btn"; ttsBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
+      const copyBtn = document.createElement("button"); copyBtn.className = "msg-action-btn"; copyBtn.innerHTML = '<i class="fa-solid fa-clipboard"></i> Copy';
+      copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(reply); copyBtn.innerHTML = '<i class="fa-solid fa-clipboard-check"></i> Copied'; copyBtn.classList.add("copied"); setTimeout(() => { copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy'; copyBtn.classList.remove("copied"); }, 2000); });
+      const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-btn"; ttsBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
       ttsBtn.addEventListener("click", () => speak(reply));
       actions.appendChild(copyBtn); actions.appendChild(ttsBtn); wrap.appendChild(actions);
-      await typeText(span, reply);
+      
+      chatEl.scrollTop = chatEl.scrollHeight;
       if (data.reply) history.push({ role:"assistant", content:reply });
       saveCurrentChat();
     } catch { thinking.textContent = "Error reaching the server. Is your backend running?"; }
