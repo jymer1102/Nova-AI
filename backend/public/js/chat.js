@@ -171,7 +171,7 @@
     showToast("File downloaded successfully!");
   }
 
-  // Add message: user messages use standard bubbles, AI messages render directly without container box
+  // Add message supporting genuine persistent interactive charts via Chart.js
   function addMsg(role, text, imgSrc = null) {
     const wrap = document.createElement("div");
     wrap.className = `msg-wrap ${role === "user" ? "user" : "ai"}`;
@@ -187,11 +187,47 @@
     
     const contentSpan = document.createElement("div");
     contentSpan.className = "msg-content-body";
-    
-    if (role === "ai" && window.marked) {
+
+    let chartData = null;
+    try {
+      if (typeof text === "string" && text.trim().startsWith("{") && text.trim().endsWith("}")) {
+        const parsed = JSON.parse(text);
+        if (parsed.type && parsed.data) chartData = parsed;
+      } else if (typeof text === "object" && text !== null && text.type && text.data) {
+        chartData = text;
+      }
+    } catch (e) {
+      // Not a chart JSON
+    }
+
+    if (chartData) {
+      const canvasContainer = document.createElement("div");
+      canvasContainer.style.cssText = "position:relative; width:100%; max-width:400px; height:250px; margin:1rem 0;";
+      const canvas = document.createElement("canvas");
+      canvasContainer.appendChild(canvas);
+      contentSpan.appendChild(canvasContainer);
+
+      setTimeout(() => {
+        new Chart(canvas.getContext("2d"), {
+          type: chartData.type,
+          data: chartData.data,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { labels: { color: 'var(--text, #fff)' } }
+            },
+            scales: chartData.type !== 'pie' ? {
+              x: { ticks: { color: 'var(--text-muted, #888)' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+              y: { ticks: { color: 'var(--text-muted, #888)' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+            } : {}
+          }
+        });
+      }, 50);
+
+    } else if (role === "ai" && window.marked) {
       contentSpan.innerHTML = marked.parse(text || "");
       
-      // Setup isolated copy buttons for code snippets
       contentSpan.querySelectorAll("pre").forEach(pre => {
         const codeEl = pre.querySelector("code");
         if (!codeEl) return;
@@ -218,7 +254,7 @@
         pre.insertBefore(codeHeader, codeEl);
       });
     } else {
-      contentSpan.textContent = text || "";
+      contentSpan.textContent = typeof text === "object" ? JSON.stringify(text) : (text || "");
     }
     
     div.appendChild(contentSpan);
@@ -231,7 +267,7 @@
     copyBtn.className = "msg-action-btn"; 
     copyBtn.innerHTML = '<i class="fa-solid fa-clipboard"></i> Copy All';
     copyBtn.addEventListener("click", () => { 
-      navigator.clipboard.writeText(text || ""); 
+      navigator.clipboard.writeText(typeof text === "object" ? JSON.stringify(text, null, 2) : (text || "")); 
       copyBtn.innerHTML = '<i class="fa-solid fa-clipboard-check"></i> Copied'; 
       copyBtn.classList.add("copied"); 
       setTimeout(() => { 
@@ -241,7 +277,7 @@
     });
     actions.appendChild(copyBtn);
     
-    if (role === "ai") {
+    if (role === "ai" && !chartData) {
       const ttsBtn = document.createElement("button"); 
       ttsBtn.className = "msg-action-btn"; 
       ttsBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
@@ -251,7 +287,7 @@
       const downloadBtn = document.createElement("button");
       downloadBtn.className = "msg-action-btn";
       downloadBtn.innerHTML = '<i class="fa-solid fa-download"></i> Save File';
-      downloadBtn.addEventListener("click", () => downloadTextFile(text, "nova-response.txt"));
+      downloadBtn.addEventListener("click", () => downloadTextFile(typeof text === "object" ? JSON.stringify(text, null, 2) : text, "nova-response.txt"));
       actions.appendChild(downloadBtn);
     }
     
@@ -319,7 +355,7 @@
           thinking.innerHTML = "";
           const img = document.createElement("img"); img.src = data.imageUrl; img.style.cssText = "max-width:100%;border-radius:12px;display:block;"; img.alt = prompt;
           thinking.appendChild(img);
-          const caption = document.format ? document.createElement("span") : document.createElement("span"); 
+          const caption = document.createElement("span"); 
           caption.innerHTML = `<i class="fa-solid fa-palette"></i> "${prompt}"`; caption.style.cssText = "display:block;margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted);";
           thinking.appendChild(caption);
           history.push({ role:"assistant", content:`Here's an image of ${prompt}!` });
@@ -333,7 +369,7 @@
       const res = await fetch(`${BACKEND_URL}/chat`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ messages:history }) });
       const data = await res.json();
       const reply = data.reply || data.error || "Something went wrong.";
-      wrap.remove(); // Remove thinking block and re-render via addMsg for markdown parsing
+      wrap.remove(); 
       addMsg("ai", reply);
       if (data.reply) history.push({ role:"assistant", content:reply });
       saveCurrentChat();
