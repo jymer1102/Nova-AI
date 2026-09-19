@@ -35,13 +35,12 @@
     });
   }
 
-  // Image upload - FIXED
+  // Image upload
   uploadBtn.addEventListener("click", () => fileInput.click());
   fileInput.addEventListener("change", async (e) => {
     const file = fileInput.files[0];
     if (!file) return;
     
-    // Validate file type
     const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     if (!validTypes.includes(file.type)) {
       showToast("Please upload a valid image file (JPG, PNG, WebP, or GIF)");
@@ -49,7 +48,6 @@
       return;
     }
     
-    // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
       showToast("File is too large. Max size is 10MB");
       fileInput.value = "";
@@ -68,14 +66,14 @@
     pendingImageType = "image/jpeg";
     previewImg.src = compressed;
     previewArea.style.display = "flex";
-    fileInput.value = ""; // Reset input
+    fileInput.value = "";
     showToast("Image ready!");
   });
   
   removeImgBtn.addEventListener("click", clearImage);
   function clearImage() { pendingImageBase64 = null; pendingImageType = null; previewArea.style.display = "none"; previewImg.src = ""; fileInput.value = ""; }
 
-  // Voice input - FIXED
+  // Voice input
   if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SR();
@@ -159,23 +157,122 @@
     speechSynthesis.speak(utt);
   }
 
-  // Add message
+  // File Download Helper
+  function downloadTextFile(content, filename) {
+    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast("File downloaded successfully!");
+  }
+
+  // Add message with Markdown, Tables, and Isolated Code-Block Copy Buttons
   function addMsg(role, text, imgSrc = null) {
     const wrap = document.createElement("div");
     wrap.className = `msg-wrap ${role === "user" ? "user" : "ai"}`;
-    const div = document.createElement("div"); div.className = "msg";
-    if (imgSrc) { const img = document.createElement("img"); img.src = imgSrc; div.appendChild(img); }
-    const span = document.createElement("span"); span.textContent = text || ""; div.appendChild(span); wrap.appendChild(div);
-    const actions = document.createElement("div"); actions.className = "msg-actions";
-    const copyBtn = document.createElement("button"); copyBtn.className = "msg-action-btn"; copyBtn.innerHTML = '<i class="fa-solid fa-clipboard"></i> Copy';
-    copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(text || ""); copyBtn.innerHTML = '<i class="fa-solid fa-clipboard-check"></i> Copied'; copyBtn.classList.add("copied"); setTimeout(() => { copyBtn.innerHTML = '<i class="fa-solid fa-clipboard"></i> Copy'; copyBtn.classList.remove("copied"); }, 2000); });
-    actions.appendChild(copyBtn);
-    if (role === "ai") {
-      const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-btn"; ttsBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
-      ttsBtn.addEventListener("click", () => speak(text)); actions.appendChild(ttsBtn);
+    
+    const div = document.createElement("div"); 
+    div.className = "msg";
+    
+    if (imgSrc) { 
+      const img = document.createElement("img"); 
+      img.src = imgSrc; 
+      div.appendChild(img); 
     }
-    wrap.appendChild(actions); chatEl.appendChild(wrap); chatEl.scrollTop = chatEl.scrollHeight;
-    return span;
+    
+    const contentSpan = document.createElement("div");
+    contentSpan.className = "msg-content-body";
+    
+    if (role === "ai" && window.marked) {
+      contentSpan.innerHTML = marked.parse(text || "");
+      
+      // Setup isolated copy buttons for code snippets
+      contentSpan.querySelectorAll("pre").forEach(pre => {
+        const codeEl = pre.querySelector("code");
+        if (!codeEl) return;
+        
+        const codeHeader = document.createElement("div");
+        codeHeader.className = "code-header";
+        codeHeader.style.cssText = "display:flex;justify-content:space-between;align-items:center;background:#2d2d2d;padding:4px 10px;font-size:0.75rem;color:#ccc;border-top-left-radius:6px;border-top-right-radius:6px;";
+        codeHeader.innerHTML = '<span>Code</span>';
+        
+        const codeCopyBtn = document.createElement("button");
+        codeCopyBtn.className = "code-copy-btn";
+        codeCopyBtn.style.cssText = "background:transparent;border:none;color:#ccc;cursor:pointer;font-size:0.75rem;";
+        codeCopyBtn.innerHTML = '<i class="fa-solid fa-clipboard"></i> Copy Code';
+        
+        codeCopyBtn.addEventListener("click", () => {
+          navigator.clipboard.writeText(codeEl.textContent);
+          codeCopyBtn.innerHTML = '<i class="fa-solid fa-clipboard-check"></i> Copied!';
+          setTimeout(() => {
+            codeCopyBtn.innerHTML = '<i class="fa-solid fa-clipboard"></i> Copy Code';
+          }, 2000);
+        });
+        
+        codeHeader.appendChild(codeCopyBtn);
+        pre.insertBefore(codeHeader, codeEl);
+      });
+    } else {
+      contentSpan.textContent = text || "";
+    }
+    
+    div.appendChild(contentSpan);
+    wrap.appendChild(div);
+    
+    const actions = document.createElement("div"); 
+    actions.className = "msg-actions";
+    
+    const copyBtn = document.createElement("button"); 
+    copyBtn.className = "msg-action-btn"; 
+    copyBtn.innerHTML = '<i class="fa-solid fa-clipboard"></i> Copy All';
+    copyBtn.addEventListener("click", () => { 
+      navigator.clipboard.writeText(text || ""); 
+      copyBtn.innerHTML = '<i class="fa-solid fa-clipboard-check"></i> Copied'; 
+      copyBtn.classList.add("copied"); 
+      setTimeout(() => { 
+        copyBtn.innerHTML = '<i class="fa-solid fa-clipboard"></i> Copy All'; 
+        copyBtn.classList.remove("copied"); 
+      }, 2000); 
+    });
+    actions.appendChild(copyBtn);
+    
+    if (role === "ai") {
+      const ttsBtn = document.createElement("button"); 
+      ttsBtn.className = "msg-action-btn"; 
+      ttsBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
+      ttsBtn.addEventListener("click", () => speak(text)); 
+      actions.appendChild(ttsBtn);
+
+      const downloadBtn = document.createElement("button");
+      downloadBtn.className = "msg-action-btn";
+      downloadBtn.innerHTML = '<i class="fa-solid fa-download"></i> Save File';
+      downloadBtn.addEventListener("click", () => downloadTextFile(text, "nova-response.txt"));
+      actions.appendChild(downloadBtn);
+    }
+    
+    wrap.appendChild(actions); 
+    chatEl.appendChild(wrap); 
+    chatEl.scrollTop = chatEl.scrollHeight;
+    
+    return contentSpan;
+  }
+
+  // Typing animation for standard blocks
+  function typeText(span, text) {
+    return new Promise(resolve => {
+      const cursor = document.createElement("span"); cursor.className = "cursor"; span.appendChild(cursor);
+      let i = 0;
+      const interval = setInterval(() => {
+        span.insertBefore(document.createTextNode(text[i]), cursor); i++;
+        chatEl.scrollTop = chatEl.scrollHeight;
+        if (i >= text.length) { clearInterval(interval); cursor.remove(); resolve(); }
+      }, 15);
+    });
   }
 
   // Image generation detection
@@ -198,7 +295,6 @@
     history.push({ role:"user", content: userContent.length===1 && userContent[0].type==="text" ? text : userContent });
     input.value = ""; clearImage(); btn.disabled = true;
 
-    // Save immediately
     const firstUserMsg = history.find(m => m.role === "user");
     if (firstUserMsg && userToken) {
       const title = typeof firstUserMsg.content === "string" ? firstUserMsg.content.slice(0,40) : "Image message";
@@ -236,23 +332,13 @@
       const res = await fetch(`${BACKEND_URL}/chat`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ messages:history }) });
       const data = await res.json();
       const reply = data.reply || data.error || "Something went wrong.";
-      
-      thinking.innerHTML = "";
-      const span = document.createElement("span"); 
-      span.textContent = reply; // Displays instantly
-      thinking.appendChild(span);
-      
-      const actions = document.createElement("div"); actions.className = "msg-actions";
-      const copyBtn = document.createElement("button"); copyBtn.className = "msg-action-btn"; copyBtn.innerHTML = '<i class="fa-solid fa-clipboard"></i> Copy';
-      copyBtn.addEventListener("click", () => { navigator.clipboard.writeText(reply); copyBtn.innerHTML = '<i class="fa-solid fa-clipboard-check"></i> Copied'; copyBtn.classList.add("copied"); setTimeout(() => { copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy'; copyBtn.classList.remove("copied"); }, 2000); });
-      const ttsBtn = document.createElement("button"); ttsBtn.className = "msg-action-btn"; ttsBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
-      ttsBtn.addEventListener("click", () => speak(reply));
-      actions.appendChild(copyBtn); actions.appendChild(ttsBtn); wrap.appendChild(actions);
-      
-      chatEl.scrollTop = chatEl.scrollHeight;
+      wrap.remove(); // Remove thinking block and re-render via addMsg for markdown parsing
+      addMsg("ai", reply);
       if (data.reply) history.push({ role:"assistant", content:reply });
       saveCurrentChat();
-    } catch { thinking.textContent = "Error reaching the server. Is your backend running?"; }
+    } catch { 
+      thinking.textContent = "Error reaching the server. Is your backend running?"; 
+    }
     btn.disabled = false;
   }
 
