@@ -171,13 +171,13 @@
     showToast("File downloaded successfully!");
   }
 
-  // Add message with Markdown, Tables, and Isolated Code-Block Copy Buttons
+  // Add message: user messages use standard bubbles, AI messages render directly without container box
   function addMsg(role, text, imgSrc = null) {
     const wrap = document.createElement("div");
     wrap.className = `msg-wrap ${role === "user" ? "user" : "ai"}`;
     
     const div = document.createElement("div"); 
-    div.className = "msg";
+    div.className = role === "user" ? "msg" : "ai-text-content";
     
     if (imgSrc) { 
       const img = document.createElement("img"); 
@@ -306,7 +306,7 @@
     }
 
     const wrap = document.createElement("div"); wrap.className = "msg-wrap ai";
-    const thinking = document.createElement("div"); thinking.className = "msg"; thinking.textContent = "Thinking...";
+    const thinking = document.createElement("div"); thinking.className = "ai-text-content"; thinking.textContent = "Thinking...";
     wrap.appendChild(thinking); chatEl.appendChild(wrap); chatEl.scrollTop = chatEl.scrollHeight;
 
     if (text && isImageRequest(text) && !pendingImageBase64) {
@@ -319,7 +319,8 @@
           thinking.innerHTML = "";
           const img = document.createElement("img"); img.src = data.imageUrl; img.style.cssText = "max-width:100%;border-radius:12px;display:block;"; img.alt = prompt;
           thinking.appendChild(img);
-          const caption = document.createElement("span"); caption.innerHTML = `<i class="fa-solid fa-palette"></i> "${prompt}"`; caption.style.cssText = "display:block;margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted);";
+          const caption = document.format ? document.createElement("span") : document.createElement("span"); 
+          caption.innerHTML = `<i class="fa-solid fa-palette"></i> "${prompt}"`; caption.style.cssText = "display:block;margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted);";
           thinking.appendChild(caption);
           history.push({ role:"assistant", content:`Here's an image of ${prompt}!` });
           saveCurrentChat();
