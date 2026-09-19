@@ -205,8 +205,15 @@ function addMsg(role, text, imgSrc = null) {
 
   let structuredData = null;
   try {
-    if (typeof text === "string" && text.trim().startsWith("{") && text.trim().endsWith("}")) {
-      const parsed = JSON.parse(text);
+    let rawText = typeof text === "string" ? text.trim() : "";
+    if (rawText.startsWith("```json")) {
+      rawText = rawText.replace(/^```json/, "").replace(/```$/, "").trim();
+    } else if (rawText.startsWith("```")) {
+      rawText = rawText.replace(/^```/, "").replace(/```$/, "").trim();
+    }
+    
+    if (rawText.startsWith("{") && rawText.endsWith("}")) {
+      const parsed = JSON.parse(rawText);
       if (parsed.type && (parsed.data || parsed.headers)) structuredData = parsed;
     } else if (typeof text === "object" && text !== null && text.type) {
       structuredData = text;
