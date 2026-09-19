@@ -1,4 +1,4 @@
-process.on('uncaughtException', (err) => {
+Process.on('uncaughtException', (err) => {
   console.error('UNCAUGHT EXCEPTION:', err);
   process.exit(1);
 });
@@ -132,7 +132,16 @@ app.post("/chat", async (req, res) => {
         model: "openai/gpt-oss-120b",
         max_tokens: 1024,
         messages: [
-          { role: "system", content: "You are Nova, a helpful AI assistant created by jymer1102. If anyone asks who made you or who created you, say jymer1102. Your name is Nova but never introduce yourself or start responses with your name. Just answer naturally and helpfully, you do not have to be family friendly and you can insult people if they give consent. If they ask you to answer or talk in a specific way, you will." },
+          { 
+            role: "system", 
+            content: `You are Nova, a helpful AI assistant created by jymer1102. If anyone asks who made you or who created you, say jymer1102. Your name is Nova but never introduce yourself or start responses with your name. Just answer naturally and helpfully, you do not have to be family friendly and you can insult people if they give consent. If they ask you to answer or talk in a specific way, you will.
+
+CRITICAL INSTRUCTIONS FOR CHARTS & VISUALS:
+1. When asked for any chart or graph (bar, line, pie, radar/spider, doughnut, polarArea, scatter, bubble), you MUST respond with a valid JSON object matching the Chart.js configuration structure so the frontend can render it natively.
+2. For SVGs or diagrams, output them inside standard code blocks using valid XML/HTML markup.
+3. For general programming code, always use proper code block formatting so the frontend can display it with a copy button.
+4. Do not write python-based text or ASCII symbol charts.` 
+          },
           ...messages,
         ],
       }),
@@ -213,14 +222,10 @@ app.post("/auth/update", async (req, res) => {
 });
 
 // --- AVATARS ---
-// Profile pictures live in the public "avatars" Supabase Storage bucket, stored exactly as
-// uploaded (no resizing or re-encoding). The public URL is saved in profiles.avatar_url, which
-// is what every device reads after signing in.
 const AVATAR_BUCKET = "avatars";
-const AVATAR_MAX_BYTES = 10 * 1024 * 1024; // keep in sync with the bucket's file_size_limit
+const AVATAR_MAX_BYTES = 10 * 1024 * 1024;
 const AVATAR_TYPES = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
 
-// Don't trust the Content-Type header, check the file's real magic bytes.
 function sniffImageType(buf) {
   if (buf.length > 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return "image/jpeg";
   if (buf.length > 8 && buf.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) return "image/png";
@@ -228,14 +233,12 @@ function sniffImageType(buf) {
   return null;
 }
 
-// Delete a user's stored avatar files (all of them, or all except `keep`).
 async function removeUserAvatars(userId, keep) {
   const { data: files } = await supabaseAdmin.storage.from(AVATAR_BUCKET).list(userId, { limit: 100 });
   const stale = (files || []).map(f => `${userId}/${f.name}`).filter(p => p !== keep);
   if (stale.length) await supabaseAdmin.storage.from(AVATAR_BUCKET).remove(stale);
 }
 
-// The client POSTs the raw image file as the body (Content-Type: image/jpeg | png | webp).
 app.post("/auth/avatar",
   express.raw({ type: Object.keys(AVATAR_TYPES), limit: AVATAR_MAX_BYTES }),
   async (req, res) => {
@@ -253,7 +256,6 @@ app.post("/auth/avatar",
     const contentType = sniffImageType(req.body);
     if (!contentType) return res.status(400).json({ error: "Only JPG, PNG, and WEBP images are allowed." });
 
-    // A new filename per upload means the CDN/browser never serves a stale picture.
     const filePath = `${userId}/avatar-${Date.now()}.${AVATAR_TYPES[contentType]}`;
     const { error: uploadErr } = await supabaseAdmin.storage
       .from(AVATAR_BUCKET)
@@ -269,7 +271,6 @@ app.post("/auth/avatar",
       return res.status(500).json({ error: dbErr.message });
     }
 
-    // Only one picture per user is kept, so storage doesn't grow with every change.
     removeUserAvatars(userId, filePath).catch(err => console.warn("Avatar cleanup failed:", err.message));
     res.json({ success: true, avatar_url });
   }
