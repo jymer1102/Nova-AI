@@ -186,3 +186,34 @@ button.icon-btn[title="Toggle star cursor"], button.icon-btn[title="Toggle star 
 }
 #backpack-egg-label.visible { opacity:1; }
 #backpack-egg-canvas { position:fixed; inset:0; pointer-events:none; z-index:9998; }
+/* Ensure charts look great inside glass messages */
+.msg canvas {
+  width: 100% !important;
+  max-height: 280px !important;
+  margin: 0.5rem 0;
+  border-radius: 12px;
+}
+
+/* Glass-styled chat tables */
+.msg-content-body table, .chat-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  font-size: 0.9rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.msg-content-body th, .msg-content-body td, 
+.chat-table th, .chat-table td {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 8px 12px;
+  text-align: left;
+  color: inherit;
+}
+
+.msg-content-body th, .chat-table th {
+  background: rgba(255, 255, 255, 0.08);
+  font-weight: 600;
+}
