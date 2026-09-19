@@ -1,4 +1,3 @@
-
 // Copyright 2012 Shaun Williams
 //
 //  This program is free software: you can redistribute it and/or modify
@@ -11118,11 +11117,33 @@ var finishState = (function(){
 // Game Over state
 // (state when player has lost last life)
 
+// --- NOVA AI HIGH SCORE SYNC ---
+// Sends the finished run's score to the player's Nova AI account (one request per game).
+// The server only keeps it if it beats their saved Pac-Man high score.
+var submitScoreToNova = function(score) {
+    var token;
+    try { token = localStorage.getItem("nova_token"); } catch (e) { return; }
+    if (!token || practiceMode || !(score > 0)) return;
+    var BACKEND_URL = "https://nova-ai-mk9x.onrender.com";
+    fetch(BACKEND_URL + "/pacman-score", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ score: Math.round(score), token: token })
+    })
+    .then(function(response) {
+        if (!response.ok) throw new Error("Server returned a " + response.status + " error.");
+        return response.json();
+    })
+    .then(function(data) { console.log("Nova AI Sync:", data.message); })
+    .catch(function(err) { console.warn("Nova AI Sync failed:", err); });
+};
+
 var overState = (function() {
     var frames;
     return {
         init: function() {
             frames = 0;
+            submitScoreToNova(getScore());
         },
         draw: function() {
             renderer.blitMap();
