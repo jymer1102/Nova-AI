@@ -44,7 +44,6 @@ const BACKEND_URL = "https://nova-ai-mk9x.onrender.com";
   let history = [];
   let pendingImageBase64 = null;
   let pendingImageType = null;
-  let pendingAvatarBase64 = null;
   let isLight = false;
   let recognition = null;
   let isRecording = false;
