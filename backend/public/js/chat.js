@@ -376,20 +376,6 @@ function addMsg(role, text, imgSrc = null) {
   return contentSpan;
 }
 
-// Typing animation for standard text blocks
-function typeText(span, text) {
-  return new Promise(resolve => {
-    const chatEl = document.getElementById("chat");
-    const cursor = document.createElement("span"); cursor.className = "cursor"; span.appendChild(cursor);
-    let i = 0;
-    const interval = setInterval(() => {
-      span.insertBefore(document.createTextNode(text[i]), cursor); i++;
-      if (chatEl) chatEl.scrollTop = chatEl.scrollHeight;
-      if (i >= text.length) { clearInterval(interval); cursor.remove(); resolve(); }
-    }, 15);
-  });
-}
-
 // Image generation detection
 function isImageRequest(text) {
   const t = text.toLowerCase();
