@@ -1,13 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // --- Greeting ---
-  function addGreeting() {
-    const name = localStorage.getItem("nova_name");
-    const greeting = `Hi${name ? ` ${name}` : ""}! I'm Nova, your personal AI assistant by jymer1102. How can I help you?`;
-    addMsg("ai", greeting);
-    if (typeof history !== 'undefined') {
-      history.push({ role: "assistant", content: greeting });
-    }
-  }
+  // addGreeting() and addMsg() live in render.js (global)
 
   // --- Image compression ---
   function compressImage(file) {
@@ -39,11 +31,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --- Image upload setup ---
-  const uploadBtn = document.getElementById("uploadBtn");
-  const fileInput = document.getElementById("fileInput");
-  const previewArea = document.getElementById("previewArea");
-  const previewImg = document.getElementById("previewImg");
-  const removeImgBtn = document.getElementById("removeImgBtn");
+  const uploadBtn = document.getElementById("upload-btn");
+  const fileInput = document.getElementById("file-input");
+  const previewArea = document.getElementById("preview-area");
+  const previewImg = document.getElementById("preview-img");
+  const removeImgBtn = document.getElementById("remove-img");
 
   let pendingImageBase64 = null;
   let pendingImageType = null;
@@ -99,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Voice input setup ---
   let recognition = null;
   let isRecording = false;
-  const micBtn = document.getElementById("micBtn");
+  const micBtn = document.getElementById("mic-btn");
 
   if (micBtn && ("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -186,8 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const wrap = document.createElement("div"); 
       wrap.className = "msg-wrap ai";
       const thinking = document.createElement("div"); 
-      thinking.className = "ai-text-content-transparent"; 
-      thinking.style.background = "transparent";
+      thinking.className = "ai-text thinking"; 
       thinking.textContent = "Thinking...";
       wrap.appendChild(thinking); 
       if (chatEl) {
