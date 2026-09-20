@@ -10,8 +10,8 @@ function applyEaster() {
   if (easterActive) {
     const isHorizontal = window.innerWidth >= window.innerHeight;
     const bannerPath = isHorizontal 
-      ? "backend/public/images/jymer1102_horizontal_banner" 
-      : "backend/public/images/jymer1102_vertical_banner";
+      ? "backend/public/images/jymer1102_horizontal_banner.png" 
+      : "backend/public/images/jymer1102_vertical_banner.png";
 
     document.body.style.setProperty('background', `url('${bannerPath}') center/cover fixed`, "important");
   } else {
