@@ -44,8 +44,7 @@ header { padding:0.75rem 1rem; background:var(--surface); display:flex; align-it
 .msg-wrap.user { align-items:flex-end; }
 .msg-wrap.ai { align-items:flex-start; }
 .msg { max-width:75%; padding:0.75rem 1rem; border-radius:18px; line-height:1.5; }
-.user .msg { background:var(--accent); color:white; border-bottom-right-radius:4px; }
-.ai .msg { background:var(--ai-bg); border:1px solid var(--border); border-bottom-left-radius:4px; }
+.user .msg { border-bottom-right-radius:4px; white-space:pre-wrap; overflow-wrap:anywhere; }
 .msg img { max-width:100%; border-radius:10px; margin-top:0.5rem; display:block; }
 .msg-actions { display:flex; gap:0.4rem; }
 .msg-action-btn { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.8rem; padding:0.2rem 0.4rem; border-radius:6px; }
@@ -86,8 +85,6 @@ button:disabled { opacity:0.5; cursor:default; }
 .msg-content-body table { width:100%; border-collapse:collapse; margin:0.75rem 0; font-size:0.9rem; }
 .msg-content-body th, .msg-content-body td { border:1px solid var(--border); padding:6px 10px; text-align:left; }
 .msg-content-body th { background:rgba(255,255,255,0.05); }
-.msg-content-body pre { background:#1e1e1e; border-radius:8px; margin:0.75rem 0; overflow:hidden; }
-.msg-content-body code { font-family:monospace; font-size:0.85rem; padding:10px; display:block; color:#dcdcdc; overflow-x:auto; }
 
 /* ============================================================
    LIQUID GLASS
@@ -120,7 +117,6 @@ header { border-radius:32px 32px 0 0!important; border-bottom:1px solid rgba(255
   box-shadow:inset 0 1px 0 rgba(255,255,255,0.22), 0 8px 20px rgba(0,0,0,0.25)!important;
   color:#ffffff!important;
 }
-.user .msg { background:rgba(47,111,235,0.55)!important; border:1px solid rgba(255,255,255,0.22)!important; }
 button, .icon-btn, .tool-btn, .msg-action-btn, textarea, input, .history-item-title {
   background:rgba(255,255,255,0.08)!important;
   backdrop-filter:blur(20px) saturate(150%)!important;
@@ -145,6 +141,7 @@ button:hover, .icon-btn:hover, .tool-btn:hover, .msg-action-btn:hover, .history-
   background:rgba(255,255,255,0.4)!important;
 }
 .light .msg { background:rgba(255,255,255,0.55)!important; color:#111111!important; }
+.light .user .msg { background:#e8e8e8!important; border:1px solid rgba(0,0,0,0.06)!important; box-shadow:none!important; }
 .light button, .light .icon-btn, .light .tool-btn, .light .msg-action-btn, .light textarea, .light input, .light .history-item-title {
   background:rgba(255,255,255,0.5)!important; color:#111111!important; border:1px solid rgba(0,0,0,0.08)!important;
 }
@@ -186,14 +183,6 @@ button.icon-btn[title="Toggle star cursor"], button.icon-btn[title="Toggle star 
 }
 #backpack-egg-label.visible { opacity:1; }
 #backpack-egg-canvas { position:fixed; inset:0; pointer-events:none; z-index:9998; }
-/* Ensure charts look great inside glass messages */
-.msg canvas {
-  width: 100% !important;
-  max-height: 280px !important;
-  margin: 0.5rem 0;
-  border-radius: 12px;
-}
-
 /* Glass-styled chat tables */
 .msg-content-body table, .chat-table {
   width: 100%;
@@ -217,3 +206,68 @@ button.icon-btn[title="Toggle star cursor"], button.icon-btn[title="Toggle star 
   background: rgba(255, 255, 255, 0.08);
   font-weight: 600;
 }
+
+/* ============================================================
+   AI replies: no bubble, just text on the page
+   ============================================================ */
+.msg-wrap.ai { align-items:stretch; }
+.ai-text { width:100%; max-width:100%; padding:0.15rem 0.25rem; line-height:1.65; color:var(--text); overflow-wrap:anywhere; }
+.ai-text.thinking { color:var(--text-muted); animation:novaPulse 1.4s ease-in-out infinite; }
+@keyframes novaPulse { 0%,100%{opacity:0.45} 50%{opacity:1} }
+
+.msg-actions { display:flex; gap:0.35rem; padding:0 0.15rem; }
+.msg-action-btn { min-width:30px; height:28px; display:inline-flex; align-items:center; justify-content:center; }
+.msg-action-btn.speaking, .msg-action-btn.speaking i { color:#4f8cff!important; }
+
+/* Markdown typography (the global reset removes default margins) */
+.ai-text > *:first-child { margin-top:0; }
+.ai-text > *:last-child { margin-bottom:0; }
+.ai-text p { margin:0 0 0.75rem; }
+.ai-text h1, .ai-text h2, .ai-text h3, .ai-text h4 { margin:1.1rem 0 0.5rem; line-height:1.3; font-weight:600; }
+.ai-text h1 { font-size:1.4rem; } .ai-text h2 { font-size:1.2rem; } .ai-text h3 { font-size:1.05rem; }
+.ai-text ul, .ai-text ol { margin:0.25rem 0 0.75rem; padding-left:1.5rem; }
+.ai-text li { margin:0.2rem 0; }
+.ai-text blockquote { margin:0.75rem 0; padding:0.25rem 0 0.25rem 0.9rem; border-left:3px solid rgba(127,127,127,0.5); color:var(--text-muted); }
+.ai-text hr { border:none; border-top:1px solid rgba(127,127,127,0.35); margin:1rem 0; }
+.ai-text a { color:#6ea8ff; }
+.light .ai-text a { color:#1a5fd0; }
+.ai-text :not(pre) > code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:0.88em; padding:0.12em 0.4em; border-radius:6px; background:rgba(127,127,127,0.22); }
+
+/* Tables */
+.table-wrap { overflow-x:auto; margin:0.75rem 0; border-radius:12px; }
+.table-wrap table { margin:0; }
+.light .msg-content-body th, .light .msg-content-body td { border-color:rgba(0,0,0,0.15); }
+.light .msg-content-body th { background:rgba(0,0,0,0.06); }
+
+/* ============================================================
+   Code boxes (copy / download just the code)
+   ============================================================ */
+.code-block { margin:0.75rem 0; border-radius:12px; overflow:hidden; background:#0c0c0e; border:1px solid rgba(255,255,255,0.14); text-align:left; }
+.code-header { display:flex; align-items:center; justify-content:space-between; gap:0.5rem; padding:0.35rem 0.5rem 0.35rem 0.9rem; background:rgba(255,255,255,0.07); border-bottom:1px solid rgba(255,255,255,0.1); color:#cfcfcf; }
+.code-lang { font:600 0.75rem/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; letter-spacing:0.03em; color:#9aa0a6; }
+.code-actions { display:flex; gap:0.35rem; }
+.code-block pre { margin:0; overflow-x:auto; background:transparent; }
+.code-block pre code { display:block; padding:0.9rem 1rem; font:0.85rem/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; color:#e6e6e6; white-space:pre; background:none; }
+
+/* Small buttons used in code boxes and chart cards (win over the global glass button rules) */
+.code-btn, .light .code-btn {
+  padding:0.25rem 0.6rem!important; font-size:0.78rem!important; border-radius:8px!important;
+  background:rgba(127,127,127,0.18)!important; color:inherit!important;
+  border:1px solid rgba(127,127,127,0.28)!important; box-shadow:none!important;
+  display:inline-flex; align-items:center; gap:0.35rem; cursor:pointer; line-height:1.2;
+}
+.code-btn:hover, .light .code-btn:hover { background:rgba(127,127,127,0.32)!important; }
+.code-btn.copied, .code-btn.copied i { color:#2ecc71!important; }
+
+/* ============================================================
+   Charts (pie, donut, bar, line, radar)
+   ============================================================ */
+.chart-block { margin:0.75rem 0; padding:0.55rem 0.8rem 0.8rem; border-radius:16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.14); }
+.light .chart-block { background:rgba(0,0,0,0.03); border-color:rgba(0,0,0,0.1); }
+.chart-toolbar { display:flex; align-items:center; justify-content:space-between; gap:0.5rem; margin-bottom:0.35rem; color:var(--text); }
+.chart-kind { font-size:0.75rem; letter-spacing:0.03em; color:var(--text-muted); }
+.chart-canvas-wrap { position:relative; height:400px; max-width:100%; }
+.chart-canvas-wrap canvas { width:100%!important; height:100%!important; }
+@media (max-width:600px) { .chart-canvas-wrap { height:340px; } }
+.chart-error-msg { margin:0.5rem 0 0; padding:0.6rem 0.8rem; border-radius:10px; background:rgba(255,77,79,0.12); color:#ff6b6d; font-size:0.9rem; }
+.light .chart-error-msg { color:#c0282a; }
