@@ -36,7 +36,7 @@
     if (history.length < 1 || !userToken) return;
     const firstUserMsg = history.find(m => m.role === "user");
     if (!firstUserMsg) return;
-    const title = typeof firstUserMsg.content === "string" ? firstUserMsg.content.slice(0, 40) : "Image message";
+    const title = NovaRender.historyTitle(firstUserMsg);
     await fetch(`${BACKEND_URL}/chats`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${userToken}` },
@@ -55,13 +55,13 @@
   function renderSidebar(chats) {
     sidebarList.innerHTML = chats.length === 0
       ? `<p style="padding:1rem;color:var(--text-muted);font-size:0.9rem">No saved chats yet</p>`
-      : chats.map(c => `<div class="history-item" data-id="${c.id}"><span class="history-item-title">${c.title}</span><button class="delete-chat-btn" data-id="${c.id}">✕</button></div>`).join("");
+      : chats.map(c => `<div class="history-item" data-id="${NovaRender.escapeHtml(c.id)}"><span class="history-item-title">${NovaRender.escapeHtml(c.title)}</span><button class="delete-chat-btn" data-id="${NovaRender.escapeHtml(c.id)}">✕</button></div>`).join("");
     sidebarList.querySelectorAll(".history-item-title").forEach(el => {
       el.addEventListener("click", () => {
         const c = chats.find(x => x.id === el.closest(".history-item").dataset.id);
         if (!c) return;
         history = c.history; currentChatId = c.id; chatEl.innerHTML = "";
-        history.forEach(m => { if (m.role !== "system") addMsg(m.role, typeof m.content === "string" ? m.content : "[image message]"); });
+        history.forEach(m => addHistoryMsg(m));
         closeSidebarFn();
       });
     });
