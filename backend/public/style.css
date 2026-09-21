@@ -89,14 +89,13 @@ button:disabled { opacity:0.5; cursor:default; }
 /* ============================================================
    LIQUID GLASS
    ============================================================ */
-body { background:var(--bg)!important; padding:15px; }
+body { background:var(--bg)!important; padding:0; height:100vh; height:100dvh; }
+/* Full-screen layout: no floating card. The header and footer bars run edge to edge.
+   (No backdrop-filter here on purpose: it would trap the fixed sidebar/overlay inside #app.) */
 #app, #auth-screen {
-  height:calc(100vh - 30px)!important; border-radius:32px;
-  background:rgba(20,20,20,0.35)!important;
-  backdrop-filter:blur(40px) saturate(150%)!important;
-  -webkit-backdrop-filter:blur(40px) saturate(150%)!important;
-  border:1px solid rgba(255,255,255,0.14)!important;
-  box-shadow:0 24px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.25)!important;
+  height:100vh!important; height:100dvh!important; border-radius:0!important;
+  background:transparent!important; border:none!important; box-shadow:none!important;
+  backdrop-filter:none!important; -webkit-backdrop-filter:none!important;
   overflow:hidden;
 }
 header, #input-area, #sidebar, .auth-box, .modal-box {
@@ -106,9 +105,9 @@ header, #input-area, #sidebar, .auth-box, .modal-box {
   border:none!important;
   box-shadow:inset 0 1px 0 rgba(255,255,255,0.18)!important;
 }
-header { border-radius:32px 32px 0 0!important; border-bottom:1px solid rgba(255,255,255,0.1)!important; }
-#input-area { border-radius:0 0 32px 32px!important; border-top:1px solid rgba(255,255,255,0.1)!important; }
-#sidebar { border-radius:0 32px 32px 0!important; border-right:1px solid rgba(255,255,255,0.1)!important; }
+header { border-radius:0!important; border-bottom:1px solid rgba(255,255,255,0.1)!important; box-shadow:none!important; }
+#input-area { border-radius:0!important; border-top:1px solid rgba(255,255,255,0.1)!important; box-shadow:none!important; }
+#sidebar { border-radius:0!important; border-right:1px solid rgba(255,255,255,0.1)!important; box-shadow:none!important; }
 .msg {
   background:rgba(255,255,255,0.09)!important;
   backdrop-filter:blur(22px) saturate(160%)!important;
@@ -135,7 +134,7 @@ button:hover, .icon-btn:hover, .tool-btn:hover, .msg-action-btn:hover, .history-
 
 /* Light Mode Structure */
 .light #app, .light #auth-screen {
-  background:rgba(255,255,255,0.55)!important; border:1px solid rgba(0,0,0,0.08)!important;
+  background:transparent!important; border:none!important;
 }
 .light header, .light #input-area, .light #sidebar, .light .auth-box, .light .modal-box {
   background:rgba(255,255,255,0.4)!important;
@@ -303,3 +302,16 @@ button.icon-btn[title="Toggle star cursor"], button.icon-btn[title="Toggle star 
 .image-card figcaption { margin-top:0.45rem; font-size:0.82rem; color:var(--text-muted); font-style:italic; }
 .image-actions { display:none; margin-top:0.4rem; }
 .image-card.ready .image-actions { display:flex; }
+
+/* ============================================================
+   Full-width header + footer bars (light-mode dividers, phone safe areas)
+   ============================================================ */
+.light header, .light #input-area { background:rgba(0,0,0,0.03)!important; }
+.light header { border-bottom:1px solid rgba(0,0,0,0.1)!important; }
+.light #input-area { border-top:1px solid rgba(0,0,0,0.1)!important; }
+.light #sidebar { border-right:1px solid rgba(0,0,0,0.1)!important; }
+
+/* Keep bars clear of phone notches / home indicator (needs viewport-fit=cover in index.html) */
+header { padding:max(0.75rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) 0.75rem max(1rem, env(safe-area-inset-left)); }
+#input-area { padding:1rem max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left)); }
+#chat { padding-left:max(1rem, env(safe-area-inset-left)); padding-right:max(1rem, env(safe-area-inset-right)); }
