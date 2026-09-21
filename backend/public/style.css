@@ -271,3 +271,35 @@ button.icon-btn[title="Toggle star cursor"], button.icon-btn[title="Toggle star 
 @media (max-width:600px) { .chart-canvas-wrap { height:340px; } }
 .chart-error-msg { margin:0.5rem 0 0; padding:0.6rem 0.8rem; border-radius:10px; background:rgba(255,77,79,0.12); color:#ff6b6d; font-size:0.9rem; }
 .light .chart-error-msg { color:#c0282a; }
+
+/* ============================================================
+   Attachments (composer preview + chips in sent messages)
+   ============================================================ */
+#preview-area { width:100%; }
+#attach-list { display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; width:100%; }
+.attach-chip { position:relative; display:inline-flex; align-items:center; gap:0.45rem; padding:0.35rem 0.4rem 0.35rem 0.7rem; border-radius:12px; font-size:0.85rem; background:rgba(127,127,127,0.16); border:1px solid rgba(127,127,127,0.28); max-width:100%; }
+.attach-chip.attach-image { padding:0; border-radius:10px; }
+.attach-chip.attach-image img { height:56px; width:auto; border-radius:10px; display:block; border:none; }
+.attach-name { max-width:190px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:500; }
+.attach-meta { color:var(--text-muted); font-size:0.75rem; white-space:nowrap; }
+.attach-x, .light .attach-x { width:22px!important; height:22px!important; padding:0!important; border-radius:50%!important; font-size:0.7rem!important; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; background:rgba(127,127,127,0.3)!important; box-shadow:none!important; border:none!important; }
+.attach-chip.attach-image .attach-x { position:absolute; top:-7px; right:-7px; background:#555!important; color:#fff!important; }
+
+.msg-files { display:flex; flex-wrap:wrap; gap:0.35rem; margin-bottom:0.4rem; }
+.msg-file { display:inline-flex; align-items:center; gap:0.35rem; padding:0.25rem 0.6rem; border-radius:10px; font-size:0.82rem; background:rgba(127,127,127,0.22); }
+.msg-file-meta { opacity:0.7; }
+.msg img { max-height:280px; width:auto; }
+
+/* ============================================================
+   Generated images
+   ============================================================ */
+.image-card { margin:0.75rem 0; max-width:440px; }
+.image-frame { position:relative; border-radius:16px; overflow:hidden; background:rgba(127,127,127,0.14); border:1px solid rgba(127,127,127,0.25); }
+.image-frame img { display:block; width:100%; height:auto; }
+.image-frame.loading, .image-frame.failed { aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; }
+.image-frame.loading img, .image-frame.failed img { display:none; }
+.image-status { display:flex; flex-direction:column; align-items:center; gap:0.6rem; padding:1.2rem; text-align:center; font-size:0.9rem; color:var(--text-muted); }
+.image-frame:not(.loading):not(.failed) .image-status { display:none; }
+.image-card figcaption { margin-top:0.45rem; font-size:0.82rem; color:var(--text-muted); font-style:italic; }
+.image-actions { display:none; margin-top:0.4rem; }
+.image-card.ready .image-actions { display:flex; }
