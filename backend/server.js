@@ -136,11 +136,47 @@ const SYSTEM_PROMPT = [
   "   - Accuracy matters. Use the exact numbers the user gave you. If they gave none, use only figures you are genuinely confident about, say briefly that they are approximate or where they come from, and if you do not know reliable figures ask the user for the data instead of inventing numbers.",
   "3. TABLES: when the user asks for a table, use a normal markdown table.",
   "4. Everything else: normal markdown.",
+  "5. ATTACHED FILES: the user can attach code or text files. They appear inside <attached_file name=\"...\"> tags in the user's message. Read them carefully, refer to them by file name, and when you suggest a fix or a rewrite show the corrected code in a fenced code block. Never say you cannot open attached files; their full text is in the message. If a file was truncated, say so.",
+  "6. IMAGES: the user can attach images and you can see them. Describe and analyze them accurately, read any text in them, and never claim you cannot see images. Only say what is actually visible; if something is unclear, say so.",
+  "7. IMAGE CREATION: this app can generate images. If the user wants a picture created and it was not created automatically, tell them to start their message with /image followed by a description, for example: /image a red sports car on a beach at sunset. Do not claim you cannot create images, and do not write code to make one unless they ask for code.",
 ].join("\n");
 
 // --- CHAT ---
+// gpt-oss can't see images, so any request that contains an image goes to a vision model instead.
+const TEXT_MODEL = process.env.TEXT_MODEL || "openai/gpt-oss-120b";
+const VISION_MODEL = process.env.VISION_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct";
+const MAX_IMAGES_PER_REQUEST = 3; // Groq allows 5; older images are dropped to keep requests small
+
+// Keeps only the newest few images, only accepts inline (data:) images, and reports whether any remain.
+function prepareMessages(messages) {
+  let seen = 0;
+  const cleaned = messages.slice().reverse().map(m => {
+    if (!m || !Array.isArray(m.content)) return m;
+    const parts = m.content.map(p => {
+      if (p && p.type === "image_url") {
+        const url = p.image_url && p.image_url.url;
+        if (typeof url !== "string" || !url.startsWith("data:image/")) {
+          return { type: "text", text: "[An image was attached but could not be used]" };
+        }
+        seen++;
+        if (seen > MAX_IMAGES_PER_REQUEST) return { type: "text", text: "[An earlier image was shared here but is no longer available]" };
+      }
+      return p;
+    });
+    return { ...m, content: parts };
+  }).reverse();
+  // Text-only models want plain strings, so flatten any leftover text parts
+  const finalMessages = seen > 0 ? cleaned : cleaned.map(m =>
+    m && Array.isArray(m.content)
+      ? { ...m, content: m.content.map(p => (p && typeof p.text === "string" ? p.text : "")).filter(Boolean).join("\n") }
+      : m
+  );
+  return { messages: finalMessages, hasImage: seen > 0 };
+}
+
 app.post("/chat", async (req, res) => {
-  const { messages } = req.body;
+  if (!Array.isArray(req.body.messages)) return res.status(400).json({ error: "No messages provided" });
+  const { messages, hasImage } = prepareMessages(req.body.messages);
   try {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
@@ -149,7 +185,7 @@ app.post("/chat", async (req, res) => {
         "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "openai/gpt-oss-120b",
+        model: hasImage ? VISION_MODEL : TEXT_MODEL,
         max_tokens: 4096,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
@@ -166,7 +202,9 @@ app.post("/chat", async (req, res) => {
         const timeStr = mins > 0 ? `${mins} minute${mins !== 1 ? "s" : ""}` : `${secs} second${secs !== 1 ? "s" : ""}`;
         return res.status(429).json({ error: `Token limit reached... Try again in ${timeStr}.` });
       }
-      return res.status(500).json({ error: "No response from AI" });
+      console.error("Groq error:", JSON.stringify(data.error || data));
+      const detail = data.error && data.error.message ? `AI error: ${String(data.error.message).slice(0, 300)}` : "No response from AI";
+      return res.status(500).json({ error: detail });
     }
     res.json({ reply: data.choices[0].message.content });
   } catch (err) {
@@ -178,10 +216,12 @@ app.post("/chat", async (req, res) => {
 // --- IMAGE GENERATION ---
 app.post("/generate-image", async (req, res) => {
   const { prompt } = req.body;
-  if (!prompt) return res.status(400).json({ error: "No prompt provided" });
+  if (typeof prompt !== "string" || !prompt.trim()) return res.status(400).json({ error: "No prompt provided" });
   try {
-    const encoded = encodeURIComponent(prompt);
-    const imageUrl = `https://image.pollinations.ai/prompt/${encoded}?width=768&height=768&nologo=true`;
+    // encodeURIComponent leaves ! ' ( ) * alone; encode them too so the URL can't break markdown
+    const encoded = encodeURIComponent(prompt.trim().slice(0, 500)).replace(/[!'()*]/g, c => "%" + c.charCodeAt(0).toString(16).toUpperCase());
+    const seed = Math.floor(Math.random() * 1e9); // new seed = a fresh image every time
+    const imageUrl = `https://image.pollinations.ai/prompt/${encoded}?width=768&height=768&nologo=true&seed=${seed}`;
     res.json({ imageUrl });
   } catch (err) {
     console.error(err);
