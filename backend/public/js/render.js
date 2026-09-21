@@ -89,6 +89,79 @@
   };
 
   /* ---------------------------------------------------------- */
+  /*  Attached files                                             */
+  /*  Code/text files are stored inside the message text as      */
+  /*  <attached_file name="..."> blocks so they persist in saved */
+  /*  chats. The chat shows them as small chips, not raw text.   */
+  /* ---------------------------------------------------------- */
+  const FILE_RE = /<attached_file name="([^"]*)">\n([\s\S]*?)\n<\/attached_file>\n*/g;
+
+  function parseAttachedFiles(text) {
+    const files = [];
+    const rest = String(text).replace(FILE_RE, (_, name, body) => {
+      files.push({ name, lines: body.replace(/\n+$/, "").split("\n").length });
+      return "";
+    });
+    return { files, rest: rest.trim() };
+  }
+
+  /* ---------------------------------------------------------- */
+  /*  "Generate an image" detection                              */
+  /*  Returns null (not an image request) or { prompt }          */
+  /*  (prompt is "" when the user didn't say what to draw).      */
+  /* ---------------------------------------------------------- */
+  const IMG_NOUN = "(?:images?|pictures?|pics?|photos?|photographs?|drawings?|illustrations?|paintings?|artworks?|art|logos?|wallpapers?|posters?|portraits?|icons?|sketch(?:es)?|renders?|avatars?|memes?)";
+  const NOT_AN_IMAGE = /\b(code|script|function|program|python|javascript|typescript|html|css|java|sql|regex|chart|graph|table|diagram|api|app|website|classifier|classification|pytorch|tensorflow|keras|opencv|dataset|algorithm|library|framework|sdk|database|component|node\.?js|react|django|flask)\b/i;
+  // Questions and how-to requests are never "please draw this"
+  const QUESTION_START = /^\s*(?:how|what|whats|what's|why|when|where|which|who|is|are|was|were|does|do|did|should|explain|tell me|describe|write|help|teach|show me how|can you explain|could you explain)\b/i;
+  // "an image classifier", "a picture viewer"... the noun is part of a bigger thing, not a picture request
+  const COMPOUND_AFTER = /^\s*(?:classifier|classification|generator|resizer|viewer|editor|gallery|carousel|slider|upload|uploader|processing|recognition|detection|segmentation|captioning|dataset|format|file|library|sensor|compression|converter|tool|pipeline)\b/i;
+
+  function tidyPrompt(s) {
+    return String(s || "").replace(/^[\s:,\-–]+/, "").replace(/^(of|showing|depicting|featuring)\s+/i, "").replace(/[\s.!?]+$/, "").trim();
+  }
+
+  function parseImageRequest(raw) {
+    const t = String(raw || "").trim();
+    if (!t) return null;
+
+    // Explicit command: /image a red car on a beach
+    let m = t.match(/^\/(?:image|imagine|img|draw)\b\s*([\s\S]*)$/i);
+    if (m) return { prompt: tidyPrompt(m[1]) };
+
+    if (NOT_AN_IMAGE.test(t) || QUESTION_START.test(t)) return null;
+
+    // "generate / create / make / design ... an image of ..."
+    m = t.match(new RegExp("\\b(?:generate|create|make|produce|render|design|draw|paint)\\b(?:\\s+me|\\s+us)?(?:\\s+(?:an?|some|another|one))?((?:\\s+[\\w-]+){0,3}?)\\s+" + IMG_NOUN + "\\b\\s*(?:of|showing|depicting|featuring|with|about|for|that|where|:|-)?\\s*([\\s\\S]*)$", "i"));
+    if (m && COMPOUND_AFTER.test(m[2])) return null;
+    if (m) {
+      const subject = tidyPrompt(m[2]);
+      const style = m[1].trim();
+      return { prompt: subject ? (style ? subject + ", " + style : subject) : "" };
+    }
+
+    // "show me / give me a picture of ..."
+    m = t.match(new RegExp("\\b(?:show|give)\\s+me\\s+(?:an?\\s+)?(?:[\\w-]+\\s+){0,2}" + IMG_NOUN + "\\s+of\\s+([\\s\\S]+)$", "i"));
+    if (m) return { prompt: tidyPrompt(m[1]) };
+
+    // "draw / paint / sketch / illustrate me a dragon"
+    m = t.match(/^(?:please\s+|pls\s+|can you\s+|could you\s+|can u\s+)*(?:draw|paint|sketch|illustrate)\b(?:\s+me|\s+us)?\s+([\s\S]+)$/i);
+    if (m) return { prompt: tidyPrompt(m[1]) };
+
+    return null;
+  }
+
+  // A short, single-line title for the sidebar
+  function historyTitle(msg) {
+    let text = "";
+    if (typeof msg.content === "string") text = msg.content;
+    else if (Array.isArray(msg.content)) text = msg.content.filter(p => p && p.type === "text").map(p => p.text).join(" ");
+    const parsed = parseAttachedFiles(text);
+    const title = parsed.rest || (parsed.files[0] ? "File: " + parsed.files[0].name : "Image message");
+    return title.replace(/\s+/g, " ").slice(0, 40);
+  }
+
+  /* ---------------------------------------------------------- */
   /*  Code boxes (copy / download just the code)                 */
   /* ---------------------------------------------------------- */
   const FILE_EXT = {
@@ -427,10 +500,98 @@
   }
 
   /* ---------------------------------------------------------- */
+  /*  Generated images                                           */
+  /* ---------------------------------------------------------- */
+  const GEN_IMAGE_HOST = "image.pollinations.ai";
+
+  function isGeneratedImageUrl(src) {
+    try {
+      const u = new URL(src, location.href);
+      return u.protocol === "https:" && u.hostname === GEN_IMAGE_HOST;
+    } catch (_) { return false; }
+  }
+
+  function scrollChat() {
+    const chat = document.getElementById("chat");
+    if (chat) chat.scrollTop = chat.scrollHeight;
+  }
+
+  function buildImageCard(src, alt) {
+    const card = el("figure", "image-card");
+    const frame = el("div", "image-frame loading");
+    const status = el("div", "image-status");
+    const im = el("img");
+    im.alt = alt;
+    im.decoding = "async";
+    frame.append(status, im);
+
+    const caption = el("figcaption");
+    caption.textContent = alt;
+
+    const actions = el("div", "image-actions");
+    const dl = makeBtn("code-btn", "fa-download", "Download", "Download image");
+    actions.appendChild(dl);
+    card.append(frame, caption, actions);
+
+    let attempt = 0;
+    function load() {
+      frame.classList.remove("failed");
+      frame.classList.add("loading");
+      status.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Generating your image… this can take a few seconds</span>';
+      im.src = attempt ? src + (src.includes("?") ? "&" : "?") + "retry=" + Date.now() : src;
+    }
+    im.addEventListener("load", () => { frame.classList.remove("loading", "failed"); card.classList.add("ready"); scrollChat(); });
+    im.addEventListener("error", () => {
+      frame.classList.remove("loading");
+      frame.classList.add("failed");
+      status.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span>Couldn\'t load the image. The free image service allows roughly one image every 15 seconds, so wait a moment and try again.</span>';
+      const retry = makeBtn("code-btn", "fa-rotate-right", "Try again", "Try again");
+      retry.addEventListener("click", () => { attempt++; load(); });
+      status.appendChild(retry);
+    });
+
+    dl.addEventListener("click", async () => {
+      try {
+        const r = await fetch(im.currentSrc || im.src, { cache: "force-cache" });
+        if (!r.ok) throw new Error("bad response");
+        const blob = await r.blob();
+        const ext = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp" }[blob.type] || "jpg";
+        downloadFile(`nova-image-${timestamp()}.${ext}`, blob);
+        flash(dl, "fa-download", "Download", "Saved");
+      } catch (_) {
+        window.open(im.currentSrc || im.src, "_blank", "noopener");
+        toast("Opened the image in a new tab. Right-click or long-press it to save.");
+      }
+    });
+
+    load();
+    return card;
+  }
+
+  /* ---------------------------------------------------------- */
   /*  Markdown -> DOM                                            */
   /* ---------------------------------------------------------- */
   function enhance(root) {
     const pending = [];
+
+    // Images: only our own generated images are loaded. Anything else an AI reply
+    // points to becomes a plain link (auto-loading arbitrary URLs can leak data).
+    root.querySelectorAll("img").forEach(img => {
+      const src = img.getAttribute("src") || "";
+      if (isGeneratedImageUrl(src)) {
+        const card = buildImageCard(src, img.getAttribute("alt") || "Generated image");
+        const parent = img.parentElement;
+        if (parent && parent.tagName === "P" && parent.childNodes.length === 1) parent.replaceWith(card);
+        else img.replaceWith(card);
+      } else if (/^https?:/i.test(src)) {
+        const a = el("a");
+        a.href = src;
+        a.textContent = img.getAttribute("alt") || src;
+        img.replaceWith(a);
+      } else {
+        img.remove();
+      }
+    });
 
     root.querySelectorAll("pre").forEach(pre => {
       const codeEl = pre.querySelector("code");
@@ -574,11 +735,6 @@
   /* ---------------------------------------------------------- */
   /*  Public API                                                 */
   /* ---------------------------------------------------------- */
-  function scrollChat() {
-    const chat = document.getElementById("chat");
-    if (chat) chat.scrollTop = chat.scrollHeight;
-  }
-
   window.addMsg = function addMsg(role, text, imgSrc) {
     const chat = document.getElementById("chat");
     const isUser = role === "user";
@@ -587,10 +743,26 @@
     chat.appendChild(wrap);
 
     if (isUser) {
+      const parsed = parseAttachedFiles(content);
+      const shown = parsed.rest;
       const bubble = el("div", "msg");
-      if (content) {
+      if (parsed.files.length) {
+        const chips = el("div", "msg-files");
+        parsed.files.forEach(f => {
+          const chip = el("span", "msg-file");
+          chip.innerHTML = '<i class="fa-solid fa-file-code"></i> ';
+          const name = el("span", "msg-file-name");
+          name.textContent = f.name;
+          const meta = el("span", "msg-file-meta");
+          meta.textContent = ` · ${f.lines} line${f.lines === 1 ? "" : "s"}`;
+          chip.append(name, meta);
+          chips.appendChild(chip);
+        });
+        bubble.appendChild(chips);
+      }
+      if (shown) {
         const p = el("div", "msg-text");
-        p.textContent = content;
+        p.textContent = shown;
         bubble.appendChild(p);
       }
       if (imgSrc) {
@@ -601,11 +773,11 @@
       }
       wrap.appendChild(bubble);
 
-      if (content) {
+      if (shown) {
         const actions = el("div", "msg-actions");
         const copyBtn = makeBtn("msg-action-btn", "fa-copy", "", "Copy message");
         copyBtn.addEventListener("click", async () => {
-          if (await copyText(content)) flash(copyBtn, "fa-copy", "", "");
+          if (await copyText(shown)) flash(copyBtn, "fa-copy", "", "");
           else toast("Couldn't copy — your browser blocked it");
         });
         actions.appendChild(copyBtn);
@@ -640,6 +812,19 @@
     return wrap;
   };
 
+  // Re-draws one saved history entry (text, image + text, attached files, generated images)
+  window.addHistoryMsg = function addHistoryMsg(m) {
+    if (!m || m.role === "system") return null;
+    if (typeof m.content === "string") return window.addMsg(m.role, m.content);
+    if (Array.isArray(m.content)) {
+      const img = m.content.find(p => p && p.type === "image_url");
+      const url = img && img.image_url && img.image_url.url;
+      const text = m.content.filter(p => p && p.type === "text").map(p => p.text).join("\n");
+      return window.addMsg(m.role, text, typeof url === "string" && url.startsWith("data:image/") ? url : null);
+    }
+    return null;
+  };
+
   window.addGreeting = function addGreeting() {
     const name = localStorage.getItem("nova_name");
     const greeting = `Hi${name ? ` ${name}` : ""}! I'm Nova, your personal AI assistant by jymer1102. How can I help you?`;
@@ -650,5 +835,5 @@
   };
 
   // Exposed for testing / other scripts
-  window.NovaRender = { normalizeChartSpec, responseToText, chunkText };
+  window.NovaRender = { normalizeChartSpec, responseToText, chunkText, parseImageRequest, parseAttachedFiles, historyTitle, escapeHtml };
 })();
