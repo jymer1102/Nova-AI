@@ -338,3 +338,12 @@ header .header-btns { grid-area:right; justify-self:end; flex-wrap:wrap; justify
   header .icon-btn { width:30px!important; height:30px!important; }
   header .header-btns, header > div:not(.header-btns) { gap:0.35rem!important; }
 }
+
+/* ============================================================
+   Math (KaTeX): \( ... \) inline, $$ ... $$ or \[ ... \] block
+   ============================================================ */
+.math-inline { color:inherit; }
+.math-display { display:block; margin:0.9rem 0; overflow-x:auto; overflow-y:hidden; padding:0.15rem 0; color:inherit; }
+.math-display .katex-display { margin:0; }
+.math-error { color:#ff6b6d; cursor:help; border-bottom:1px dotted currentColor; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:0.9em; }
+.light .math-error { color:#c0282a; }
