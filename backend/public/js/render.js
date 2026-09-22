@@ -569,6 +569,77 @@
   }
 
   /* ---------------------------------------------------------- */
+  /*  Math (KaTeX)                                               */
+  /*  Delimiters: \( ... \) inline, $$ ... $$ or \[ ... \] block. */
+  /*  Plain single $ is never treated as math, so prices like     */
+  /*  "$5 to $10" are never misread as a formula.                 */
+  /* ---------------------------------------------------------- */
+  const MATH_OPEN = "\uE010", MATH_CLOSE = "\uE011"; // private-use markers; markdown/DOMPurify treat them as plain text
+
+  // Swaps fenced code blocks / inline code for placeholders so math delimiters
+  // inside code (e.g. a LaTeX example in a code sample) are never touched.
+  function protectCode(text) {
+    const saved = [];
+    const put = s => { saved.push(s); return MATH_OPEN + "CODE" + (saved.length - 1) + MATH_CLOSE; };
+    let out = text.replace(/```[\s\S]*?```/g, put).replace(/`[^`\n]+`/g, put);
+    return { out, restore: s => s.replace(/\uE010CODE(\d+)\uE011/g, (_, i) => saved[+i]) };
+  }
+
+  // Pulls $$...$$, \[...\] and \(...\) out of markdown text and replaces each with a
+  // placeholder token, so marked/DOMPurify pass them through untouched as plain text.
+  function extractMath(markdown) {
+    const { out: codeProtected, restore } = protectCode(markdown);
+    const found = [];
+    const stash = (display, tex) => { found.push({ display, tex }); return MATH_OPEN + "MATH" + (found.length - 1) + MATH_CLOSE; };
+    let out = codeProtected
+      .replace(/\$\$([\s\S]+?)\$\$/g, (_, tex) => stash(true, tex))
+      .replace(/\\\[([\s\S]+?)\\\]/g, (_, tex) => stash(true, tex))
+      .replace(/\\\(([\s\S]+?)\\\)/g, (_, tex) => stash(false, tex));
+    return { text: restore(out), math: found };
+  }
+
+  // Renders one TeX string to a sanitized <span>. Never throws: bad TeX becomes
+  // a small inline error rather than breaking the whole message.
+  function renderMathSpan(tex, display) {
+    const span = el("span", display ? "math-display" : "math-inline");
+    if (typeof katex === "undefined") { span.textContent = display ? `$$${tex}$$` : `\\(${tex}\\)`; return span; }
+    try {
+      const html = katex.renderToString(tex, { throwOnError: true, displayMode: display, output: "html", strict: "ignore", maxSize: 500, maxExpand: 1000 });
+      span.innerHTML = (typeof DOMPurify !== "undefined") ? DOMPurify.sanitize(html) : html;
+    } catch (e) {
+      span.className += " math-error";
+      span.title = e && e.message ? e.message : "Couldn't parse this formula";
+      span.textContent = display ? `$$${tex}$$` : `(${tex})`;
+    }
+    return span;
+  }
+
+  // Walks the rendered DOM and swaps each placeholder for its KaTeX span.
+  // Skips text inside <code>/<pre> as a second line of defense.
+  function renderMathIn(root, mathList) {
+    if (!mathList.length) return;
+    const re = /\uE010MATH(\d+)\uE011/;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: n => n.parentElement && n.parentElement.closest("code, pre") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT,
+    });
+    const hits = [];
+    let node;
+    while ((node = walker.nextNode())) { if (re.test(node.nodeValue)) hits.push(node); }
+
+    hits.forEach(node => {
+      const frag = document.createDocumentFragment();
+      const parts = node.nodeValue.split(/\uE010MATH(\d+)\uE011/);
+      parts.forEach((part, i) => {
+        if (i % 2 === 0) { if (part) frag.appendChild(document.createTextNode(part)); return; }
+        const m = mathList[+part];
+        if (!m) { frag.appendChild(document.createTextNode(part)); return; }
+        frag.appendChild(renderMathSpan(m.tex, m.display));
+      });
+      node.parentNode.replaceChild(frag, node);
+    });
+  }
+
+    /* ---------------------------------------------------------- */
   /*  Markdown -> DOM                                            */
   /* ---------------------------------------------------------- */
   function enhance(root) {
@@ -630,11 +701,16 @@
       target.textContent = md;
       return;
     }
+    // Pull out $$...$$, \[...\] and \(...\) before markdown parsing, so marked
+    // doesn't mangle backslashes and DOMPurify never has to touch KaTeX's HTML.
+    const { text: mdForMarked, math } = extractMath(md);
+
     let html;
-    try { html = marked.parse(md, { gfm: true, breaks: true }); }
+    try { html = marked.parse(mdForMarked, { gfm: true, breaks: true }); }
     catch (_) { html = escapeHtml(md).replace(/\n/g, "<br>"); }
 
     target.innerHTML = DOMPurify.sanitize(html);
+    renderMathIn(target, math);
     const charts = enhance(target);
     // The message is already in the page here, so charts can size themselves
     charts.forEach(entry => drawChart(entry, true));
