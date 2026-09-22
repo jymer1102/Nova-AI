@@ -315,3 +315,26 @@ button.icon-btn[title="Toggle star cursor"], button.icon-btn[title="Toggle star 
 header { padding:max(0.75rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) 0.75rem max(1rem, env(safe-area-inset-left)); }
 #input-area { padding:1rem max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left)); }
 #chat { padding-left:max(1rem, env(safe-area-inset-left)); padding-right:max(1rem, env(safe-area-inset-right)); }
+
+/* ============================================================
+   Header: the title sits on its own line above the buttons (all screen sizes)
+   Row 1: title, centered. Its click box is only as wide as the title itself
+          (justify-self:center shrinks it to the letters), so the star-cursor
+          easter egg only triggers when you click the text.
+   Row 2: history/new-chat on the left, everything else on the right.
+   Easter-egg buttons are added to the right group, so it wraps if a tiny
+   screen can't fit them all.
+   ============================================================ */
+header {
+  display:grid; grid-template-columns:auto 1fr; grid-template-areas:"title title" "left right";
+  align-items:center; row-gap:0.4rem; column-gap:0.5rem;
+}
+header .header-title { grid-area:title; justify-self:center; max-width:100%; white-space:nowrap; }
+header > div:not(.header-btns) { grid-area:left; }
+header .header-btns { grid-area:right; justify-self:end; flex-wrap:wrap; justify-content:flex-end; }
+
+@media (max-width:480px) {
+  header { column-gap:0.4rem; }
+  header .icon-btn { width:30px!important; height:30px!important; }
+  header .header-btns, header > div:not(.header-btns) { gap:0.35rem!important; }
+}
