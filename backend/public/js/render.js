@@ -737,18 +737,229 @@
   }
 
   /* ---------------------------------------------------------- */
+  /*  Math -> spoken English                                     */
+  /*  Reading the rendered glyphs of a formula produces garbage   */
+  /*  ("x2+1" for x^2+1), so read-aloud converts the ORIGINAL      */
+  /*  LaTeX source into words instead. This covers the constructs */
+  /*  the system prompt asks the AI to use; anything unrecognized */
+  /*  degrades gracefully to its bare words rather than throwing. */
+  /* ---------------------------------------------------------- */
+  const GREEK_WORDS = {
+    alpha: "alpha", beta: "beta", gamma: "gamma", delta: "delta", epsilon: "epsilon", zeta: "zeta",
+    eta: "eta", theta: "theta", iota: "iota", kappa: "kappa", lambda: "lambda", mu: "mu", nu: "nu",
+    xi: "xi", omicron: "omicron", pi: "pi", rho: "rho", sigma: "sigma", tau: "tau", upsilon: "upsilon",
+    phi: "phi", chi: "chi", psi: "psi", omega: "omega",
+  };
+  const MATH_WORDS = {
+    pm: "plus or minus", mp: "minus or plus", times: "times", cdot: "times", ast: "times",
+    div: "divided by", frac: "over",
+    leq: "is less than or equal to", le: "is less than or equal to",
+    geq: "is greater than or equal to", ge: "is greater than or equal to",
+    neq: "is not equal to", ne: "is not equal to", approx: "is approximately",
+    equiv: "is equivalent to", sim: "is similar to", propto: "is proportional to",
+    infty: "infinity", partial: "partial", nabla: "del",
+    forall: "for all", exists: "there exists", in: "is in", notin: "is not in",
+    subset: "is a subset of", subseteq: "is a subset of or equal to",
+    cup: "union", cap: "intersect", emptyset: "the empty set",
+    rightarrow: "yields", to: "yields", Rightarrow: "implies",
+    leftarrow: "comes from", leftrightarrow: "if and only if", Leftrightarrow: "if and only if",
+    cdots: "and so on", ldots: "and so on", dots: "and so on",
+    quad: " ", qquad: "  ", displaystyle: "", textstyle: "",
+    left: "", right: "", begin: "", end: "",
+    degree: "degrees", angle: "angle", perp: "is perpendicular to", parallel: "is parallel to",
+  };
+  const ROOT_WORDS = { 2: "square", 3: "cube", 4: "fourth", 5: "fifth", 6: "sixth", 7: "seventh", 8: "eighth", 9: "ninth", 10: "tenth" };
+
+  // Finds the index of the "}" that matches the "{" at s[openIdx].
+  function findMatchingBrace(s, openIdx) {
+    let depth = 0;
+    for (let i = openIdx; i < s.length; i++) {
+      if (s[i] === "{") depth++;
+      else if (s[i] === "}") { depth--; if (depth === 0) return i; }
+    }
+    return -1;
+  }
+
+  // Reads one LaTeX "argument" starting at index i: a {...} group (possibly
+  // nested), a lone \command, or a single character.
+  function readArg(s, i) {
+    while (i < s.length && /\s/.test(s[i])) i++;
+    if (s[i] === "{") {
+      const end = findMatchingBrace(s, i);
+      if (end === -1) return { arg: s.slice(i + 1), next: s.length };
+      return { arg: s.slice(i + 1, end), next: end + 1 };
+    }
+    if (s[i] === "\\") {
+      const m = /^\\[a-zA-Z]+/.exec(s.slice(i));
+      if (m) return { arg: m[0], next: i + m[0].length };
+    }
+    return { arg: s[i] || "", next: i + 1 };
+  }
+
+  // Replaces every \name{...} (or \name{...}{...}, or \sqrt[n]{...}) with build(args, optional).
+  function replaceCommand(s, name, argCount, build) {
+    const cmdRe = new RegExp("\\\\" + name + "(?![a-zA-Z])", "g");
+    let out = "", last = 0, m;
+    while ((m = cmdRe.exec(s))) {
+      let i = m.index + m[0].length;
+      let optional = null;
+      if (name === "sqrt" && s[i] === "[") {
+        const close = s.indexOf("]", i);
+        if (close !== -1) { optional = s.slice(i + 1, close); i = close + 1; }
+      }
+      const args = [];
+      for (let k = 0; k < argCount; k++) { const r = readArg(s, i); args.push(r.arg); i = r.next; }
+      out += s.slice(last, m.index) + build(args, optional);
+      last = i;
+      cmdRe.lastIndex = i;
+    }
+    return out + s.slice(last);
+  }
+
+  function ordinalRootWord(nStr) {
+    const n = parseInt(nStr, 10);
+    if (ROOT_WORDS[n]) return ROOT_WORDS[n];
+    if (Number.isFinite(n)) return `${n}th`;
+    return mathToSpeech(nStr);
+  }
+
+  function speakExponent(exp) {
+    const e = String(exp).trim();
+    if (e === "2") return "squared";
+    if (e === "3") return "cubed";
+    if (/^-?\d+$/.test(e)) return `to the power of ${e}`;
+    return `to the power of ${mathToSpeech(e)}`;
+  }
+
+  // ^{...} and _{...} are not backslash commands, so they get their own pass.
+  function replaceScripts(s) {
+    let out = "", i = 0;
+    while (i < s.length) {
+      const c = s[i];
+      if (c === "^" || c === "_") {
+        const { arg, next } = readArg(s, i + 1);
+        out += c === "^" ? ` ${speakExponent(arg)} ` : ` sub ${mathToSpeech(arg)} `;
+        i = next;
+      } else { out += c; i++; }
+    }
+    return out;
+  }
+
+  // A very approximate reading of mhchem \ce{...} content: formula digits,
+  // reaction arrows, ionic charges, and (s)/(l)/(g)/(aq) states.
+  function speakChem(inner) {
+    let s = String(inner)
+      .replace(/<=>|<->/g, " is in equilibrium with ")
+      .replace(/->|\\rightarrow|\\to\b/g, " yields ")
+      .replace(/\(\s*(s|l|g|aq)\s*\)/gi, (_, st) => ({ s: " solid ", l: " liquid ", g: " gas ", aq: " aqueous " }[st.toLowerCase()]))
+      .replace(/\^\{?(\d*)\+\}?/g, (_, n) => ` ${n || "a positive"} ${n ? "plus" : ""} charge `)
+      .replace(/\^\{?(\d*)-\}?/g, (_, n) => ` ${n || "a negative"} ${n ? "minus" : ""} charge `)
+      .replace(/_\{?(\d+)\}?/g, " $1 ")
+      .replace(/(\d+)/g, " $1 ")
+      .replace(/\+/g, " plus ")
+      .replace(/[{}\[\]]/g, " ");
+    return ` ${s.replace(/\s+/g, " ").trim()} `;
+  }
+
+  function speakMatrices(s) {
+    return s.replace(/\\begin\{[pbvB]?matrix\}[\s\S]*?\\end\{[pbvB]?matrix\}/g, " a matrix ");
+  }
+
+  function mathToSpeechImpl(tex) {
+    let s = String(tex == null ? "" : tex);
+    s = speakMatrices(s);
+    s = replaceCommand(s, "ce", 1, ([inner]) => speakChem(inner));
+    s = replaceCommand(s, "text", 1, ([inner]) => ` ${inner} `);
+    s = replaceCommand(s, "mathrm", 1, ([inner]) => ` ${inner} `);
+    s = replaceCommand(s, "operatorname", 1, ([inner]) => ` ${inner} `);
+    s = replaceCommand(s, "mathbf", 1, ([inner]) => ` ${mathToSpeech(inner)} `);
+    s = replaceCommand(s, "mathit", 1, ([inner]) => ` ${mathToSpeech(inner)} `);
+    s = replaceCommand(s, "boldsymbol", 1, ([inner]) => ` ${mathToSpeech(inner)} `);
+    s = replaceCommand(s, "frac", 2, ([a, b]) => ` ${mathToSpeech(a)} over ${mathToSpeech(b)} `);
+    s = replaceCommand(s, "sqrt", 1, ([a], n) => n ? ` the ${ordinalRootWord(n)} root of ${mathToSpeech(a)} ` : ` the square root of ${mathToSpeech(a)} `);
+    s = replaceScripts(s);
+    s = s
+      .replace(/\\sum/g, " the sum ")
+      .replace(/\\prod/g, " the product ")
+      .replace(/\\oint/g, " the contour integral ")
+      .replace(/\\int/g, " the integral ")
+      .replace(/\\lim/g, " the limit ");
+    s = s.replace(/\\([a-zA-Z]+)/g, (_, name) => {
+      const key = name.toLowerCase();
+      if (GREEK_WORDS[key]) return ` ${GREEK_WORDS[key]} `;
+      if (name in MATH_WORDS) return ` ${MATH_WORDS[name]} `;
+      return ` ${name} `; // unrecognized command: say its name rather than dropping it silently
+    });
+    s = s
+      .replace(/->/g, " yields ")
+      .replace(/<=>|<->/g, " is in equilibrium with ")
+      .replace(/[{}&]/g, " ")
+      .replace(/\\/g, " ")
+      .replace(/\*/g, " times ")
+      .replace(/\+/g, " plus ")
+      .replace(/-/g, " minus ")
+      .replace(/=/g, " equals ")
+      .replace(/</g, " is less than ")
+      .replace(/>/g, " is greater than ");
+    return s.replace(/\s+/g, " ").trim();
+  }
+
+  // Never let a formula-to-speech bug take down read-aloud for the whole message.
+  function mathToSpeech(tex) {
+    try { return mathToSpeechImpl(tex); }
+    catch (_) { return String(tex || "").replace(/[\\{}$]/g, " ").replace(/\s+/g, " ").trim(); }
+  }
+
+  /* ---------------------------------------------------------- */
   /*  Text-to-speech                                             */
   /* ---------------------------------------------------------- */
   let ttsSession = 0;
   let ttsBtn = null;
+  let voicesReadyPromise = null;
 
-  function speakableText(bodyEl) {
-    const clone = bodyEl.cloneNode(true);
-    clone.querySelectorAll(".code-block, .chart-block, .chart-error").forEach(n => n.remove());
-    clone.querySelectorAll("td, th").forEach(n => n.append(", "));
-    clone.querySelectorAll("li, h1, h2, h3, h4, h5, h6").forEach(n => n.append(". "));
-    clone.querySelectorAll("p, br").forEach(n => n.append(" "));
-    return (clone.textContent || "").replace(/\s+/g, " ").trim();
+  // Chrome loads voices asynchronously; speak() called before they're ready can
+  // silently do nothing on some builds. Wait briefly for "voiceschanged" once.
+  function waitForVoices(timeoutMs = 300) {
+    if (!("speechSynthesis" in window)) return Promise.resolve([]);
+    const existing = speechSynthesis.getVoices();
+    if (existing.length) return Promise.resolve(existing);
+    if (voicesReadyPromise) return voicesReadyPromise;
+    voicesReadyPromise = new Promise(resolve => {
+      let done = false;
+      const finish = () => { if (done) return; done = true; resolve(speechSynthesis.getVoices()); };
+      speechSynthesis.addEventListener("voiceschanged", finish, { once: true });
+      setTimeout(finish, timeoutMs); // some browsers never fire the event; don't wait forever
+    });
+    return voicesReadyPromise;
+  }
+
+  function pickVoice(voices) {
+    const lang = navigator.language || "en-US";
+    return voices.find(v => v.lang === lang) || voices.find(v => v.lang && v.lang.slice(0, 2) === lang.slice(0, 2)) || voices.find(v => v.default) || voices[0] || null;
+  }
+
+  function speakableText(markdown) {
+    // Swap each formula for spoken words BEFORE stripping markdown, using the
+    // original LaTeX source (not the rendered glyphs) so it reads naturally.
+    const { text: withPlaceholders, math } = extractMath(String(markdown || ""));
+    let text = withPlaceholders.replace(/\uE010MATH(\d+)\uE011/g, (_, i) => {
+      const m = math[Number(i)];
+      return m ? ` ${mathToSpeech(m.tex)} ` : "";
+    });
+    // Code (and our chart JSON) is unreadable aloud; drop fenced blocks entirely.
+    text = text.replace(/```[\s\S]*?```/g, " Code omitted. ");
+
+    if (typeof marked === "undefined") return text.replace(/\s+/g, " ").trim();
+    let html;
+    try { html = marked.parse(text, { gfm: true, breaks: true }); }
+    catch (_) { return text.replace(/\s+/g, " ").trim(); }
+
+    const tmp = document.createElement("div");
+    tmp.innerHTML = (typeof DOMPurify !== "undefined") ? DOMPurify.sanitize(html) : html;
+    tmp.querySelectorAll("td, th").forEach(n => n.append(", "));
+    tmp.querySelectorAll("li, h1, h2, h3, h4, h5, h6").forEach(n => n.append(". "));
+    tmp.querySelectorAll("p, br").forEach(n => n.append(" "));
+    return (tmp.textContent || "").replace(/\s+/g, " ").trim();
   }
 
   // Chrome silently stops long utterances, so read in sentence-sized pieces
@@ -778,10 +989,19 @@
     if (ttsBtn) { setBtn(ttsBtn, "fa-volume-high"); ttsBtn.classList.remove("speaking"); ttsBtn.title = "Read aloud"; ttsBtn = null; }
   }
 
+  // Safari (and several Android/embedded Chrome builds) require speak() to be
+  // called synchronously inside the click handler: once anything — an await,
+  // a setTimeout, a promise callback — comes between the click and the first
+  // speak(), the browser silently drops it. No error, no sound, nothing. So
+  // the first speak() below runs with zero delay and zero awaits ahead of it.
+  // Chunking (above) already keeps each utterance under Chrome's ~15s
+  // single-utterance cutoff, so no periodic pause()/resume() nudge is needed —
+  // that trick is also a known cause of permanent silence on some platforms,
+  // so it's deliberately not used here.
   function toggleTTS(btn, text) {
     if (!("speechSynthesis" in window)) { toast("Read aloud isn't supported in this browser"); return; }
     const sameButton = ttsBtn === btn;
-    stopTTS();
+    stopTTS(); // synchronous: cancels anything playing, no delay before the speak() below
     if (sameButton) return;
 
     const chunks = chunkText(text);
@@ -793,19 +1013,58 @@
     btn.classList.add("speaking");
     btn.title = "Stop reading";
 
-    chunks.forEach((chunk, i) => {
-      const u = new SpeechSynthesisUtterance(chunk);
-      const done = () => {
-        if (session !== ttsSession || i !== chunks.length - 1) return;
-        setBtn(btn, "fa-volume-high");
-        btn.classList.remove("speaking");
-        btn.title = "Read aloud";
-        ttsBtn = null;
+    if (speechSynthesis.paused) speechSynthesis.resume(); // recover from a stuck engine
+
+    // Best-effort voice pick using whatever the browser already has cached.
+    // Never awaited: waiting here would push the first speak() past the click.
+    let voice = pickVoice(speechSynthesis.getVoices());
+
+    let i = 0;
+    const speakNext = () => {
+      if (session !== ttsSession) return;
+      if (i >= chunks.length) { stopTTS(); return; }
+
+      const u = new SpeechSynthesisUtterance(chunks[i]);
+      try {
+        if (voice) u.voice = voice;
+        u.lang = (voice && voice.lang) || navigator.language || "en-US";
+      } catch (_) {
+        // A stale or invalid voice reference must never break read-aloud entirely;
+        // fall back to the browser's own default voice for this chunk.
+      }
+      let started = false;
+      const watchdog = setTimeout(() => {
+        if (started || session !== ttsSession) return;
+        stopTTS();
+        toast("Couldn't read this aloud. Your browser or device may not have a voice installed.");
+      }, 5000);
+      u.onstart = () => { started = true; clearTimeout(watchdog); };
+      u.onend = () => { clearTimeout(watchdog); i++; speakNext(); };
+      u.onerror = (e) => {
+        clearTimeout(watchdog);
+        if (session !== ttsSession) return; // our own stopTTS() caused this; already handled
+        // "interrupted"/"canceled" just mean something else stopped this utterance on purpose
+        if (e && (e.error === "interrupted" || e.error === "canceled")) return;
+        stopTTS();
+        toast("Couldn't read this aloud. Your browser or device may not have a voice installed.");
       };
-      u.onend = done;
-      u.onerror = done;
-      speechSynthesis.speak(u);
-    });
+      try {
+        speechSynthesis.speak(u);
+      } catch (e) {
+        // A handful of browsers throw synchronously instead of firing onerror;
+        // without this, that exception would silently kill read-aloud entirely.
+        clearTimeout(watchdog);
+        stopTTS();
+        toast("Couldn't read this aloud. Your browser or device may not have a voice installed.");
+      }
+    };
+    speakNext(); // still synchronous, still inside the click that triggered this
+
+    // If the voice list wasn't ready yet, refine it in the background for the
+    // chunks still to come. Purely cosmetic — playback has already started.
+    if (!voice) {
+      waitForVoices().then(voices => { if (session === ttsSession) voice = pickVoice(voices); });
+    }
   }
 
   /* ---------------------------------------------------------- */
@@ -869,7 +1128,7 @@
       const copyBtn = makeBtn("msg-action-btn", "fa-copy", "", "Copy response");
       const dlBtn = makeBtn("msg-action-btn", "fa-download", "", "Download response");
 
-      ttsButton.addEventListener("click", () => toggleTTS(ttsButton, speakableText(body)));
+      ttsButton.addEventListener("click", () => toggleTTS(ttsButton, speakableText(content)));
       copyBtn.addEventListener("click", async () => {
         if (await copyText(responseToText(content))) flash(copyBtn, "fa-copy", "", "");
         else toast("Couldn't copy — your browser blocked it");
@@ -911,5 +1170,5 @@
   };
 
   // Exposed for testing / other scripts
-  window.NovaRender = { normalizeChartSpec, responseToText, chunkText, parseImageRequest, parseAttachedFiles, historyTitle, escapeHtml };
+  window.NovaRender = { normalizeChartSpec, responseToText, chunkText, parseImageRequest, parseAttachedFiles, historyTitle, escapeHtml, mathToSpeech, speakableText, extractMath };
 })();
