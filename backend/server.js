@@ -230,6 +230,48 @@ app.post("/generate-image", async (req, res) => {
   }
 });
 
+// --- READ ALOUD (real audio, so it plays even with the phone's mute switch on) ---
+// Uses ElevenLabs (an API key is required: set ELEVENLABS_API_KEY). If it isn't
+// configured, the client automatically falls back to the browser's own voice.
+const TTS_VOICE_ID = process.env.TTS_VOICE_ID || "21m00Tcm4TlvDq8ikWAM"; // "Rachel", one of ElevenLabs' default voices
+const TTS_MODEL = process.env.TTS_MODEL || "eleven_flash_v2_5"; // low-latency model; good fit for a chat reply
+app.post("/tts", async (req, res) => {
+  const { text } = req.body;
+  if (typeof text !== "string" || !text.trim()) return res.status(400).json({ error: "No text provided" });
+  if (!process.env.ELEVENLABS_API_KEY) {
+    // Not a user-facing failure: the client treats this as "not set up yet" and
+    // quietly uses the browser's built-in voice instead.
+    return res.status(501).json({ error: "tts_not_configured" });
+  }
+  try {
+    const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${TTS_VOICE_ID}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "audio/mpeg",
+        "xi-api-key": process.env.ELEVENLABS_API_KEY,
+      },
+      // 3,000 characters keeps a single request comfortably inside ElevenLabs' limits;
+      // the client already sends replies in smaller chunks anyway.
+      body: JSON.stringify({ text: text.slice(0, 3000), model_id: TTS_MODEL }),
+    });
+    if (!response.ok) {
+      let detail = "";
+      try { detail = (await response.json()).detail?.message || ""; } catch (_) {}
+      if (response.status === 401) { console.error("ElevenLabs: invalid API key"); return res.status(501).json({ error: "tts_not_configured" }); }
+      if (response.status === 429) return res.status(429).json({ error: "Read-aloud has used up its monthly quota. It'll fall back to your device's own voice for now." });
+      console.error("ElevenLabs error:", response.status, detail);
+      return res.status(500).json({ error: "Couldn't generate audio" });
+    }
+    res.setHeader("Content-Type", "audio/mpeg");
+    const buf = Buffer.from(await response.arrayBuffer());
+    res.send(buf);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Couldn't generate audio" });
+  }
+});
+
 // --- AUTH ---
 app.post("/auth/refresh", async (req, res) => {
   const { refresh_token } = req.body;
