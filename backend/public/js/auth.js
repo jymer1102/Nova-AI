@@ -43,14 +43,15 @@
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, name, phone }),
       });
-      const data = await res.json();
-      if (data.error) { authError.textContent = data.error; authSubmit.disabled = false; authSubmit.textContent = isSignUp ? "Sign Up" : "Sign In"; return; }
+      const status = res.status;
+      const data = await res.json().catch(() => ({}));
+      // TEMPORARY DEBUG — shows exactly what the server sent back, remove once fixed.
+      authError.textContent = `DEBUG [status ${status}]: ${JSON.stringify(data)}`;
+      console.log("Signup/login raw response:", status, data);
+      if (data.error) { authSubmit.disabled = false; authSubmit.textContent = isSignUp ? "Sign Up" : "Sign In"; return; }
       if (!data.session) {
         // Supabase's "Confirm email" setting is on: the account was created but
         // needs email confirmation before it gets a session.
-        authError.textContent = data.needsConfirmation
-          ? "Account created! Check your email to confirm it, then sign in."
-          : "Something went wrong. Try again.";
         authSubmit.disabled = false; authSubmit.textContent = isSignUp ? "Sign Up" : "Sign In";
         return;
       }
@@ -59,7 +60,7 @@
       localStorage.setItem("nova_refresh_token", data.session.refresh_token);
       localStorage.setItem("nova_name", data.user?.user_metadata?.name || name || "");
       showApp();
-    } catch { authError.textContent = "Something went wrong. Try again."; authSubmit.disabled = false; authSubmit.textContent = isSignUp ? "Sign Up" : "Sign In"; }
+    } catch (err) { authError.textContent = "DEBUG (network/JS error): " + (err && err.message ? err.message : String(err)); authSubmit.disabled = false; authSubmit.textContent = isSignUp ? "Sign Up" : "Sign In"; }
   });
 
   async function showApp() {
