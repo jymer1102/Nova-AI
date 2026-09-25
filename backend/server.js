@@ -13,6 +13,8 @@ const cors = require("cors");
 const path = require("path");
 const { createClient } = require("@supabase/supabase-js");
 
+console.log(">>> Nova server build marker: signup-debug-v1 <<<");
+
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
@@ -425,6 +427,7 @@ app.post("/auth/signup", async (req, res) => {
       email, password,
       options: { data: { name, phone } }
     });
+    console.log("Signup result — error:", error, "| data:", JSON.stringify(data));
     if (error) return res.status(400).json({ error: error.message });
     // If "Confirm email" is enabled in Supabase's Auth settings (the default for
     // new projects), signUp succeeds but issues no session until the user clicks
