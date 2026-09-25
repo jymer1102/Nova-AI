@@ -419,19 +419,38 @@ app.get("/auth/callback", (req, res) => {
 
 app.post("/auth/signup", async (req, res) => {
   const { email, password, name, phone } = req.body;
-  const { data, error } = await supabase.auth.signUp({
-    email, password,
-    options: { data: { name, phone } }
-  });
-  if (error) return res.status(400).json({ error: error.message });
-  res.json({ user: data.user, session: data.session });
+  if (!email || !password) return res.status(400).json({ error: "Email and password are required." });
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email, password,
+      options: { data: { name, phone } }
+    });
+    if (error) return res.status(400).json({ error: error.message });
+    // If "Confirm email" is enabled in Supabase's Auth settings (the default for
+    // new projects), signUp succeeds but issues no session until the user clicks
+    // the confirmation link in their email — data.session is null in that case.
+    // Tell the client explicitly instead of letting it crash on session.access_token.
+    if (!data.session) {
+      return res.json({ user: data.user, session: null, needsConfirmation: true });
+    }
+    res.json({ user: data.user, session: data.session });
+  } catch (err) {
+    console.error("Signup failed:", err);
+    res.status(500).json({ error: "Signup failed. Check server logs for details." });
+  }
 });
 
 app.post("/auth/login", async (req, res) => {
   const { email, password } = req.body;
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return res.status(400).json({ error: error.message });
-  res.json({ user: data.user, session: data.session });
+  if (!email || !password) return res.status(400).json({ error: "Email and password are required." });
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) return res.status(400).json({ error: error.message });
+    res.json({ user: data.user, session: data.session });
+  } catch (err) {
+    console.error("Login failed:", err);
+    res.status(500).json({ error: "Login failed. Check server logs for details." });
+  }
 });
 
 // --- CHATS ---
