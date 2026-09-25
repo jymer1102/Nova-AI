@@ -45,6 +45,15 @@
       });
       const data = await res.json();
       if (data.error) { authError.textContent = data.error; authSubmit.disabled = false; authSubmit.textContent = isSignUp ? "Sign Up" : "Sign In"; return; }
+      if (!data.session) {
+        // Supabase's "Confirm email" setting is on: the account was created but
+        // needs email confirmation before it gets a session.
+        authError.textContent = data.needsConfirmation
+          ? "Account created! Check your email to confirm it, then sign in."
+          : "Something went wrong. Try again.";
+        authSubmit.disabled = false; authSubmit.textContent = isSignUp ? "Sign Up" : "Sign In";
+        return;
+      }
       userToken = data.session.access_token;
       localStorage.setItem("nova_token", userToken);
       localStorage.setItem("nova_refresh_token", data.session.refresh_token);
