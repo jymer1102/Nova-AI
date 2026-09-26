@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
       img.src = `data:${im.type};base64,${im.base64}`;
       img.alt = "Attached image";
       const x = document.createElement("button");
-      x.type = "button"; x.className = "attach-x"; x.title = "Remove image"; x.textContent = "✕";
+      x.type = "button"; x.className = "attach-x"; x.title = "Remove image"; x.innerHTML = '<i class="fa-solid fa-xmark"></i>';
       x.addEventListener("click", () => { pendingImages.splice(i, 1); renderAttachments(); });
       chip.append(img, x);
       attachList.appendChild(chip);
@@ -154,7 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
       meta.className = "attach-meta";
       meta.textContent = f.truncated ? "truncated" : `${f.text.length.toLocaleString()} chars`;
       const x = document.createElement("button");
-      x.type = "button"; x.className = "attach-x"; x.title = "Remove file"; x.textContent = "✕";
+      x.type = "button"; x.className = "attach-x"; x.title = "Remove file"; x.innerHTML = '<i class="fa-solid fa-xmark"></i>';
       x.addEventListener("click", () => { pendingFiles.splice(i, 1); renderAttachments(); });
       chip.append(name, meta, x);
       attachList.appendChild(chip);
