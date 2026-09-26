@@ -288,6 +288,8 @@ button.icon-btn[title="Toggle star cursor"], button.icon-btn[title="Toggle star 
 .msg-file { display:inline-flex; align-items:center; gap:0.35rem; padding:0.25rem 0.6rem; border-radius:10px; font-size:0.82rem; background:rgba(127,127,127,0.22); }
 .msg-file-meta { opacity:0.7; }
 .msg img { max-height:280px; width:auto; }
+.msg-images { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.5rem; }
+.msg-images img { margin-top:0; }
 
 /* ============================================================
    Generated images
