@@ -69,7 +69,7 @@ button:disabled { opacity:0.5; cursor:default; }
 .history-item { display:flex; align-items:center; justify-content:space-between; gap:0.5rem; }
 .history-item-title { flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer; padding:0.6rem 0.4rem; border-radius:8px; font-size:0.9rem; color:var(--text); }
 .history-item-title:hover { background:var(--surface2); }
-.delete-chat-btn { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.9rem; padding:0.3rem 0.5rem; border-radius:6px; flex-shrink:0; }
+.delete-chat-btn { background:none; border:none; color:#e74c3c; cursor:pointer; font-size:0.9rem; padding:0.3rem 0.5rem; border-radius:6px; flex-shrink:0; }
 .delete-chat-btn:hover { background:#c0392b; color:white; }
 #overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:99; }
 #overlay.show { display:block; }
