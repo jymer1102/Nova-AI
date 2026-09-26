@@ -105,6 +105,17 @@
     return { files, rest: rest.trim() };
   }
 
+  // Picks a file-chip icon based on the attachment's name (works for plain
+  // files and for "zipname/path/inside.ext" names produced by zip extraction).
+  function fileChipIcon(name) {
+    const base = String(name).split("/").pop() || "";
+    const ext = (base.includes(".") ? base.slice(base.lastIndexOf(".") + 1) : "").toLowerCase();
+    if (ext === "pdf") return "fa-file-pdf";
+    if (ext === "zip") return "fa-file-zipper";
+    if (["png", "jpg", "jpeg", "gif", "webp", "heic", "heif", "svg"].includes(ext)) return "fa-file-image";
+    return "fa-file-code";
+  }
+
   /* ---------------------------------------------------------- */
   /*  "Generate an image" detection                              */
   /*  Returns null (not an image request) or { prompt }          */
@@ -1201,6 +1212,7 @@
     const chat = document.getElementById("chat");
     const isUser = role === "user";
     const content = String(text == null ? "" : text);
+    const imgList = Array.isArray(imgSrc) ? imgSrc.filter(Boolean) : (imgSrc ? [imgSrc] : []);
     const wrap = el("div", "msg-wrap " + (isUser ? "user" : "ai"));
     chat.appendChild(wrap);
 
@@ -1212,7 +1224,7 @@
         const chips = el("div", "msg-files");
         parsed.files.forEach(f => {
           const chip = el("span", "msg-file");
-          chip.innerHTML = '<i class="fa-solid fa-file-code"></i> ';
+          chip.innerHTML = `<i class="fa-solid ${fileChipIcon(f.name)}"></i> `;
           const name = el("span", "msg-file-name");
           name.textContent = f.name;
           const meta = el("span", "msg-file-meta");
@@ -1227,11 +1239,15 @@
         p.textContent = shown;
         bubble.appendChild(p);
       }
-      if (imgSrc) {
-        const img = el("img");
-        img.src = imgSrc;
-        img.alt = "Uploaded image";
-        bubble.appendChild(img);
+      if (imgList.length) {
+        const imgs = el("div", "msg-images");
+        imgList.forEach(src => {
+          const img = el("img");
+          img.src = src;
+          img.alt = "Uploaded image";
+          imgs.appendChild(img);
+        });
+        bubble.appendChild(imgs);
       }
       wrap.appendChild(bubble);
 
@@ -1279,10 +1295,11 @@
     if (!m || m.role === "system") return null;
     if (typeof m.content === "string") return window.addMsg(m.role, m.content);
     if (Array.isArray(m.content)) {
-      const img = m.content.find(p => p && p.type === "image_url");
-      const url = img && img.image_url && img.image_url.url;
+      const urls = m.content
+        .filter(p => p && p.type === "image_url" && p.image_url && typeof p.image_url.url === "string" && p.image_url.url.startsWith("data:image/"))
+        .map(p => p.image_url.url);
       const text = m.content.filter(p => p && p.type === "text").map(p => p.text).join("\n");
-      return window.addMsg(m.role, text, typeof url === "string" && url.startsWith("data:image/") ? url : null);
+      return window.addMsg(m.role, text, urls);
     }
     return null;
   };
@@ -1297,5 +1314,5 @@
   };
 
   // Exposed for testing / other scripts
-  window.NovaRender = { normalizeChartSpec, responseToText, chunkText, parseImageRequest, parseAttachedFiles, historyTitle, escapeHtml, mathToSpeech, speakableText, extractMath };
+  window.NovaRender = { normalizeChartSpec, responseToText, chunkText, parseImageRequest, parseAttachedFiles, historyTitle, escapeHtml, mathToSpeech, speakableText, extractMath, fileChipIcon };
 })();
