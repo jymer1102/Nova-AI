@@ -1,6 +1,6 @@
 <div align="center">
 
-# Nova AI
+# Agent 1102
 
 ![README Banner](backend/public/images/favicon/favicon.png)
 
