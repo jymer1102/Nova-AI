@@ -147,8 +147,8 @@ const SYSTEM_PROMPT = [
 // --- CHAT ---
 // gpt-oss can't see images, so any request that contains an image goes to a vision model instead.
 const TEXT_MODEL = process.env.TEXT_MODEL || "openai/gpt-oss-120b";
-const VISION_MODEL = process.env.VISION_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct";
-const MAX_IMAGES_PER_REQUEST = 3; // Groq allows 5; older images are dropped to keep requests small
+const VISION_MODEL = process.env.VISION_MODEL || "qwen/qwen3.8-27b";
+const MAX_IMAGES_PER_REQUEST = 3; // qwen/qwen3.8-27b's hard limit is 3 images per request; older images are dropped to keep requests within that
 
 // Keeps only the newest few images, only accepts inline (data:) images, and reports whether any remain.
 function prepareMessages(messages) {
