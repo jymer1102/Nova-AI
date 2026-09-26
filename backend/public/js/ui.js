@@ -15,14 +15,26 @@
     applyEaster();
   });
 
-  // New / Clear chat
+  // New chat (keeps the old behavior: saves the current chat, then starts fresh)
   newChatBtn.addEventListener("click", () => { saveCurrentChat(); history = []; chatEl.innerHTML = ""; currentChatId = Date.now().toString(); addGreeting(); });
-  clearBtn.addEventListener("click", () => { saveCurrentChat(); history = []; chatEl.innerHTML = ""; currentChatId = Date.now().toString(); addGreeting(); });
+
+  // Trash-can button: permanently deletes the CURRENT chat (not just clears the view)
+  clearBtn.addEventListener("click", async () => {
+    if (!confirm("Delete this chat? This can't be undone.")) return;
+    if (userToken && currentChatId) {
+      try {
+        await fetch(`${BACKEND_URL}/chats/${currentChatId}`, { method: "DELETE", headers: { "Authorization": `Bearer ${userToken}` } });
+      } catch { console.error("Failed to delete chat"); }
+    }
+    history = []; chatEl.innerHTML = ""; currentChatId = Date.now().toString(); addGreeting();
+    if (sidebar.classList.contains("open")) await loadChats();
+  });
 
   // Clear all chats
   clearAllBtn.addEventListener("click", async () => {
     if (!confirm("Delete all chat history? This can't be undone.")) return;
     await fetch(`${BACKEND_URL}/chats`, { method: "DELETE", headers: { "Authorization": `Bearer ${userToken}` } });
+    history = []; chatEl.innerHTML = ""; currentChatId = Date.now().toString(); addGreeting();
     renderSidebar([]);
   });
 
@@ -55,7 +67,7 @@
   function renderSidebar(chats) {
     sidebarList.innerHTML = chats.length === 0
       ? `<p style="padding:1rem;color:var(--text-muted);font-size:0.9rem">No saved chats yet</p>`
-      : chats.map(c => `<div class="history-item" data-id="${NovaRender.escapeHtml(c.id)}"><span class="history-item-title">${NovaRender.escapeHtml(c.title)}</span><button class="delete-chat-btn" data-id="${NovaRender.escapeHtml(c.id)}">✕</button></div>`).join("");
+      : chats.map(c => `<div class="history-item" data-id="${NovaRender.escapeHtml(c.id)}"><span class="history-item-title">${NovaRender.escapeHtml(c.title)}</span><button class="delete-chat-btn" data-id="${NovaRender.escapeHtml(c.id)}" title="Delete chat"><i class="fa-solid fa-xmark"></i></button></div>`).join("");
     sidebarList.querySelectorAll(".history-item-title").forEach(el => {
       el.addEventListener("click", () => {
         const c = chats.find(x => x.id === el.closest(".history-item").dataset.id);
@@ -68,7 +80,12 @@
     sidebarList.querySelectorAll(".delete-chat-btn").forEach(el => {
       el.addEventListener("click", async e => {
         e.stopPropagation();
+        const c = chats.find(x => x.id === el.dataset.id);
+        if (!confirm(`Delete "${c ? c.title : "this chat"}"? This can't be undone.`)) return;
         await fetch(`${BACKEND_URL}/chats/${el.dataset.id}`, { method: "DELETE", headers: { "Authorization": `Bearer ${userToken}` } });
+        if (el.dataset.id === currentChatId) {
+          history = []; chatEl.innerHTML = ""; currentChatId = Date.now().toString(); addGreeting();
+        }
         await loadChats();
       });
     });
